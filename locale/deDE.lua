@@ -25,7 +25,7 @@ ns:AddTrans("deDE", "LID_AT_MAX", "Das ist vorläufig das Ende des Demo-Inhalts.
 ns:AddTrans("deDE", "LID_BACK_TO_MENU", "Zurück zum Menü")
 ns:AddTrans("deDE", "LID_BAG", "Rohes Fleisch: %d")
 ns:AddTrans("deDE", "LID_BAG_FULL", "Deine Tasche ist voll.")
-ns:AddTrans("deDE", "LID_BAG_HINT", "Klicken zum Anlegen.  Shift + Rechtsklick zum Zerstören.")
+ns:AddTrans("deDE", "LID_BAG_HINT", "Klicken zum Anlegen.  Umschalt + Rechtsklick zum Zerstören.")
 ns:AddTrans("deDE", "LID_BARTEXT", "%d / %d")
 ns:AddTrans("deDE", "LID_BATTLE_START", "Ein %s springt aus dem Wasser!")
 ns:AddTrans("deDE", "LID_BRAKIL", "Häuptling Brakil")

@@ -54,7 +54,7 @@ function T:Create()
 			local link = f:CreateTexture(nil, "ARTWORK")
 			link:SetSize(5, ROW_STEP - ICON)
 			link:SetPoint("TOP", b, "BOTTOM", 0, 0)
-			link:SetColorTexture(0.85, 0.75, 0.1, 1)
+			link:SetColorTexture(0.85, 0.75, 0.1, 0)
 			self.links[i] = link
 		end
 	end
@@ -115,7 +115,7 @@ function T:Refresh()
 			extra = ns:Trans("LID_LEARNED_ALREADY")
 		elseif canLearn then
 			b.icon:SetVertexColor(1, 1, 1)
-			ns.SetBorderColor(b, 0.2, 1, 0.2, 1)
+			ns.SetBorderColor(b, 0.2, 0.6, 1, 1)
 			extra = ns:Trans("LID_CLICK_LEARN")
 		else
 			b.icon:SetVertexColor(0.35, 0.35, 0.35)
@@ -132,9 +132,9 @@ function T:Refresh()
 		local link = self.links[i]
 		if link then
 			if G:HasTalent(self.activeTree, i) then
-				link:SetColorTexture(0.95, 0.85, 0.15, 1)
+				link:SetColorTexture(0.95, 0.85, 0.15, 0)
 			else
-				link:SetColorTexture(0.3, 0.28, 0.12, 1)
+				link:SetColorTexture(0.3, 0.28, 0.12, 0)
 			end
 		end
 	end

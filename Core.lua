@@ -614,13 +614,17 @@ end
 
 SLASH_MURLOCRPG1 = "/murloc"
 SLASH_MURLOCRPG2 = "/mrpg"
+SLASH_MURLOCRPG3 = "/멀록"
+SLASH_MURLOCRPG4 = "/鱼人"
+SLASH_MURLOCRPG5 = "/魚人"
+SLASH_MURLOCRPG6 = "/мурлок"
 SlashCmdList["MURLOCRPG"] = function() ns.UI:Toggle() end
 local loader = CreateFrame("Frame")
 loader:RegisterEvent("PLAYER_LOGIN")
 loader:SetScript("OnEvent", function(self)
 	self:UnregisterEvent("PLAYER_LOGIN")
 	ns:SetAddonOutput("MurlocRPG", 134169)
-	ns:SetVersion(134169, "0.1.0")
+	ns:SetVersion(134169, "0.2.0")
 	G:Init()
 	ns.UI:Create()
 	print(ns:Trans("LID_LOADED"))

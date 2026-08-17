@@ -47,6 +47,7 @@ ns:AddTrans("koKR", "LID_CLICK_MERCHANT", "프라잭을 클릭하여 거래하�
 ns:AddTrans("koKR", "LID_CONSUMABLE_ENERGY", "기력 %d을(를) 회복합니다.")
 ns:AddTrans("koKR", "LID_CONSUMABLE_OWNED", "%d개 보유 중입니다.")
 ns:AddTrans("koKR", "LID_COST", "기력 %d을(를) 소모합니다.")
+ns:AddTrans("koKR", "LID_CURRENTLY_EQUIPPED", "현재 착용 중")
 ns:AddTrans("koKR", "LID_DEAD", "정신을 잃고 야영지에서 깨어납니다.")
 ns:AddTrans("koKR", "LID_DEAD_TEXT", "영혼 치유사가 갈대밭에서 나와 당신을 기다립니다.")
 ns:AddTrans("koKR", "LID_DEAD_TITLE", "죽었습니다")

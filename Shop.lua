@@ -39,7 +39,11 @@ function Shop:Create()
 		local row = math.floor((i - 1) / COLS)
 		local b = ns.ItemSlot(f, SLOT, function(self2) Shop:OnBuy(self2.itemId, self2) end)
 		b:SetPoint("TOPLEFT", 14 + col * STEP, -78 - row * STEP)
-		b:SetScript("OnEnter", function(self2) ns.ShowItemTooltip(self2, ns.ITEM_BY_ID[self2.itemId], ns:Trans("LID_SHOP_BUY_HINT"), ns:Trans("LID_SHOP_COST")) end)
+		b:SetScript("OnEnter", function(self2)
+			local item = ns.ITEM_BY_ID[self2.itemId]
+			ns.ShowItemTooltip(self2, item, ns:Trans("LID_SHOP_BUY_HINT"), ns:Trans("LID_SHOP_COST"))
+			ns.ShowCompare(item)
+		end)
 		self.buySlots[i] = b
 	end
 
@@ -81,7 +85,11 @@ function Shop:Create()
 		local b = ns.ItemSlot(f, SLOT, function(self2) Shop:OnSell(self2.bagIndex, self2) end)
 		b:SetPoint("TOPLEFT", 14 + col * STEP, -446 - row * STEP)
 		b.bagIndex = i
-		b:SetScript("OnEnter", function(self2) ns.ShowItemTooltip(self2, ns.ITEM_BY_ID[G:Bag()[self2.bagIndex]], ns:Trans("LID_SHOP_SELL_HINT"), ns:Trans("LID_SHOP_SELLS_FOR")) end)
+		b:SetScript("OnEnter", function(self2)
+			local item = ns.ITEM_BY_ID[G:Bag()[self2.bagIndex]]
+			ns.ShowItemTooltip(self2, item, ns:Trans("LID_SHOP_SELL_HINT"), ns:Trans("LID_SHOP_SELLS_FOR"))
+			ns.ShowCompare(item)
+		end)
 		self.sellSlots[i] = b
 	end
 
@@ -181,5 +189,6 @@ function Shop:Toggle()
 end
 
 function Shop:Hide()
+	ns.HideCompare()
 	if self.frame then self.frame:Hide() end
 end

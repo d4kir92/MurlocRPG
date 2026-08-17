@@ -8,6 +8,44 @@ local BAG_COLS = 5
 local LEFT_SLOTS = {"HEAD", "NECK", "SHOULDER", "BACK", "CHEST", "WRISTS"}
 local RIGHT_SLOTS = {"HANDS", "WAIST", "LEGS", "FEET", "FINGER1", "FINGER2"}
 local WEAPON_SLOTS = {"MAINHAND", "OFFHAND"}
+local function CompareTooltip()
+	if not ns.compareTooltip then
+		ns.compareTooltip = CreateFrame("GameTooltip", "MurlocRPGCompareTooltip", UIParent, "GameTooltipTemplate")
+	end
+
+	return ns.compareTooltip
+end
+
+local function HideCompare()
+	if ns.compareTooltip then ns.compareTooltip:Hide() end
+end
+
+ns.HideCompare = HideCompare
+local function ShowCompare(item)
+	HideCompare()
+	if not item or not item.slotType then return end
+	local slotKey = G:TargetSlot(item)
+	local equipped = ns.ITEM_BY_ID[G:Equipped()[slotKey]]
+	if not equipped or equipped.id == item.id then return end
+	local tip = CompareTooltip()
+	tip:SetOwner(UIParent, "ANCHOR_NONE")
+	tip:ClearAllPoints()
+	tip:SetPoint("TOPLEFT", GameTooltip, "TOPRIGHT", 4, 0)
+	tip:ClearLines()
+	tip:AddLine(ns:Trans("LID_CURRENTLY_EQUIPPED"), 1, 0.82, 0)
+	local r, g, b = ns.ItemColor(equipped)
+	tip:AddLine(equipped.name, r, g, b)
+	tip:AddLine(ns.SLOTS[slotKey] and ns:Trans(ns.SLOTS[slotKey].name) or equipped.slotType, 0.8, 0.8, 0.8)
+	for _, line in ipairs(ns.ItemStatLines(equipped)) do
+		tip:AddLine(line, 0.2, 1, 0.2)
+	end
+
+	tip:AddLine(format(ns:Trans("LID_ITEM_SLOT_REQ"), equipped.level), 0.7, 0.7, 0.7)
+	if equipped.value and equipped.value > 0 then tip:AddLine(format(ns:Trans("LID_ITEM_VALUE"), ns.MoneyText(equipped.value)), 0.9, 0.85, 0.5) end
+	tip:Show()
+end
+
+ns.ShowCompare = ShowCompare
 local function ShowItemTooltip(button, item, hint, priceLabel)
 	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 	if not item then
@@ -45,7 +83,11 @@ local function ItemSlot(parent, size, onClick)
 	b.icon:SetPoint("BOTTOMRIGHT", -2, 2)
 	ns.Border(b, 0.3, 0.3, 0.3, 1)
 	b:SetScript("OnClick", onClick)
-	b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	b:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+		HideCompare()
+	end)
+
 	return b
 end
 
@@ -214,7 +256,11 @@ function Inventory:Create()
 		local b = ItemSlot(f, BAG_SLOT, function(self2, button) Inventory:OnSlotClick(self2.bagIndex, button, self2) end)
 		b:SetPoint("TOPLEFT", 14 + col * BAG_STEP, -40 - row * BAG_STEP)
 		b.bagIndex = i
-		b:SetScript("OnEnter", function(self2) ShowItemTooltip(self2, ns.ITEM_BY_ID[G:Bag()[self2.bagIndex]], ns:Trans("LID_BAG_HINT")) end)
+		b:SetScript("OnEnter", function(self2)
+			local item = ns.ITEM_BY_ID[G:Bag()[self2.bagIndex]]
+			ShowItemTooltip(self2, item, ns:Trans("LID_BAG_HINT"))
+			ShowCompare(item)
+		end)
 		self.slots[i] = b
 	end
 
@@ -289,5 +335,6 @@ function Inventory:Toggle()
 end
 
 function Inventory:Hide()
+	HideCompare()
 	if self.frame then self.frame:Hide() end
 end

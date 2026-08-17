@@ -47,6 +47,7 @@ ns:AddTrans("ruRU", "LID_CLICK_MERCHANT", "Щелкните по Фраззак�
 ns:AddTrans("ruRU", "LID_CONSUMABLE_ENERGY", "Вы восстанавливаете %d энергии.")
 ns:AddTrans("ruRU", "LID_CONSUMABLE_OWNED", "У вас есть %d.")
 ns:AddTrans("ruRU", "LID_COST", "Стоит %d энергии.")
+ns:AddTrans("ruRU", "LID_CURRENTLY_EQUIPPED", "Сейчас надето")
 ns:AddTrans("ruRU", "LID_DEAD", "Вы теряете сознание и приходите в себя в лагере.")
 ns:AddTrans("ruRU", "LID_DEAD_TEXT", "Из тростника выходит целительница духа и ждет вас.")
 ns:AddTrans("ruRU", "LID_DEAD_TITLE", "Вы мертвы")

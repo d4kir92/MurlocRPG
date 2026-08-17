@@ -290,8 +290,18 @@ function UI:CreateGameOverPage(parent)
 		self.overLines[i] = line
 	end
 
-	self.overButton = ns.MakeButton(p, 240, 34, ns:Trans("LID_BACK_TO_MENU"), nil, function() UI:ShowPage("menu") end)
-	self.overButton:SetPoint("BOTTOM", 0, 40)
+	self.overNewButton = ns.MakeButton(p, 240, 34, ns:Trans("LID_GAMEOVER_NEW_CHAR"), nil, function()
+		G:DeleteSave()
+		UI:StartLoading("class")
+	end)
+
+	self.overNewButton:SetPoint("BOTTOM", -125, 40)
+	self.overNormalButton = ns.MakeButton(p, 240, 34, ns:Trans("LID_GAMEOVER_SWITCH_NORMAL"), nil, function()
+		G:DisableHardcore()
+		UI:StartLoading("world")
+	end)
+
+	self.overNormalButton:SetPoint("BOTTOM", 125, 40)
 end
 
 function UI:ShowGameOver(summary)

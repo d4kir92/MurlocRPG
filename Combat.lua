@@ -263,7 +263,7 @@ function C:Defeat()
 	G:ResetStreak()
 	G.db.hp = 0
 	if G:Hardcore() then
-		ns.UI:ShowGameOver(G:EndRun(enemy and enemy.name))
+		ns.UI:ShowGameOver(G:EndRun(enemy and enemy.name, true))
 
 		return
 	end

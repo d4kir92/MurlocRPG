@@ -78,7 +78,7 @@ function G:RunScore()
 	return (self.db.level or 1) * 100 + questsDone * 250 + (self.db.kills or 0) * 10 + math.floor((self.db.earned or 0) / 100)
 end
 
-function G:EndRun(killedBy)
+function G:EndRun(killedBy, keep)
 	local summary = {
 		level = self.db.level or 1,
 		xp = self.db.xp or 0,
@@ -90,11 +90,23 @@ function G:EndRun(killedBy)
 		score = self:RunScore(),
 	}
 
-	wipe(self.db)
+	if not keep then wipe(self.db) end
 	self.battle = nil
 	self.turnLocked = false
 	self.victory = false
 	return summary
+end
+
+function G:DeleteSave()
+	wipe(self.db)
+	self.battle = nil
+	self.turnLocked = false
+	self.victory = false
+end
+
+function G:DisableHardcore()
+	self.db.hardcore = false
+	self.db.dead = true
 end
 
 function G:Resurrect()
@@ -672,7 +684,7 @@ loader:RegisterEvent("PLAYER_LOGIN")
 loader:SetScript("OnEvent", function(self)
 	self:UnregisterEvent("PLAYER_LOGIN")
 	ns:SetAddonOutput("MurlocRPG", 134169)
-	ns:SetVersion(134169, "0.4.0")
+	ns:SetVersion(134169, "0.5.0")
 	G:Init()
 	ns.UI:Create()
 	print(ns:Trans("LID_LOADED"))

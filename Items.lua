@@ -1042,8 +1042,9 @@ function ns.ItemStatLines(item)
 	return lines
 end
 
-function ns.RollDrop(playerLevel, elite)
-	if math.random(100) > (elite and 75 or 40) then return nil end
+function ns.RollDrop(playerLevel, elite, streak)
+	local chance = (elite and 75 or 40) * (1 + ns.STREAK_STEP * (streak or 0))
+	if math.random(100) > math.min(95, chance) then return nil end
 	local pool = {}
 	local top = playerLevel + (elite and 4 or 1)
 	local bottom = playerLevel - 4

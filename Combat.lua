@@ -54,6 +54,7 @@ function C:Start()
 
 	enemy.maxHP = template.hp
 	ns.ScaleEnemy(enemy, G.db.level, G:Stats())
+	ns.ApplyStreak(enemy, G:Streak())
 	if G.dungeon then ns.MakeElite(enemy) end
 	G.battle = enemy
 	G.turnLocked = false
@@ -175,6 +176,7 @@ function C:Flee()
 		G.battle = nil
 		G.turnLocked = false
 		G.dungeon = false
+		G:ResetStreak()
 		ns.UI:Log(ns:Trans("LID_FLEE_OK"), 0.7, 0.7, 0.7)
 		ns.UI:Refresh()
 	else
@@ -217,14 +219,15 @@ function C:Victory()
 	end
 
 	G:AddKill()
+	G.streak = G:Streak() + 1
 	if not enemy.elite then G:QuestKill(enemy.id) end
-	local money = ns.MoneyFromEnemy(enemy.level) * (enemy.elite and ns.ELITE_MONEY or 1)
+	local money = math.floor(ns.MoneyFromEnemy(enemy.level) * (enemy.elite and ns.ELITE_MONEY or 1) * G:StreakMult())
 	if money > 0 then
 		G:AddMoney(money)
 		ns.UI:Log(format(ns:Trans("LID_LOOT_MONEY"), ns.MoneyText(money)), 0.9, 0.85, 0.5)
 	end
 
-	local drop = ns.RollDrop(G.db.level, enemy.elite)
+	local drop = ns.RollDrop(G.db.level, enemy.elite, G:Streak())
 	if drop then
 		if G:AddItem(drop.id) then
 			ns.UI:Log(format(ns:Trans("LID_ITEM_DROP"), ns:Trans(enemy.name), ns.ItemLink(drop)), 0.9, 0.9, 0.6)
@@ -244,9 +247,10 @@ function C:Defeat()
 	G.turnLocked = false
 	G.victory = false
 	G.dungeon = false
+	G:ResetStreak()
 	G.db.hp = 0
 	if G:Hardcore() then
-		ns.UI:ShowGameOver(G:EndRun(enemy and ns:Trans(enemy.name)))
+		ns.UI:ShowGameOver(G:EndRun(enemy and enemy.name))
 
 		return
 	end

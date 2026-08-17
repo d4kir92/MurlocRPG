@@ -360,6 +360,8 @@ ns.CRIT_ROLL = 95
 ns.ARMOR_DIVISOR = 20
 ns.XP_PER_MOB_LEVEL = 100
 ns.DUNGEON_LEVEL = 5
+ns.MOB_HP = 2
+ns.STREAK_STEP = 0.05
 ns.ELITE_HP = 2
 ns.ELITE_DMG = 2
 ns.ELITE_XP = 2
@@ -400,7 +402,18 @@ function ns.ScaleEnemy(enemy, playerLevel, stats)
 		enemy.maxDmg = math.max(enemy.minDmg, math.floor(hit * 1.18 + 0.5))
 	end
 
+	enemy.hp = enemy.hp * ns.MOB_HP
 	enemy.maxHP = enemy.hp
+end
+
+function ns.ApplyStreak(enemy, streak)
+	if not streak or streak <= 0 then return end
+	local mult = 1 + ns.STREAK_STEP * streak
+	enemy.hp = math.floor(enemy.hp * mult + 0.5)
+	enemy.maxHP = enemy.hp
+	enemy.minDmg = math.max(1, math.floor(enemy.minDmg * mult + 0.5))
+	enemy.maxDmg = math.max(enemy.minDmg, math.floor(enemy.maxDmg * mult + 0.5))
+	enemy.streak = streak
 end
 
 function ns.MakeElite(enemy)

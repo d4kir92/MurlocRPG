@@ -53,6 +53,18 @@ function G:NewGame(classId, hardcore)
 	self.victory = false
 end
 
+function G:Streak()
+	return self.streak or 0
+end
+
+function G:StreakMult()
+	return 1 + ns.STREAK_STEP * self:Streak()
+end
+
+function G:ResetStreak()
+	self.streak = 0
+end
+
 function G:Hardcore()
 	return self.db.hardcore and true or false
 end

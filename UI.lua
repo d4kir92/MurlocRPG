@@ -408,6 +408,11 @@ function UI:CreateScene(parent)
 	self.campProps = {CampProp(ns.CAMP_HUT, 88, 150, GROUND + 6), CampProp(ns.CAMP_TENT, BRAKIL_X, 195, GROUND + 8), CampProp(ns.CAMP_HUT, 638, 125, GROUND + 4),}
 	self.campLabel = scene:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	self.campLabel:SetPoint("TOP", 0, -8)
+	self.streakText = scene:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	self.streakText:SetPoint("TOPRIGHT", -8, -8)
+	self.streakText:SetJustifyH("RIGHT")
+	self.streakText:SetTextColor(1, 0.65, 0.2)
+	self.streakText:Hide()
 	self.campLabel:SetText(ns:Trans("LID_CAMP_TITLE"))
 	self.brakil = ns.CreateSprite(scene, SPRITE_SIZE)
 	self.brakil:SetPos(BRAKIL_X, GROUND)
@@ -597,7 +602,7 @@ function UI:CreateActions(parent)
 	self.returnButton = back
 	local nextEnemy = ns.MakeButton(victory, 339, 28, ns:Trans("LID_NEXT_ENEMY"), "stealth", function() UI:NextEnemy() end)
 	nextEnemy:SetPoint("LEFT", back, "RIGHT", 6, 0)
-	ns.Tooltip(nextEnemy, ns:Trans("LID_NEXT_ENEMY"), ns:Trans("LID_TIP_NEXT"))
+	ns.Tooltip(nextEnemy, ns:Trans("LID_NEXT_ENEMY"), ns:Trans("LID_TIP_NEXT"), ns:Trans("LID_STREAK_TIP"))
 	self.nextEnemyButton = nextEnemy
 	local dead = CreateFrame("Frame", nil, area)
 	dead:SetAllPoints(area)
@@ -639,6 +644,7 @@ function UI:EnterWorld(fresh)
 	G.turnLocked = false
 	G.victory = false
 	G.dungeon = false
+	G:ResetStreak()
 	self.mode = G.db.dead and "dead" or "camp"
 	if self.mode == "dead" then
 		self:ShowDead()
@@ -795,6 +801,7 @@ function UI:ReturnToCamp()
 	self.murk:MoveTo(-100, 1.3, function()
 		G.victory = false
 		G.dungeon = false
+		G:ResetStreak()
 		UI.transition = false
 		UI.busy = false
 		UI:EnterMode("camp")
@@ -1018,6 +1025,14 @@ function UI:Refresh()
 		self.talentsButton:SetText(format("%s |cff20ff20(%d)|r", ns:Trans("LID_TALENTS"), points))
 	else
 		self.talentsButton:SetText(ns:Trans("LID_TALENTS"))
+	end
+
+	local streak = G:Streak()
+	if streak > 0 then
+		self.streakText:SetText(format(ns:Trans("LID_STREAK"), streak, math.floor(ns.STREAK_STEP * streak * 100 + 0.5)))
+		self.streakText:Show()
+	else
+		self.streakText:Hide()
 	end
 
 	local newItems = G:NewItems()

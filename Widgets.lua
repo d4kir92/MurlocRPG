@@ -89,6 +89,7 @@ end
 function ns.MakeButton(parent, w, h, text, iconName, onClick)
 	local b = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
 	b:SetSize(w, h)
+	if b.SetMotionScriptsWhileDisabled then b:SetMotionScriptsWhileDisabled(true) end
 	b:SetText(text)
 	b:SetScript("OnClick", onClick)
 	b.icon = b:CreateTexture(nil, "OVERLAY")
@@ -101,6 +102,7 @@ end
 function ns.IconButton(parent, size, iconName, onClick)
 	local b = CreateFrame("Button", nil, parent)
 	b:SetSize(size, size)
+	if b.SetMotionScriptsWhileDisabled then b:SetMotionScriptsWhileDisabled(true) end
 	b.icon = b:CreateTexture(nil, "ARTWORK")
 	b.icon:SetPoint("TOPLEFT", 2, -2)
 	b.icon:SetPoint("BOTTOMRIGHT", -2, 2)

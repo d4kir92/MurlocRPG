@@ -70,6 +70,7 @@ function UI:Create()
 	self:CreateLoadingPage(area)
 	self:CreateClassPage(area)
 	self:CreateWorldPage(area)
+	self:CreateGameOverPage(area)
 	self:ShowPage("menu")
 end
 
@@ -226,16 +227,82 @@ function UI:CreateClassPage(parent)
 		self.classSkills[i] = b
 	end
 
+	local hardcore = CreateFrame("CheckButton", nil, p, "UICheckButtonTemplate")
+	hardcore:SetSize(26, 26)
+	hardcore:SetPoint("BOTTOM", 0, 56)
+	hardcore:SetChecked(false)
+	hardcore.label = hardcore:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	hardcore.label:SetPoint("LEFT", hardcore, "RIGHT", 4, 0)
+	hardcore.label:SetText(ns:Trans("LID_HARDCORE"))
+	hardcore.label:SetTextColor(1, 0.4, 0.4)
+	ns.Tooltip(hardcore, ns:Trans("LID_HARDCORE"), ns:Trans("LID_HARDCORE_HINT"))
+	hardcore:SetScript("OnClick", function(self2)
+		UI.hardcore = self2:GetChecked() and true or false
+		ns.Sound("IG_MAINMENU_OPTION_CHECKBOX_ON")
+	end)
+
+	self.hardcoreCheck = hardcore
 	self.enterButton = ns.MakeButton(p, 240, 34, ns:Trans("LID_ENTER_WORLD"), nil, function()
-		G:NewGame(ns.CLASSES[UI.selectedClass or 1].id)
+		G:NewGame(ns.CLASSES[UI.selectedClass or 1].id, UI.hardcore)
 		UI:EnterWorld(true)
 	end)
 
 	self.enterButton:SetPoint("BOTTOM", 0, 16)
 end
 
+function UI:CreateGameOverPage(parent)
+	local p = CreateFrame("Frame", nil, parent)
+	p:SetAllPoints(parent)
+	p:Hide()
+	self.pages.gameover = p
+	local bg = PageBackground(p, ns.BG_WORLD)
+	bg:SetVertexColor(0.35, 0.3, 0.3)
+	local header = p:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	header:SetPoint("TOP", 0, -70)
+	header:SetText(ns:Trans("LID_GAMEOVER_TITLE"))
+	header:SetTextColor(1, 0.4, 0.4)
+	self.overHint = p:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	self.overHint:SetPoint("TOP", header, "BOTTOM", 0, -6)
+	self.overHint:SetText(ns:Trans("LID_GAMEOVER_HINT"))
+	self.overHint:SetTextColor(0.8, 0.7, 0.7)
+	self.overScore = p:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	self.overScore:SetPoint("TOP", self.overHint, "BOTTOM", 0, -24)
+	self.overScore:SetTextColor(1, 0.82, 0)
+	local box = CreateFrame("Frame", nil, p)
+	box:SetSize(360, 150)
+	box:SetPoint("TOP", self.overScore, "BOTTOM", 0, -18)
+	ns.Fill(box, 0, 0, 0, 0.65)
+	ns.Border(box, 0.45, 0.35, 0.15, 1)
+	self.overLines = {}
+	for i = 1, 5 do
+		local line = box:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+		line:SetPoint("TOPLEFT", 16, -14 - (i - 1) * 26)
+		line:SetJustifyH("LEFT")
+		self.overLines[i] = line
+	end
+
+	self.overButton = ns.MakeButton(p, 240, 34, ns:Trans("LID_BACK_TO_MENU"), nil, function() UI:ShowPage("menu") end)
+	self.overButton:SetPoint("BOTTOM", 0, 40)
+end
+
+function UI:ShowGameOver(summary)
+	self.busy = false
+	self.transition = false
+	self.mode = nil
+	self:HidePanels()
+	self.overScore:SetText(format(ns:Trans("LID_SCORE"), summary.score))
+	self.overLines[1]:SetText(format(ns:Trans("LID_RUN_LEVEL"), summary.level))
+	self.overLines[2]:SetText(format(ns:Trans("LID_RUN_QUESTS"), summary.questsDone, summary.questTotal))
+	self.overLines[3]:SetText(format(ns:Trans("LID_RUN_KILLS"), summary.kills))
+	self.overLines[4]:SetText(format(ns:Trans("LID_RUN_MONEY"), ns.MoneyText(summary.earned)))
+	self.overLines[5]:SetText(format(ns:Trans("LID_RUN_KILLED_BY"), summary.killedBy or "?"))
+	ns.Sound("IG_QUEST_FAILED")
+	self:ShowPage("gameover")
+end
+
 function UI:RefreshClassPage()
 	self.selectedClass = self.selectedClass or 1
+	self.hardcoreCheck:SetChecked(self.hardcore and true or false)
 	local class = ns.CLASSES[self.selectedClass]
 	for i, b in ipairs(self.classButtons) do
 		if i == self.selectedClass then
@@ -886,7 +953,8 @@ function UI:Refresh()
 
 	if mode ~= self.mode and not self.transition then self:EnterMode(mode) end
 	local class = G:Class()
-	self.nameText:SetText(class and format("Murk  |cff9ad8ff%s|r", class.name) or "Murk")
+	local hardcoreTag = G:Hardcore() and format("  |cffff4040%s|r", ns:Trans("LID_HARDCORE")) or ""
+	self.nameText:SetText((class and format("Murk  |cff9ad8ff%s|r", class.name) or "Murk") .. hardcoreTag)
 	self.levelText:SetText(format(ns:Trans("LID_LEVEL"), db.level))
 	ns.SetBar(self.hpBar, db.hp, s.maxHP, format(ns:Trans("LID_BARTEXT"), db.hp, s.maxHP))
 	ns.SetBar(self.mpBar, db.mp, s.maxMP, format(ns:Trans("LID_BARTEXT"), db.mp, s.maxMP))
@@ -921,6 +989,7 @@ function UI:Refresh()
 	ns.Enable(self.talentsButton, idle)
 	ns.Enable(self.characterButton, idle)
 	ns.Enable(self.inventoryButton, idle)
+	ns.Enable(self.shopButton, idle)
 	ns.Enable(self.nextEnemyButton, idle)
 	ns.Enable(self.returnButton, idle)
 	ns.Enable(self.resurrectButton, idle)

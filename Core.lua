@@ -20,10 +20,13 @@ function G:HasSave()
 	return self.db.version == SAVE_VERSION and self.db.class ~= nil
 end
 
-function G:NewGame(classId)
+function G:NewGame(classId, hardcore)
 	wipe(self.db)
 	self.db.version = SAVE_VERSION
 	self.db.class = classId
+	self.db.hardcore = hardcore and true or false
+	self.db.kills = 0
+	self.db.earned = 0
 	self.db.level = 1
 	self.db.xp = 0
 	self.db.meat = 0
@@ -48,6 +51,40 @@ function G:NewGame(classId)
 	self.battle = nil
 	self.turnLocked = false
 	self.victory = false
+end
+
+function G:Hardcore()
+	return self.db.hardcore and true or false
+end
+
+function G:AddKill()
+	self.db.kills = (self.db.kills or 0) + 1
+end
+
+function G:RunScore()
+	local questsDone = math.max(0, (self.db.questIndex or 1) - 1)
+
+	return (self.db.level or 1) * 100 + questsDone * 250 + (self.db.kills or 0) * 10 + math.floor((self.db.earned or 0) / 100)
+end
+
+function G:EndRun(killedBy)
+	local summary = {
+		level = self.db.level or 1,
+		xp = self.db.xp or 0,
+		questsDone = math.max(0, (self.db.questIndex or 1) - 1),
+		questTotal = #ns.QUESTS,
+		kills = self.db.kills or 0,
+		earned = self.db.earned or 0,
+		killedBy = killedBy,
+		score = self:RunScore(),
+	}
+
+	wipe(self.db)
+	self.battle = nil
+	self.turnLocked = false
+	self.victory = false
+
+	return summary
 end
 
 function G:Resurrect()
@@ -286,7 +323,9 @@ function G:Money()
 end
 
 function G:AddMoney(copper)
-	self.db.money = self:Money() + math.max(0, math.floor(copper or 0))
+	local gain = math.max(0, math.floor(copper or 0))
+	self.db.money = self:Money() + gain
+	self.db.earned = (self.db.earned or 0) + gain
 end
 
 function G:CanAfford(copper)

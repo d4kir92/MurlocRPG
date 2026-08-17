@@ -213,6 +213,7 @@ function C:Victory()
 		ns.UI:Log(format(ns:Trans("LID_LOOT"), enemy.meat, ns.ITEMS.MEAT.name), 0.8, 0.8, 0.8)
 	end
 
+	G:AddKill()
 	G:QuestKill(enemy.id)
 	local money = ns.MoneyFromEnemy(enemy.level)
 	if money > 0 then
@@ -235,11 +236,18 @@ function C:Victory()
 end
 
 function C:Defeat()
+	local enemy = G.battle
 	G.battle = nil
 	G.turnLocked = false
 	G.victory = false
-	G.db.dead = true
 	G.db.hp = 0
+	if G:Hardcore() then
+		ns.UI:ShowGameOver(G:EndRun(enemy and enemy.name))
+
+		return
+	end
+
+	G.db.dead = true
 	ns.UI:Log(ns:Trans("LID_DEAD"), 1, 0.3, 0.3)
 	ns.UI:Refresh()
 end

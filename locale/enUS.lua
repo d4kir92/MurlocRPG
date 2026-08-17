@@ -93,6 +93,8 @@ ns:AddTrans("enUS", "LID_LOADED", "|cff55d2ffMurloc RPG|r loaded. Type |cffffd10
 ns:AddTrans("enUS", "LID_LOADING", "Loading...")
 ns:AddTrans("enUS", "LID_LOAD_GAME", "Load")
 ns:AddTrans("enUS", "LID_LOCKED", "Unlocks at level %d.")
+ns:AddTrans("enUS", "LID_LOG_LATEST", "Jump to Latest")
+ns:AddTrans("enUS", "LID_LOG_LATEST_TIP", "Scroll the log back to the newest message.")
 ns:AddTrans("enUS", "LID_LOOT", "You loot %d x %s.")
 ns:AddTrans("enUS", "LID_LOOT_MONEY", "You loot %s.")
 ns:AddTrans("enUS", "LID_NEW_GAME", "New Game")

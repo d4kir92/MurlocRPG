@@ -93,6 +93,8 @@ ns:AddTrans("zhCN", "LID_LOADED", "|cff55d2ffMurloc RPG|r 已载入。输入 |cf
 ns:AddTrans("zhCN", "LID_LOADING", "载入中...")
 ns:AddTrans("zhCN", "LID_LOAD_GAME", "载入")
 ns:AddTrans("zhCN", "LID_LOCKED", "%d级时解锁。")
+ns:AddTrans("zhCN", "LID_LOG_LATEST", "跳到最新")
+ns:AddTrans("zhCN", "LID_LOG_LATEST_TIP", "将日志滚动回最新的消息。")
 ns:AddTrans("zhCN", "LID_LOOT", "你拾取了%d个%s。")
 ns:AddTrans("zhCN", "LID_LOOT_MONEY", "你拾取了%s。")
 ns:AddTrans("zhCN", "LID_NEW_GAME", "新游戏")

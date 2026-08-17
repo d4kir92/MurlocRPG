@@ -93,6 +93,8 @@ ns:AddTrans("frFR", "LID_LOADED", "|cff55d2ffMurloc RPG|r chargé. Tapez |cffffd
 ns:AddTrans("frFR", "LID_LOADING", "Chargement...")
 ns:AddTrans("frFR", "LID_LOAD_GAME", "Charger")
 ns:AddTrans("frFR", "LID_LOCKED", "Débloqué au niveau %d.")
+ns:AddTrans("frFR", "LID_LOG_LATEST", "Aller au plus récent")
+ns:AddTrans("frFR", "LID_LOG_LATEST_TIP", "Fait défiler le journal jusqu'au message le plus récent.")
 ns:AddTrans("frFR", "LID_LOOT", "Vous récupérez %d x %s.")
 ns:AddTrans("frFR", "LID_LOOT_MONEY", "Vous récupérez %s.")
 ns:AddTrans("frFR", "LID_NEW_GAME", "Nouvelle partie")

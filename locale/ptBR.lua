@@ -93,6 +93,8 @@ ns:AddTrans("ptBR", "LID_LOADED", "|cff55d2ffMurloc RPG|r carregado. Digite |cff
 ns:AddTrans("ptBR", "LID_LOADING", "Carregando...")
 ns:AddTrans("ptBR", "LID_LOAD_GAME", "Carregar")
 ns:AddTrans("ptBR", "LID_LOCKED", "Desbloqueia no nível %d.")
+ns:AddTrans("ptBR", "LID_LOG_LATEST", "Ir para o mais recente")
+ns:AddTrans("ptBR", "LID_LOG_LATEST_TIP", "Rola o registro até a mensagem mais recente.")
 ns:AddTrans("ptBR", "LID_LOOT", "Você saqueia %d x %s.")
 ns:AddTrans("ptBR", "LID_LOOT_MONEY", "Você saqueia %s.")
 ns:AddTrans("ptBR", "LID_NEW_GAME", "Novo jogo")

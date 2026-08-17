@@ -93,6 +93,8 @@ ns:AddTrans("ruRU", "LID_LOADED", "|cff55d2ffMurloc RPG|r загружен. Вв
 ns:AddTrans("ruRU", "LID_LOADING", "Загрузка...")
 ns:AddTrans("ruRU", "LID_LOAD_GAME", "Загрузить")
 ns:AddTrans("ruRU", "LID_LOCKED", "Открывается на %d уровне.")
+ns:AddTrans("ruRU", "LID_LOG_LATEST", "К последним")
+ns:AddTrans("ruRU", "LID_LOG_LATEST_TIP", "Прокручивает журнал к самому свежему сообщению.")
 ns:AddTrans("ruRU", "LID_LOOT", "Вы получаете %d x %s.")
 ns:AddTrans("ruRU", "LID_LOOT_MONEY", "Вы получаете %s.")
 ns:AddTrans("ruRU", "LID_NEW_GAME", "Новая игра")

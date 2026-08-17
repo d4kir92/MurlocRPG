@@ -31,9 +31,17 @@ local function PageBackground(page, texture)
 	return bg
 end
 
+function UI:UpdateLogJump()
+	if not self.logJumpButton or not self.log then return end
+	local atBottom = true
+	if self.log.AtBottom then atBottom = self.log:AtBottom() end
+	ns.Enable(self.logJumpButton, not atBottom)
+end
+
 function UI:Log(msg, r, g, b)
 	if not self.log then return end
 	self.log:AddMessage(msg, r or 1, g or 1, b or 1)
+	self:UpdateLogJump()
 end
 
 function UI:Create()
@@ -366,7 +374,7 @@ function UI:CreateWorldPage(parent)
 	self:CreateActions(p)
 	local log = CreateFrame("ScrollingMessageFrame", nil, p)
 	log:SetPoint("TOPLEFT", self.actions, "BOTTOMLEFT", 2, -6)
-	log:SetSize(688, 160)
+	log:SetSize(688, 138)
 	log:SetFontObject(GameFontHighlightSmall)
 	log:SetJustifyH("LEFT")
 	log:SetFading(false)
@@ -378,10 +386,21 @@ function UI:CreateWorldPage(parent)
 		else
 			self2:ScrollDown()
 		end
+
+		UI:UpdateLogJump()
 	end)
 
 	if log.SetInsertMode then log:SetInsertMode("BOTTOM") end
 	self.log = log
+	local jump = ns.MakeButton(p, 120, 20, ns:Trans("LID_LOG_LATEST"), nil, function()
+		log:ScrollToBottom()
+		UI:UpdateLogJump()
+	end)
+
+	jump:SetPoint("TOPRIGHT", log, "BOTTOMRIGHT", 0, -2)
+	ns.Tooltip(jump, ns:Trans("LID_LOG_LATEST"), ns:Trans("LID_LOG_LATEST_TIP"))
+	self.logJumpButton = jump
+	self:UpdateLogJump()
 end
 
 function UI:CreateScene(parent)
@@ -1027,6 +1046,7 @@ function UI:Refresh()
 		self.talentsButton:SetText(ns:Trans("LID_TALENTS"))
 	end
 
+	self:UpdateLogJump()
 	local streak = G:Streak()
 	if streak > 0 then
 		self.streakText:SetText(format(ns:Trans("LID_STREAK"), streak, math.floor(ns.STREAK_STEP * streak * 100 + 0.5)))

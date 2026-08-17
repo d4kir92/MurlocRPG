@@ -93,6 +93,8 @@ ns:AddTrans("koKR", "LID_LOADED", "|cff55d2ffMurloc RPG|r 불러왔습니다. |c
 ns:AddTrans("koKR", "LID_LOADING", "불러오는 중...")
 ns:AddTrans("koKR", "LID_LOAD_GAME", "불러오기")
 ns:AddTrans("koKR", "LID_LOCKED", "%d 레벨에 해금됩니다.")
+ns:AddTrans("koKR", "LID_LOG_LATEST", "최신으로 이동")
+ns:AddTrans("koKR", "LID_LOG_LATEST_TIP", "기록을 가장 최근 메시지로 스크롤합니다.")
 ns:AddTrans("koKR", "LID_LOOT", "%d x %s을(를) 획득했습니다.")
 ns:AddTrans("koKR", "LID_LOOT_MONEY", "%s을(를) 획득했습니다.")
 ns:AddTrans("koKR", "LID_NEW_GAME", "새 게임")

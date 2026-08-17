@@ -93,6 +93,8 @@ ns:AddTrans("deDE", "LID_LOADED", "|cff55d2ffMurloc RPG|r geladen. Tippe |cffffd
 ns:AddTrans("deDE", "LID_LOADING", "Lädt...")
 ns:AddTrans("deDE", "LID_LOAD_GAME", "Laden")
 ns:AddTrans("deDE", "LID_LOCKED", "Wird auf Stufe %d freigeschaltet.")
+ns:AddTrans("deDE", "LID_LOG_LATEST", "Zum Neuesten")
+ns:AddTrans("deDE", "LID_LOG_LATEST_TIP", "Scrollt das Log zurück zur neuesten Meldung.")
 ns:AddTrans("deDE", "LID_LOOT", "Du erbeutest %d x %s.")
 ns:AddTrans("deDE", "LID_LOOT_MONEY", "Du erbeutest %s.")
 ns:AddTrans("deDE", "LID_NEW_GAME", "Neues Spiel")

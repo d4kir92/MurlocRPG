@@ -25,7 +25,9 @@
 ## SavedVariablesPerCharacter: MurlocRPGDB
 ## X-Curse-Project-ID: 646134
 ## X-Wago-ID: e56n3pK9
-## IconTexture: Interface\Icons\INV_Misc_Head_Murloc_01
+## IconTexture: 134169
+
+libs\D4Lib\D4Lib.xml
 
 Icons.lua
 Data.lua

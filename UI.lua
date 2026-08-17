@@ -286,8 +286,11 @@ function UI:CreateWorldPage(parent)
 	self.mpBar:SetPoint("TOPLEFT", self.hpBar, "BOTTOMLEFT", 0, -2)
 	self.xpBar = ns.Bar(p, 260, 8, 0.55, 0.2, 0.65)
 	self.xpBar:SetPoint("TOPLEFT", self.mpBar, "BOTTOMLEFT", 0, -2)
+	self.moneyText = p:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	self.moneyText:SetPoint("TOPRIGHT", -6, -8)
+	self.moneyText:SetJustifyH("RIGHT")
 	self.bagText = p:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-	self.bagText:SetPoint("TOPRIGHT", -6, -8)
+	self.bagText:SetPoint("TOPRIGHT", self.moneyText, "BOTTOMRIGHT", 0, -4)
 	self.bagText:SetJustifyH("RIGHT")
 	self.questText = p:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	self.questText:SetPoint("TOPRIGHT", self.bagText, "BOTTOMRIGHT", 0, -4)
@@ -296,7 +299,7 @@ function UI:CreateWorldPage(parent)
 	self:CreateActions(p)
 	local log = CreateFrame("ScrollingMessageFrame", nil, p)
 	log:SetPoint("TOPLEFT", self.actions, "BOTTOMLEFT", 2, -6)
-	log:SetSize(688, 228)
+	log:SetSize(688, 194)
 	log:SetFontObject(GameFontHighlightSmall)
 	log:SetJustifyH("LEFT")
 	log:SetFading(false)
@@ -454,7 +457,7 @@ function UI:CreateActions(parent)
 	local L = ns.L
 	local area = CreateFrame("Frame", nil, parent)
 	area:SetPoint("TOPLEFT", self.scene, "BOTTOMLEFT", 0, -8)
-	area:SetSize(SCENE_W, 68)
+	area:SetSize(SCENE_W, 102)
 	self.actions = area
 	local camp = CreateFrame("Frame", nil, area)
 	camp:SetAllPoints(area)
@@ -500,7 +503,7 @@ function UI:CreateActions(parent)
 
 	self.supplyButtons = {}
 	for i, supply in ipairs(ns.CONSUMABLES) do
-		local b = ns.MakeButton(battle, 166, 28, "", supply.icon, function() UI:SimpleAction(function() C:UseSupply(supply.id) end) end)
+		local b = ns.MakeButton(battle, 224, 28, "", supply.icon, function() UI:SimpleAction(function() C:UseSupply(supply.id) end) end)
 		if i == 1 then
 			b:SetPoint("TOPLEFT", attack, "BOTTOMLEFT", 0, -6)
 		else
@@ -511,8 +514,8 @@ function UI:CreateActions(parent)
 		self.supplyButtons[i] = b
 	end
 
-	local flee = ns.MakeButton(battle, 166, 28, L.ACT_FLEE, "vanish", function() UI:SimpleAction(function() C:Flee() end) end)
-	flee:SetPoint("LEFT", self.supplyButtons[#self.supplyButtons], "RIGHT", 6, 0)
+	local flee = ns.MakeButton(battle, 339, 28, L.ACT_FLEE, "vanish", function() UI:SimpleAction(function() C:Flee() end) end)
+	flee:SetPoint("TOPLEFT", self.supplyButtons[1], "BOTTOMLEFT", 0, -6)
 	ns.Tooltip(flee, L.ACT_FLEE, L.FLEE_DESC)
 	self.fleeButton = flee
 	local victory = CreateFrame("Frame", nil, area)
@@ -895,7 +898,8 @@ function UI:Refresh()
 		ns.SetBar(self.xpBar, db.xp, G:XPMax(), format(L.XP, db.xp, G:XPMax()))
 	end
 
-	self.bagText:SetText(format(L.BAG, db.meat) .. "    " .. ns.MoneyText(G:Money()))
+	self.moneyText:SetText(ns.MoneyText(G:Money()))
+	self.bagText:SetText(format(L.BAG, db.meat))
 	local quest = G:CurrentQuest()
 	if quest and db.quest == "active" then
 		self.questText:SetText(format(L.Q_LINE, quest.name, G:QuestProgress(), quest.need))

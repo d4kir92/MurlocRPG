@@ -250,6 +250,7 @@ ns.SILVER_PER_GOLD = 100
 ns.COPPER_PER_GOLD = ns.COPPER_PER_SILVER * ns.SILVER_PER_GOLD
 function ns.MoneyText(copper)
 	copper = math.max(0, math.floor(copper or 0))
+	if GetCoinTextureString then return GetCoinTextureString(copper) end
 	local gold = math.floor(copper / ns.COPPER_PER_GOLD)
 	local silver = math.floor((copper % ns.COPPER_PER_GOLD) / ns.COPPER_PER_SILVER)
 	local rest = copper % ns.COPPER_PER_SILVER

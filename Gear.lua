@@ -11,7 +11,7 @@ local WEAPON_SLOTS = {"MAINHAND", "OFFHAND"}
 local function ShowItemTooltip(button, item, hint, priceLabel)
 	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 	if not item then
-		GameTooltip:AddLine(button.slotLabel or ns.L.EMPTY_SLOT, 0.6, 0.6, 0.6)
+		GameTooltip:AddLine(button.slotLabel or ns:Trans("LID_EMPTY_SLOT"), 0.6, 0.6, 0.6)
 		GameTooltip:Show()
 		return
 	end
@@ -24,12 +24,12 @@ local function ShowItemTooltip(button, item, hint, priceLabel)
 	end
 
 	if (G.db.level or 1) < item.level then
-		GameTooltip:AddLine(format(ns.L.ITEM_SLOT_REQ, item.level), 1, 0.2, 0.2)
+		GameTooltip:AddLine(format(ns:Trans("LID_ITEM_SLOT_REQ"), item.level), 1, 0.2, 0.2)
 	else
-		GameTooltip:AddLine(format(ns.L.ITEM_SLOT_REQ, item.level), 0.7, 0.7, 0.7)
+		GameTooltip:AddLine(format(ns:Trans("LID_ITEM_SLOT_REQ"), item.level), 0.7, 0.7, 0.7)
 	end
 
-	if item.value and item.value > 0 then GameTooltip:AddLine(format(priceLabel or ns.L.ITEM_VALUE, ns.MoneyText(item.value)), 0.9, 0.85, 0.5) end
+	if item.value and item.value > 0 then GameTooltip:AddLine(format(priceLabel or ns:Trans("LID_ITEM_VALUE"), ns.MoneyText(item.value)), 0.9, 0.85, 0.5) end
 	if hint then GameTooltip:AddLine(hint, 0.5, 0.5, 0.5, true) end
 	GameTooltip:Show()
 end
@@ -72,7 +72,7 @@ function Character:Create()
 	close:SetPoint("TOPRIGHT", -3, -3)
 	self.title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	self.title:SetPoint("TOP", 0, -8)
-	self.title:SetText(ns.L.CHARACTER)
+	self.title:SetText(ns:Trans("LID_CHARACTER"))
 	self.subtitle = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	self.subtitle:SetPoint("TOP", self.title, "BOTTOM", 0, -2)
 	local stage = CreateFrame("Frame", nil, f)
@@ -96,7 +96,7 @@ function Character:Create()
 		b:SetPoint("TOPLEFT", x, y)
 		b.slotKey = slotKey
 		b.slotLabel = ns.SLOTS[slotKey].name
-		b:SetScript("OnEnter", function(self2) ShowItemTooltip(self2, ns.ITEM_BY_ID[G:Equipped()[slotKey]], ns.L.EQUIPPED_HINT) end)
+		b:SetScript("OnEnter", function(self2) ShowItemTooltip(self2, ns.ITEM_BY_ID[G:Equipped()[slotKey]], ns:Trans("LID_EQUIPPED_HINT")) end)
 		self.slots[slotKey] = b
 	end
 
@@ -116,7 +116,7 @@ function Character:Create()
 
 	local statsHeader = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	statsHeader:SetPoint("TOPLEFT", 14, -414)
-	statsHeader:SetText(ns.L.STATS)
+	statsHeader:SetText(ns:Trans("LID_STATS"))
 	self.statLabels = {}
 	self.statValues = {}
 	local keys = {"STAT_STR", "STAT_STM", "STAT_INT", "STAT_AGI", "STAT_HEALTH", "STAT_MANA", "STAT_DAMAGE", "STAT_CRIT", "STAT_ARMOR", "STAT_REGEN", "STAT_LIFESTEAL",}
@@ -127,7 +127,7 @@ function Character:Create()
 		local y = -438 - row * 18
 		local label = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 		label:SetPoint("TOPLEFT", x, y)
-		label:SetText(ns.L[key])
+		label:SetText(ns:Trans("LID_" .. key))
 		label:SetTextColor(0.7, 0.7, 0.7)
 		local value = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 		value:SetPoint("TOPLEFT", x + 96, y)
@@ -143,7 +143,7 @@ function Character:Refresh()
 	local class = G:Class()
 	local s = G:Stats()
 	local db = G.db
-	self.subtitle:SetText(format("Murk  -  %s  -  %s", class and class.name or "?", format(ns.L.LEVEL, db.level)))
+	self.subtitle:SetText(format("Murk  -  %s  -  %s", class and class.name or "?", format(ns:Trans("LID_LEVEL"), db.level)))
 	for slotKey, b in pairs(self.slots) do
 		local item = ns.ITEM_BY_ID[G:Equipped()[slotKey]]
 		if item then
@@ -214,14 +214,14 @@ function Inventory:Create()
 		local b = ItemSlot(f, BAG_SLOT, function(self2, button) Inventory:OnSlotClick(self2.bagIndex, button, self2) end)
 		b:SetPoint("TOPLEFT", 14 + col * BAG_STEP, -40 - row * BAG_STEP)
 		b.bagIndex = i
-		b:SetScript("OnEnter", function(self2) ShowItemTooltip(self2, ns.ITEM_BY_ID[G:Bag()[self2.bagIndex]], ns.L.BAG_HINT) end)
+		b:SetScript("OnEnter", function(self2) ShowItemTooltip(self2, ns.ITEM_BY_ID[G:Bag()[self2.bagIndex]], ns:Trans("LID_BAG_HINT")) end)
 		self.slots[i] = b
 	end
 
 	self.hint = f:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 	self.hint:SetPoint("BOTTOM", 0, 12)
 	self.hint:SetWidth(276)
-	self.hint:SetText(ns.L.BAG_HINT)
+	self.hint:SetText(ns:Trans("LID_BAG_HINT"))
 end
 
 function Inventory:OnSlotClick(bagIndex, button, slot)
@@ -246,7 +246,7 @@ end
 function Inventory:Refresh()
 	if not self.frame or not self.frame:IsShown() or not G:HasSave() then return end
 	local bag = G:Bag()
-	self.title:SetText(format(ns.L.INVENTORY_TITLE, #bag, ns.BAG_SIZE))
+	self.title:SetText(format(ns:Trans("LID_INVENTORY_TITLE"), #bag, ns.BAG_SIZE))
 	for i, b in ipairs(self.slots) do
 		local item = ns.ITEM_BY_ID[bag[i]]
 		if item then

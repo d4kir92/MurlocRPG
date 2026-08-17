@@ -55,7 +55,7 @@ function G:Resurrect()
 	self.db.dead = false
 	self.db.hp = math.max(1, math.ceil(s.maxHP * 0.35))
 	self.db.mp = math.ceil(s.maxMP * 0.35)
-	ns.UI:Log(ns.L.RESURRECTED, 0.6, 0.9, 0.6)
+	ns.UI:Log(ns:Trans("LID_RESURRECTED"), 0.6, 0.9, 0.6)
 	ns.Sound("IG_QUEST_LIST_COMPLETE")
 end
 
@@ -216,10 +216,10 @@ function G:LearnTalent(treeIndex, talent)
 	local ok, reason = self:CanLearn(treeIndex, talent)
 	if not ok then
 		if reason == "points" then
-			ns.UI:Log(ns.L.TALENT_NONE, 1, 0.4, 0.4)
+			ns.UI:Log(ns:Trans("LID_TALENT_NONE"), 1, 0.4, 0.4)
 		elseif reason == "tier" then
 			local tree = self:Class().trees[treeIndex]
-			ns.UI:Log(format(ns.L.TALENT_NEED, talent.tier - 1, tree.name), 1, 0.4, 0.4)
+			ns.UI:Log(format(ns:Trans("LID_TALENT_NEED"), talent.tier - 1, tree.name), 1, 0.4, 0.4)
 		end
 		return false
 	end
@@ -229,7 +229,7 @@ function G:LearnTalent(treeIndex, talent)
 	local s = self:Stats()
 	self.db.hp = math.min(self.db.hp, s.maxHP)
 	self.db.mp = math.min(self.db.mp, s.maxMP)
-	ns.UI:Log(format(ns.L.TALENT_LEARNED, talent.name), 0.4, 0.8, 1)
+	ns.UI:Log(format(ns:Trans("LID_TALENT_LEARNED"), talent.name), 0.4, 0.8, 1)
 	ns.Sound("IG_CHARACTER_INFO_TAB")
 	return true
 end
@@ -239,7 +239,7 @@ function G:ResetTalents()
 	local s = self:Stats()
 	self.db.hp = math.min(self.db.hp, s.maxHP)
 	self.db.mp = math.min(self.db.mp, s.maxMP)
-	ns.UI:Log(ns.L.TALENT_CLEARED, 0.7, 0.7, 0.7)
+	ns.UI:Log(ns:Trans("LID_TALENT_CLEARED"), 0.7, 0.7, 0.7)
 end
 
 function G:Bag()
@@ -311,13 +311,13 @@ function G:BuySupply(id)
 	local supply = ns.CONSUMABLE_BY_ID[id]
 	if not supply then return false end
 	if not self:CanAfford(supply.value) then
-		ns.UI:Log(format(ns.L.SHOP_NO_MONEY, supply.name), 1, 0.4, 0.4)
+		ns.UI:Log(format(ns:Trans("LID_SHOP_NO_MONEY"), supply.name), 1, 0.4, 0.4)
 		return false
 	end
 
 	self.db.money = self:Money() - supply.value
 	self:AddSupply(id, 1)
-	ns.UI:Log(format(ns.L.SHOP_BOUGHT, supply.name, ns.MoneyText(supply.value)), 0.8, 0.8, 0.8)
+	ns.UI:Log(format(ns:Trans("LID_SHOP_BOUGHT"), supply.name, ns.MoneyText(supply.value)), 0.8, 0.8, 0.8)
 	ns.Sound("IG_BACKPACK_OPEN")
 	return true
 end
@@ -335,17 +335,17 @@ function G:Buy(itemId)
 	local item = ns.ITEM_BY_ID[itemId]
 	if not item then return false end
 	if not self:CanAfford(item.value) then
-		ns.UI:Log(format(ns.L.SHOP_NO_MONEY, ns.ItemLink(item)), 1, 0.4, 0.4)
+		ns.UI:Log(format(ns:Trans("LID_SHOP_NO_MONEY"), ns.ItemLink(item)), 1, 0.4, 0.4)
 		return false
 	end
 
 	if not self:AddItem(item.id) then
-		ns.UI:Log(ns.L.BAG_FULL, 1, 0.4, 0.4)
+		ns.UI:Log(ns:Trans("LID_BAG_FULL"), 1, 0.4, 0.4)
 		return false
 	end
 
 	self.db.money = self:Money() - item.value
-	ns.UI:Log(format(ns.L.SHOP_BOUGHT, ns.ItemLink(item), ns.MoneyText(item.value)), 0.8, 0.8, 0.8)
+	ns.UI:Log(format(ns:Trans("LID_SHOP_BOUGHT"), ns.ItemLink(item), ns.MoneyText(item.value)), 0.8, 0.8, 0.8)
 	ns.Sound("IG_BACKPACK_OPEN")
 	return true
 end
@@ -355,13 +355,13 @@ function G:Sell(bagIndex)
 	local item = ns.ITEM_BY_ID[bag[bagIndex]]
 	if not item then return false end
 	if item.value <= 0 then
-		ns.UI:Log(format(ns.L.SHOP_WORTHLESS, ns.ItemLink(item)), 1, 0.4, 0.4)
+		ns.UI:Log(format(ns:Trans("LID_SHOP_WORTHLESS"), ns.ItemLink(item)), 1, 0.4, 0.4)
 		return false
 	end
 
 	tremove(bag, bagIndex)
 	self:AddMoney(item.value)
-	ns.UI:Log(format(ns.L.SHOP_SOLD, ns.ItemLink(item), ns.MoneyText(item.value)), 0.8, 0.8, 0.8)
+	ns.UI:Log(format(ns:Trans("LID_SHOP_SOLD"), ns.ItemLink(item), ns.MoneyText(item.value)), 0.8, 0.8, 0.8)
 	ns.Sound("IG_BACKPACK_OPEN")
 	return true
 end
@@ -371,7 +371,7 @@ function G:Equip(bagIndex)
 	local item = ns.ITEM_BY_ID[bag[bagIndex]]
 	if not item then return false end
 	if self.db.level < item.level then
-		ns.UI:Log(format(ns.L.ITEM_LEVEL, item.level), 1, 0.4, 0.4)
+		ns.UI:Log(format(ns:Trans("LID_ITEM_LEVEL"), item.level), 1, 0.4, 0.4)
 		return false
 	end
 
@@ -382,7 +382,7 @@ function G:Equip(bagIndex)
 	equipped[slotKey] = item.id
 	if previous then tinsert(bag, previous) end
 	self:ClampVitals()
-	ns.UI:Log(format(ns.L.ITEM_EQUIPPED, ns.ItemLink(item)), 0.8, 0.8, 0.8)
+	ns.UI:Log(format(ns:Trans("LID_ITEM_EQUIPPED"), ns.ItemLink(item)), 0.8, 0.8, 0.8)
 	ns.Sound("IG_BACKPACK_OPEN")
 	return true
 end
@@ -392,14 +392,14 @@ function G:Unequip(slotKey)
 	local item = ns.ITEM_BY_ID[equipped[slotKey]]
 	if not item then return false end
 	if self:BagFull() then
-		ns.UI:Log(ns.L.BAG_FULL, 1, 0.4, 0.4)
+		ns.UI:Log(ns:Trans("LID_BAG_FULL"), 1, 0.4, 0.4)
 		return false
 	end
 
 	equipped[slotKey] = nil
 	tinsert(self:Bag(), item.id)
 	self:ClampVitals()
-	ns.UI:Log(format(ns.L.ITEM_UNEQUIPPED, ns.ItemLink(item)), 0.8, 0.8, 0.8)
+	ns.UI:Log(format(ns:Trans("LID_ITEM_UNEQUIPPED"), ns.ItemLink(item)), 0.8, 0.8, 0.8)
 	return true
 end
 
@@ -408,7 +408,7 @@ function G:DestroyItem(bagIndex)
 	local item = ns.ITEM_BY_ID[bag[bagIndex]]
 	if not item then return false end
 	tremove(bag, bagIndex)
-	ns.UI:Log(format(ns.L.ITEM_DESTROYED, ns.ItemLink(item)), 0.7, 0.7, 0.7)
+	ns.UI:Log(format(ns:Trans("LID_ITEM_DESTROYED"), ns.ItemLink(item)), 0.7, 0.7, 0.7)
 	return true
 end
 
@@ -426,20 +426,20 @@ function G:AddXP(amount)
 		db.xp = db.xp - self:XPMax()
 		db.level = db.level + 1
 		self:Restore()
-		ns.UI:Log(format(ns.L.LEVELUP, db.level), 1, 0.85, 0.2)
-		ns.UI:Log(ns.L.POINT_GAINED, 0.4, 0.8, 1)
+		ns.UI:Log(format(ns:Trans("LID_LEVELUP"), db.level), 1, 0.85, 0.2)
+		ns.UI:Log(ns:Trans("LID_POINT_GAINED"), 0.4, 0.8, 1)
 		ns.Sound("IG_CHARACTER_INFO_TAB")
 		local class = self:Class()
 		if class then
 			for _, a in ipairs(class.abilities) do
-				if a.level == db.level then ns.UI:Log(format(ns.L.LEARNED, a.name), 0.4, 0.8, 1) end
+				if a.level == db.level then ns.UI:Log(format(ns:Trans("LID_LEARNED"), a.name), 0.4, 0.8, 1) end
 			end
 		end
 	end
 
 	if self:IsMaxLevel() then
 		db.xp = 0
-		ns.UI:Log(ns.L.AT_MAX, 0.7, 0.7, 0.7)
+		ns.UI:Log(ns:Trans("LID_AT_MAX"), 0.7, 0.7, 0.7)
 	end
 end
 
@@ -477,13 +477,13 @@ end
 
 function G:GiveQuestReward(q)
 	self:AddMoney(q.money or 0)
-	ns.UI:Log(format(ns.L.Q_REWARD, q.xp), 0.4, 1, 0.4)
-	if q.money and q.money > 0 then ns.UI:Log(format(ns.L.Q_REWARD_MONEY, ns.MoneyText(q.money)), 0.9, 0.85, 0.5) end
+	ns.UI:Log(format(ns:Trans("LID_Q_REWARD"), q.xp), 0.4, 1, 0.4)
+	if q.money and q.money > 0 then ns.UI:Log(format(ns:Trans("LID_Q_REWARD_MONEY"), ns.MoneyText(q.money)), 0.9, 0.85, 0.5) end
 	if q.supply then
 		local supply = ns.CONSUMABLE_BY_ID[q.supply.id]
 		if supply then
 			self:AddSupply(supply.id, q.supply.count)
-			ns.UI:Log(format(ns.L.Q_REWARD_SUPPLY, q.supply.count, supply.name), 0.9, 0.85, 0.5)
+			ns.UI:Log(format(ns:Trans("LID_Q_REWARD_SUPPLY"), q.supply.count, supply.name), 0.9, 0.85, 0.5)
 		end
 	end
 
@@ -491,9 +491,9 @@ function G:GiveQuestReward(q)
 		local item = ns.ITEM_BY_ID[q.item]
 		if item then
 			if self:AddItem(item.id) then
-				ns.UI:Log(format(ns.L.Q_REWARD_ITEM, ns.ItemLink(item)), 0.9, 0.85, 0.5)
+				ns.UI:Log(format(ns:Trans("LID_Q_REWARD_ITEM"), ns.ItemLink(item)), 0.9, 0.85, 0.5)
 			else
-				ns.UI:Log(ns.L.BAG_FULL, 1, 0.4, 0.4)
+				ns.UI:Log(ns:Trans("LID_BAG_FULL"), 1, 0.4, 0.4)
 			end
 		end
 	end
@@ -505,7 +505,7 @@ function G:TalkToBrakil()
 	local db = self.db
 	local q = self:CurrentQuest()
 	if not q then
-		ns.UI:Log(ns.L.Q_FINISHED, 1, 0.85, 0.2)
+		ns.UI:Log(ns:Trans("LID_Q_FINISHED"), 1, 0.85, 0.2)
 		ns.UI:Refresh()
 		return
 	end
@@ -514,7 +514,7 @@ function G:TalkToBrakil()
 		db.quest = "active"
 		db.questProgress = 0
 		ns.UI:Log(q.offer, 1, 0.85, 0.2)
-		ns.UI:Log(format(ns.L.Q_ACCEPTED, q.name), 0.4, 1, 0.4)
+		ns.UI:Log(format(ns:Trans("LID_Q_ACCEPTED"), q.name), 0.4, 1, 0.4)
 		ns.UI:Refresh()
 		return
 	end
@@ -542,7 +542,7 @@ function G:TalkToBrakil()
 		db.quest = "ready"
 	else
 		db.quest = "all_done"
-		ns.UI:Log(ns.L.Q_ALL_DONE, 0.6, 0.6, 0.6)
+		ns.UI:Log(ns:Trans("LID_Q_ALL_DONE"), 0.6, 0.6, 0.6)
 	end
 
 	ns.UI:Refresh()
@@ -550,7 +550,7 @@ end
 
 function G:Rest()
 	self:Restore()
-	ns.UI:Log(ns.L.RESTED, 0.6, 0.9, 0.6)
+	ns.UI:Log(ns:Trans("LID_RESTED"), 0.6, 0.9, 0.6)
 	ns.UI:Refresh()
 end
 
@@ -565,5 +565,5 @@ loader:SetScript("OnEvent", function(self)
 	ns:SetVersion(134169, "0.11.2")
 	G:Init()
 	ns.UI:Create()
-	print(ns.L.LOADED)
+	print(ns:Trans("LID_LOADED"))
 end)

@@ -25,6 +25,7 @@ libs\D4Lib\D4Lib.xml
 
 Icons.lua
 Data.lua
+locale\enUS.lua
 Items.lua
 Classes.lua
 Widgets.lua

@@ -76,7 +76,7 @@ function T:Create()
 		end
 	end
 
-	self.resetButton = ns.MakeButton(f, 100, 22, ns.L.TALENT_RESET, nil, function()
+	self.resetButton = ns.MakeButton(f, 100, 22, ns:Trans("LID_TALENT_RESET"), nil, function()
 		G:ResetTalents()
 		T:Refresh()
 		ns.UI:Refresh()
@@ -135,8 +135,8 @@ function T:Refresh()
 
 	local tree = class.trees[self.activeTree]
 
-	self.pointsText:SetText(format(ns.L.TALENT_POINTS, G:TalentPoints()))
-	self.spentText:SetText(format(ns.L.TALENT_SPENT, tree.name, G:TreeSpent(self.activeTree)))
+	self.pointsText:SetText(format(ns:Trans("LID_TALENT_POINTS"), G:TalentPoints()))
+	self.spentText:SetText(format(ns:Trans("LID_TALENT_SPENT"), tree.name, G:TreeSpent(self.activeTree)))
 
 	for i, b in ipairs(self.buttons) do
 		local talent = tree.talents[i]
@@ -161,9 +161,9 @@ function T:Refresh()
 			ns.SetBorderColor(b, 0.3, 0.3, 0.3, 1)
 
 			if not unlocked then
-				extra = format(ns.L.TALENT_NEED, talent.tier - 1, tree.name)
+				extra = format(ns:Trans("LID_TALENT_NEED"), talent.tier - 1, tree.name)
 			else
-				extra = ns.L.TALENT_NONE
+				extra = ns:Trans("LID_TALENT_NONE")
 			end
 		end
 

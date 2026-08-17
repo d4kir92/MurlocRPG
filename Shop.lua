@@ -38,14 +38,14 @@ function Shop:Create()
 
 	self.title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	self.title:SetPoint("TOP", 0, -8)
-	self.title:SetText(ns.L.SHOP_TITLE)
+	self.title:SetText(ns:Trans("LID_SHOP_TITLE"))
 
 	self.money = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	self.money:SetPoint("TOP", 0, -32)
 
 	local buyHeader = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	buyHeader:SetPoint("TOPLEFT", 14, -56)
-	buyHeader:SetText(ns.L.SHOP_BUY)
+	buyHeader:SetText(ns:Trans("LID_SHOP_BUY"))
 
 	self.buySlots = {}
 
@@ -58,7 +58,7 @@ function Shop:Create()
 		end)
 		b:SetPoint("TOPLEFT", 14 + col * STEP, -78 - row * STEP)
 		b:SetScript("OnEnter", function(self2)
-			ns.ShowItemTooltip(self2, ns.ITEM_BY_ID[self2.itemId], ns.L.SHOP_BUY_HINT, ns.L.SHOP_COST)
+			ns.ShowItemTooltip(self2, ns.ITEM_BY_ID[self2.itemId], ns:Trans("LID_SHOP_BUY_HINT"), ns:Trans("LID_SHOP_COST"))
 		end)
 
 		self.buySlots[i] = b
@@ -68,11 +68,11 @@ function Shop:Create()
 	self.empty:SetPoint("TOPLEFT", 16, -82)
 	self.empty:SetWidth(268)
 	self.empty:SetJustifyH("LEFT")
-	self.empty:SetText(ns.L.SHOP_EMPTY)
+	self.empty:SetText(ns:Trans("LID_SHOP_EMPTY"))
 
 	local supplyHeader = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	supplyHeader:SetPoint("TOPLEFT", 14, -344)
-	supplyHeader:SetText(ns.L.SHOP_SUPPLIES)
+	supplyHeader:SetText(ns:Trans("LID_SHOP_SUPPLIES"))
 
 	self.supplySlots = {}
 
@@ -86,9 +86,9 @@ function Shop:Create()
 			GameTooltip:SetOwner(self2, "ANCHOR_RIGHT")
 			GameTooltip:AddLine(supply.name, 1, 1, 1)
 			GameTooltip:AddLine(supply.desc, 0.2, 1, 0.2)
-			GameTooltip:AddLine(format(ns.L.SHOP_COST, ns.MoneyText(supply.value)), 0.9, 0.85, 0.5)
-			GameTooltip:AddLine(format(ns.L.CONSUMABLE_OWNED, G:SupplyCount(supply.id)), 0.7, 0.7, 0.7)
-			GameTooltip:AddLine(ns.L.SHOP_BUY_HINT, 0.5, 0.5, 0.5, true)
+			GameTooltip:AddLine(format(ns:Trans("LID_SHOP_COST"), ns.MoneyText(supply.value)), 0.9, 0.85, 0.5)
+			GameTooltip:AddLine(format(ns:Trans("LID_CONSUMABLE_OWNED"), G:SupplyCount(supply.id)), 0.7, 0.7, 0.7)
+			GameTooltip:AddLine(ns:Trans("LID_SHOP_BUY_HINT"), 0.5, 0.5, 0.5, true)
 			GameTooltip:Show()
 		end)
 
@@ -100,7 +100,7 @@ function Shop:Create()
 
 	local sellHeader = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	sellHeader:SetPoint("TOPLEFT", 14, -424)
-	sellHeader:SetText(ns.L.SHOP_SELL)
+	sellHeader:SetText(ns:Trans("LID_SHOP_SELL"))
 
 	self.sellSlots = {}
 
@@ -114,7 +114,7 @@ function Shop:Create()
 		b:SetPoint("TOPLEFT", 14 + col * STEP, -446 - row * STEP)
 		b.bagIndex = i
 		b:SetScript("OnEnter", function(self2)
-			ns.ShowItemTooltip(self2, ns.ITEM_BY_ID[G:Bag()[self2.bagIndex]], ns.L.SHOP_SELL_HINT, ns.L.SHOP_SELLS_FOR)
+			ns.ShowItemTooltip(self2, ns.ITEM_BY_ID[G:Bag()[self2.bagIndex]], ns:Trans("LID_SHOP_SELL_HINT"), ns:Trans("LID_SHOP_SELLS_FOR"))
 		end)
 
 		self.sellSlots[i] = b
@@ -123,7 +123,7 @@ function Shop:Create()
 	self.hint = f:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 	self.hint:SetPoint("BOTTOM", 0, 12)
 	self.hint:SetWidth(276)
-	self.hint:SetText(ns.L.SHOP_SELL_HINT)
+	self.hint:SetText(ns:Trans("LID_SHOP_SELL_HINT"))
 end
 
 function Shop:OnBuySupply(id, slot)
@@ -166,7 +166,7 @@ function Shop:Refresh()
 		return
 	end
 
-	self.money:SetText(format(ns.L.SHOP_MONEY, ns.MoneyText(G:Money())))
+	self.money:SetText(format(ns:Trans("LID_SHOP_MONEY"), ns.MoneyText(G:Money())))
 
 	local stock = G:ShopStock()
 

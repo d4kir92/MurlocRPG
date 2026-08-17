@@ -1,10 +1,8 @@
 local _, ns = ...
-
 local G = ns.Game
 local C = ns.Combat
 local UI = {}
 ns.UI = UI
-
 local SCENE_W = 692
 local SCENE_H = 300
 local GROUND = 18
@@ -17,7 +15,6 @@ local ENEMY_X = 500
 local LOAD_TIME = 1.6
 local BG_LEFT = 0.2404
 local BG_RIGHT = 0.7596
-
 local function SetShown(frame, shown)
 	if shown then
 		frame:Show()
@@ -31,23 +28,16 @@ local function PageBackground(page, texture)
 	bg:SetAllPoints(page)
 	bg:SetTexture(texture)
 	bg:SetTexCoord(BG_LEFT, BG_RIGHT, 0, 1)
-
 	return bg
 end
 
 function UI:Log(msg, r, g, b)
-	if not self.log then
-		return
-	end
-
+	if not self.log then return end
 	self.log:AddMessage(msg, r or 1, g or 1, b or 1)
 end
 
 function UI:Create()
-	if self.frame then
-		return
-	end
-
+	if self.frame then return end
 	local f = CreateFrame("Frame", "MurlocRPGFrame", UIParent)
 	f:SetSize(720, 720)
 	f:SetPoint("CENTER")
@@ -59,34 +49,27 @@ function UI:Create()
 	f:SetScript("OnDragStart", f.StartMoving)
 	f:SetScript("OnDragStop", f.StopMovingOrSizing)
 	f:Hide()
-
 	ns.Fill(f, 0.04, 0.09, 0.08, 0.96)
 	ns.Border(f, 0.25, 0.55, 0.45, 1)
 	tinsert(UISpecialFrames, "MurlocRPGFrame")
-
 	self.frame = f
 	self.busy = false
 	self.transition = false
 	self.mode = nil
 	self.pages = {}
-
 	self.titleText = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	self.titleText:SetPoint("TOP", 0, -8)
 	self.titleText:SetText(ns.L.TITLE)
-
 	local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
 	close:SetPoint("TOPRIGHT", -3, -3)
-
 	local area = CreateFrame("Frame", nil, f)
 	area:SetPoint("TOPLEFT", 8, -34)
 	area:SetSize(704, 678)
 	self.area = area
-
 	self:CreateMenuPage(area)
 	self:CreateLoadingPage(area)
 	self:CreateClassPage(area)
 	self:CreateWorldPage(area)
-
 	self:ShowPage("menu")
 end
 
@@ -97,11 +80,7 @@ function UI:ShowPage(name)
 
 	self.current = name
 	SetShown(self.titleText, name ~= "menu")
-
-	if name ~= "world" then
-		self:HideWindows()
-	end
-
+	if name ~= "world" then self:HideWindows() end
 	if name == "menu" then
 		ns.Enable(self.loadButton, G:HasSave())
 		self.menuHint:SetText(G:HasSave() and ns.L.OVERWRITE or "")
@@ -124,29 +103,19 @@ function UI:CreateMenuPage(parent)
 	p:SetAllPoints(parent)
 	p:Hide()
 	self.pages.menu = p
-
 	local bg = PageBackground(p, ns.BG_WORLD)
 	bg:SetVertexColor(0.5, 0.5, 0.55)
-
 	local logo = p:CreateTexture(nil, "ARTWORK")
 	logo:SetSize(440, 220)
 	logo:SetPoint("TOP", 0, -60)
 	logo:SetTexture(ns.TITLE_ART)
-
 	local sub = p:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	sub:SetPoint("TOP", logo, "BOTTOM", 0, 4)
 	sub:SetText(ns.L.SUBTITLE)
-
-	self.newGameButton = ns.MakeButton(p, 240, 34, ns.L.NEW_GAME, nil, function()
-		UI:StartLoading("class")
-	end)
+	self.newGameButton = ns.MakeButton(p, 240, 34, ns.L.NEW_GAME, nil, function() UI:StartLoading("class") end)
 	self.newGameButton:SetPoint("TOP", sub, "BOTTOM", 0, -46)
-
-	self.loadButton = ns.MakeButton(p, 240, 34, ns.L.LOAD_GAME, nil, function()
-		UI:StartLoading("world")
-	end)
+	self.loadButton = ns.MakeButton(p, 240, 34, ns.L.LOAD_GAME, nil, function() UI:StartLoading("world") end)
 	self.loadButton:SetPoint("TOP", self.newGameButton, "BOTTOM", 0, -10)
-
 	self.menuHint = p:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 	self.menuHint:SetPoint("TOP", self.loadButton, "BOTTOM", 0, -16)
 	self.menuHint:SetWidth(480)
@@ -157,31 +126,27 @@ function UI:CreateLoadingPage(parent)
 	p:SetAllPoints(parent)
 	p:Hide()
 	self.pages.loading = p
-
-	PageBackground(p, ns.BG_LOADING)
-
+	local fill = p:CreateTexture(nil, "BACKGROUND")
+	fill:SetAllPoints(p)
+	fill:SetColorTexture(0, 0, 0, 1)
+	local bg = p:CreateTexture(nil, "BACKGROUND", nil, 1)
+	bg:SetPoint("CENTER")
+	bg:SetSize(704, 352)
+	bg:SetTexture(ns.BG_LOADING)
 	self.loadBar = ns.Bar(p, 500, 22, 0.2, 0.45, 0.9)
 	self.loadBar:SetPoint("BOTTOM", 0, 56)
 	ns.Border(self.loadBar, 0.5, 0.45, 0.3, 1)
-
 	local text = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	text:SetPoint("BOTTOM", self.loadBar, "TOP", 0, 8)
 	text:SetText(ns.L.LOADING)
-
 	p:SetScript("OnUpdate", function(_, elapsed)
-		if UI.current ~= "loading" then
-			return
-		end
-
+		if UI.current ~= "loading" then return end
 		UI.loadTime = (UI.loadTime or 0) + elapsed
-
 		local pct = math.min(1, UI.loadTime / LOAD_TIME)
 		ns.SetBar(UI.loadBar, pct, 1, format("%d%%", math.floor(pct * 100)))
-
 		if pct >= 1 then
 			local target = UI.loadTarget
 			UI.loadTarget = nil
-
 			if target == "world" then
 				UI:EnterWorld(false)
 			elseif target then
@@ -203,32 +168,25 @@ function UI:CreateClassPage(parent)
 	p:SetAllPoints(parent)
 	p:Hide()
 	self.pages.class = p
-
 	local bg = PageBackground(p, ns.BG_WORLD)
 	bg:SetVertexColor(0.75, 0.75, 0.8)
-
 	local header = p:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	header:SetPoint("TOP", 0, -6)
 	header:SetText(ns.L.CHOOSE_CLASS)
-
 	self.classButtons = {}
-
 	for i, class in ipairs(ns.CLASSES) do
 		local b = CreateFrame("Button", nil, p)
 		b:SetSize(180, 54)
 		b:SetPoint("TOPLEFT", 12, -44 - (i - 1) * 60)
 		ns.Fill(b, 0, 0, 0, 0.55)
 		ns.Border(b, 0.3, 0.3, 0.3, 1)
-
 		b.icon = b:CreateTexture(nil, "ARTWORK")
 		b.icon:SetSize(44, 44)
 		b.icon:SetPoint("LEFT", 5, 0)
 		ns.SetIcon(b.icon, class.icon)
-
 		b.label = b:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 		b.label:SetPoint("LEFT", b.icon, "RIGHT", 8, 0)
 		b.label:SetText(class.name)
-
 		b.classIndex = i
 		b:SetScript("OnClick", function()
 			UI.selectedClass = i
@@ -242,33 +200,26 @@ function UI:CreateClassPage(parent)
 	local stage = CreateFrame("Frame", nil, p)
 	stage:SetSize(180, 190)
 	stage:SetPoint("TOPLEFT", 206, -60)
-
 	self.classMurk = ns.CreateSprite(stage, SPRITE_SIZE)
 	self.classMurk:SetPos(90, 8)
 	self.classMurk:SetFlip(false)
-	self.classMurk:Play(ns.SPRITES.MURK_IDLE, 10, true)
-
+	self.classMurk:Play(ns.SPRITES.MURK_IDLE, 40, true)
 	local info = CreateFrame("Frame", nil, p)
 	info:SetSize(300, 360)
 	info:SetPoint("TOPRIGHT", -12, -44)
 	ns.Fill(info, 0, 0, 0, 0.65)
 	ns.Border(info, 0.45, 0.35, 0.15, 1)
-
 	self.classTitle = info:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	self.classTitle:SetPoint("TOP", 0, -10)
-
 	self.classDesc = info:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	self.classDesc:SetPoint("TOPLEFT", 12, -44)
 	self.classDesc:SetWidth(276)
 	self.classDesc:SetJustifyH("LEFT")
 	self.classDesc:SetJustifyV("TOP")
-
 	local skills = info:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	skills:SetPoint("BOTTOMLEFT", 12, 74)
 	skills:SetText(ns.L.SKILLS)
-
 	self.classSkills = {}
-
 	for i = 1, 3 do
 		local b = ns.IconButton(info, 52, nil)
 		b:SetPoint("BOTTOMLEFT", 12 + (i - 1) * 60, 14)
@@ -279,14 +230,13 @@ function UI:CreateClassPage(parent)
 		G:NewGame(ns.CLASSES[UI.selectedClass or 1].id)
 		UI:EnterWorld(true)
 	end)
+
 	self.enterButton:SetPoint("BOTTOM", 0, 16)
 end
 
 function UI:RefreshClassPage()
 	self.selectedClass = self.selectedClass or 1
-
 	local class = ns.CLASSES[self.selectedClass]
-
 	for i, b in ipairs(self.classButtons) do
 		if i == self.selectedClass then
 			ns.SetBorderColor(b, 1, 0.82, 0, 1)
@@ -299,10 +249,8 @@ function UI:RefreshClassPage()
 
 	self.classTitle:SetText(class.name)
 	self.classDesc:SetText(class.desc)
-
 	for i, b in ipairs(self.classSkills) do
 		local a = class.abilities[i]
-
 		if a then
 			b:Show()
 			ns.SetIcon(b.icon, a.icon)
@@ -318,45 +266,34 @@ function UI:CreateWorldPage(parent)
 	p:SetAllPoints(parent)
 	p:Hide()
 	self.pages.world = p
-
 	local portrait = CreateFrame("Frame", nil, p)
 	portrait:SetSize(48, 48)
 	portrait:SetPoint("TOPLEFT", 6, -4)
 	ns.Fill(portrait, 0, 0, 0, 0.5)
 	ns.Border(portrait, 0.35, 0.6, 0.5, 1)
-
 	self.portrait = ns.CreateSprite(portrait, 46)
 	self.portrait:SetPoint("CENTER")
 	self.portrait:SetFlip(false)
 	self.portrait:Play(ns.SPRITES.MURK_IDLE, 10, true)
-
 	self.nameText = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	self.nameText:SetPoint("TOPLEFT", portrait, "TOPRIGHT", 8, 0)
 	self.nameText:SetText("Murk")
-
 	self.levelText = p:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	self.levelText:SetPoint("LEFT", self.nameText, "RIGHT", 8, 0)
-
 	self.hpBar = ns.Bar(p, 260, 12, 0.15, 0.65, 0.2)
 	self.hpBar:SetPoint("TOPLEFT", portrait, "TOPRIGHT", 8, -16)
-
 	self.mpBar = ns.Bar(p, 260, 12, 0.2, 0.4, 0.85)
 	self.mpBar:SetPoint("TOPLEFT", self.hpBar, "BOTTOMLEFT", 0, -2)
-
 	self.xpBar = ns.Bar(p, 260, 8, 0.55, 0.2, 0.65)
 	self.xpBar:SetPoint("TOPLEFT", self.mpBar, "BOTTOMLEFT", 0, -2)
-
 	self.bagText = p:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	self.bagText:SetPoint("TOPRIGHT", -6, -8)
 	self.bagText:SetJustifyH("RIGHT")
-
 	self.questText = p:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	self.questText:SetPoint("TOPRIGHT", self.bagText, "BOTTOMRIGHT", 0, -4)
 	self.questText:SetJustifyH("RIGHT")
-
 	self:CreateScene(p)
 	self:CreateActions(p)
-
 	local log = CreateFrame("ScrollingMessageFrame", nil, p)
 	log:SetPoint("TOPLEFT", self.actions, "BOTTOMLEFT", 2, -6)
 	log:SetSize(688, 228)
@@ -373,10 +310,7 @@ function UI:CreateWorldPage(parent)
 		end
 	end)
 
-	if log.SetInsertMode then
-		log:SetInsertMode("BOTTOM")
-	end
-
+	if log.SetInsertMode then log:SetInsertMode("BOTTOM") end
 	self.log = log
 end
 
@@ -385,61 +319,43 @@ function UI:CreateScene(parent)
 	scene:SetPoint("TOPLEFT", 6, -60)
 	scene:SetSize(SCENE_W, SCENE_H)
 	self.scene = scene
-
-	if scene.SetClipsChildren then
-		scene:SetClipsChildren(true)
-	end
-
+	if scene.SetClipsChildren then scene:SetClipsChildren(true) end
 	local bg = scene:CreateTexture(nil, "BACKGROUND")
 	bg:SetAllPoints(scene)
 	bg:SetTexture(ns.SCENE_SHORE)
 	bg:SetTexCoord(0, 1, 0.08, 0.92)
-
+	self.sceneBG = bg
 	ns.Border(scene, 0.2, 0.4, 0.35, 1)
-
 	local function CampProp(file, x, size, y)
 		local t = scene:CreateTexture(nil, "BORDER")
 		t:SetTexture(file)
 		t:SetSize(size, size)
 		t:SetPoint("BOTTOM", scene, "BOTTOMLEFT", x, y)
 		t:Hide()
-
 		return t
 	end
 
-	self.campProps = {
-		CampProp(ns.CAMP_HUT, 88, 150, GROUND + 6),
-		CampProp(ns.CAMP_TENT, BRAKIL_X, 195, GROUND + 8),
-		CampProp(ns.CAMP_HUT, 638, 125, GROUND + 4),
-	}
-
+	self.campProps = {CampProp(ns.CAMP_HUT, 88, 150, GROUND + 6), CampProp(ns.CAMP_TENT, BRAKIL_X, 195, GROUND + 8), CampProp(ns.CAMP_HUT, 638, 125, GROUND + 4),}
 	self.campLabel = scene:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	self.campLabel:SetPoint("TOP", 0, -8)
 	self.campLabel:SetText(ns.L.CAMP_TITLE)
-
 	self.brakil = ns.CreateSprite(scene, SPRITE_SIZE)
 	self.brakil:SetPos(BRAKIL_X, GROUND)
-	self.brakil:Play(ns.SPRITES.BRAKIL_IDLE, 9, true)
-
+	self.brakil:Play(ns.SPRITES.BRAKIL_IDLE, 12, true)
 	self.brakilName = scene:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	self.brakilName:SetPoint("BOTTOM", scene, "BOTTOMLEFT", BRAKIL_X, GROUND - 12)
 	self.brakilName:SetText("Chief Brakil")
-
 	local brakilHit = CreateFrame("Button", nil, scene)
 	brakilHit:SetSize(110, 150)
 	brakilHit:SetPoint("BOTTOM", scene, "BOTTOMLEFT", BRAKIL_X, GROUND)
 	brakilHit:SetFrameLevel(scene:GetFrameLevel() + 20)
-	brakilHit:SetScript("OnClick", function()
-		UI:Talk()
-	end)
+	brakilHit:SetScript("OnClick", function() UI:Talk() end)
 	brakilHit:SetScript("OnEnter", function(self2)
-		UI.brakil:SetTint(1.25, 1.25, 1.25)
+		UI.brakil.texture:SetVertexColor(1.25, 1.25, 1.25)
 		GameTooltip:SetOwner(self2, "ANCHOR_RIGHT")
 		GameTooltip:AddLine("Chief Brakil", 1, 0.82, 0)
 		GameTooltip:AddLine(ns.L.TALK, 1, 1, 1)
-
 		local quest = G:CurrentQuest()
-
 		if not quest then
 			GameTooltip:AddLine(ns.L.Q_ALL_DONE, 0.6, 0.6, 0.6)
 		elseif G.db.quest ~= "active" then
@@ -449,62 +365,57 @@ function UI:CreateScene(parent)
 		else
 			GameTooltip:AddLine(format(ns.L.Q_LINE, quest.name, G:QuestProgress(), quest.need), 1, 0.82, 0)
 		end
+
 		GameTooltip:Show()
 	end)
+
 	brakilHit:SetScript("OnLeave", function()
-		UI.brakil:SetTint(1, 1, 1)
+		UI.brakil.texture:SetVertexColor(1, 1, 1)
 		GameTooltip:Hide()
 	end)
-	self.brakilHit = brakilHit
 
+	self.brakilHit = brakilHit
 	self.merchant = ns.CreateSprite(scene, SPRITE_SIZE)
 	self.merchant:SetPos(MERCHANT_X, GROUND)
 	self.merchant:Play(ns.SPRITES.GOBLIN_IDLE, 8, true)
-
 	self.merchantName = scene:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	self.merchantName:SetPoint("BOTTOM", scene, "BOTTOMLEFT", MERCHANT_X, GROUND - 12)
 	self.merchantName:SetText(ns.L.SHOP_TITLE)
-
 	local merchantHit = CreateFrame("Button", nil, scene)
 	merchantHit:SetSize(82, 150)
 	merchantHit:SetPoint("BOTTOM", scene, "BOTTOMLEFT", MERCHANT_X, GROUND)
 	merchantHit:SetFrameLevel(scene:GetFrameLevel() + 20)
-	merchantHit:SetScript("OnClick", function()
-		ns.Shop:Toggle()
-	end)
+	merchantHit:SetScript("OnClick", function() ns.Shop:Toggle() end)
 	merchantHit:SetScript("OnEnter", function(self2)
-		UI.merchant:SetTint(1.25, 1.25, 1.25)
+		UI.merchant.texture:SetVertexColor(1.25, 1.25, 1.25)
 		GameTooltip:SetOwner(self2, "ANCHOR_RIGHT")
 		GameTooltip:AddLine(ns.L.SHOP_TITLE, 1, 0.82, 0)
 		GameTooltip:AddLine(ns.L.CLICK_MERCHANT, 1, 1, 1)
 		GameTooltip:Show()
 	end)
+
 	merchantHit:SetScript("OnLeave", function()
-		UI.merchant:SetTint(1, 1, 1)
+		UI.merchant.texture:SetVertexColor(1, 1, 1)
 		GameTooltip:Hide()
 	end)
-	self.merchantHit = merchantHit
 
+	self.merchantHit = merchantHit
 	self.healer = ns.CreateSprite(scene, SPRITE_SIZE)
 	self.healer:SetPos(ENEMY_X, GROUND)
-	self.healer:Play(ns.SPRITES.BRAKIL_IDLE, 7, true)
+	self.healer:Play(ns.SPRITES.BRAKIL_IDLE, 12, true)
 	self.healer:SetTint(0.6, 0.88, 1)
 	self.healer:Hide()
-
 	self.healerName = scene:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	self.healerName:SetPoint("BOTTOM", scene, "BOTTOMLEFT", ENEMY_X, GROUND - 12)
 	self.healerName:SetText(ns.L.SPIRIT_HEALER)
 	self.healerName:SetTextColor(0.6, 0.88, 1)
 	self.healerName:Hide()
-
 	local healerHit = CreateFrame("Button", nil, scene)
 	healerHit:SetSize(110, 150)
 	healerHit:SetPoint("BOTTOM", scene, "BOTTOMLEFT", ENEMY_X, GROUND)
 	healerHit:SetFrameLevel(scene:GetFrameLevel() + 20)
 	healerHit:Hide()
-	healerHit:SetScript("OnClick", function()
-		UI:DoResurrect()
-	end)
+	healerHit:SetScript("OnClick", function() UI:DoResurrect() end)
 	healerHit:SetScript("OnEnter", function(self2)
 		UI.healer:SetTint(0.85, 1, 1)
 		GameTooltip:SetOwner(self2, "ANCHOR_RIGHT")
@@ -512,32 +423,28 @@ function UI:CreateScene(parent)
 		GameTooltip:AddLine(ns.L.HEALER_HINT, 1, 1, 1)
 		GameTooltip:Show()
 	end)
+
 	healerHit:SetScript("OnLeave", function()
 		UI.healer:SetTint(0.6, 0.88, 1)
 		GameTooltip:Hide()
 	end)
-	self.healerHit = healerHit
 
+	self.healerHit = healerHit
 	self.enemy = ns.CreateSprite(scene, SPRITE_SIZE)
 	self.enemy:SetPos(ENEMY_X, GROUND)
 	self.enemy:Hide()
-
 	self.murk = ns.CreateSprite(scene, SPRITE_SIZE)
 	self.murk:SetPos(MURK_CAMP_X, GROUND)
 	self.murk:SetFlip(false)
-	self.murk:Play(ns.SPRITES.MURK_IDLE, 10, true)
-
+	self.murk:Play(ns.SPRITES.MURK_IDLE, 40, true)
 	self.fx = ns.CreateSprite(scene, 177)
 	self.fx:SetPos(ENEMY_X, GROUND + 18)
 	self.fx:SetFrameLevel(scene:GetFrameLevel() + 30)
 	self.fx:Hide()
-
 	self.enemyName = scene:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	self.enemyName:SetPoint("TOP", scene, "TOPLEFT", ENEMY_X, -10)
-
 	self.enemyBar = ns.Bar(scene, 160, 12, 0.75, 0.2, 0.2)
 	self.enemyBar:SetPoint("TOP", self.enemyName, "BOTTOM", 0, -3)
-
 	for _, sprite in ipairs({self.brakil, self.merchant, self.healer, self.enemy, self.murk}) do
 		sprite:SetFrameLevel(scene:GetFrameLevel() + 5)
 	end
@@ -545,91 +452,55 @@ end
 
 function UI:CreateActions(parent)
 	local L = ns.L
-
 	local area = CreateFrame("Frame", nil, parent)
 	area:SetPoint("TOPLEFT", self.scene, "BOTTOMLEFT", 0, -8)
 	area:SetSize(SCENE_W, 68)
 	self.actions = area
-
 	local camp = CreateFrame("Frame", nil, area)
 	camp:SetAllPoints(area)
 	self.campActions = camp
-
-	local talents = ns.MakeButton(camp, 166, 28, L.TALENTS, "Ability_Marksmanship", function()
-		ns.Talents:Toggle()
-	end)
+	local talents = ns.MakeButton(camp, 166, 28, L.TALENTS, "Ability_Marksmanship", function() ns.Talents:Toggle() end)
 	talents:SetPoint("TOPLEFT", 4, -2)
 	ns.Tooltip(talents, L.TALENTS, "Spend your talent points.")
 	self.talentsButton = talents
-
-	local character = ns.MakeButton(camp, 166, 28, L.CHARACTER, "Murloc_icon", function()
-		ns.Character:Toggle()
-	end)
+	local character = ns.MakeButton(camp, 166, 28, L.CHARACTER, "Murloc_icon", function() ns.Character:Toggle() end)
 	character:SetPoint("LEFT", talents, "RIGHT", 8, 0)
 	ns.Tooltip(character, L.CHARACTER, "Equipment and stats.")
 	self.characterButton = character
-
-	local inventory = ns.MakeButton(camp, 166, 28, L.INVENTORY, "Inv_misc_bag_08", function()
-		ns.Inventory:Toggle()
-	end)
+	local inventory = ns.MakeButton(camp, 166, 28, L.INVENTORY, "Inv_misc_bag_08", function() ns.Inventory:Toggle() end)
 	inventory:SetPoint("LEFT", character, "RIGHT", 8, 0)
 	ns.Tooltip(inventory, L.INVENTORY, "Your loot.")
 	self.inventoryButton = inventory
-
-	local shop = ns.MakeButton(camp, 166, 28, L.SHOP, "gold_coin_icon", function()
-		ns.Shop:Toggle()
-	end)
+	local shop = ns.MakeButton(camp, 166, 28, L.SHOP, "gold_coin_icon", function() ns.Shop:Toggle() end)
 	shop:SetPoint("LEFT", inventory, "RIGHT", 8, 0)
 	ns.Tooltip(shop, L.SHOP, "Buy and sell with Blacksmith Frazzak.")
 	self.shopButton = shop
-
-	local hunt = ns.MakeButton(camp, 339, 28, L.HUNT, "stealth", function()
-		UI:StartHunt()
-	end)
-	hunt:SetPoint("TOPLEFT", talents, "BOTTOMLEFT", 0, -6)
-	ns.Tooltip(hunt, L.HUNT, "Walk out and look for prey.")
-	self.huntButton = hunt
-
-	local rest = ns.MakeButton(camp, 339, 28, L.REST, "Spell_nature_regeneration", function()
-		UI:Rest()
-	end)
-	rest:SetPoint("LEFT", hunt, "RIGHT", 8, 0)
+	local rest = ns.MakeButton(camp, 339, 28, L.REST, "Spell_nature_regeneration", function() UI:Rest() end)
+	rest:SetPoint("TOPLEFT", talents, "BOTTOMLEFT", 0, -6)
 	ns.Tooltip(rest, L.REST, "Restore all health and mana.")
 	self.restButton = rest
-
+	local hunt = ns.MakeButton(camp, 339, 28, L.HUNT, "stealth", function() UI:StartHunt() end)
+	hunt:SetPoint("LEFT", rest, "RIGHT", 8, 0)
+	ns.Tooltip(hunt, L.HUNT, "Walk out and look for prey.")
+	self.huntButton = hunt
 	local battle = CreateFrame("Frame", nil, area)
 	battle:SetAllPoints(area)
 	battle:Hide()
 	self.battleActions = battle
-
-	local attack = ns.MakeButton(battle, 166, 28, L.ACT_ATTACK, "INV_Sword_06", function()
-		UI:PlayerStrike(function()
-			C:Attack()
-		end)
-	end)
+	local attack = ns.MakeButton(battle, 166, 28, L.ACT_ATTACK, "INV_Sword_06", function() UI:PlayerStrike(function() C:Attack() end) end)
 	attack:SetPoint("TOPLEFT", 4, -2)
 	ns.Tooltip(attack, L.ACT_ATTACK, L.ATTACK_DESC)
 	self.attackButton = attack
-
 	self.abilityButtons = {}
-
 	for i = 1, 3 do
-		local b = ns.MakeButton(battle, 166, 28, "", nil, function(self2)
-			UI:CastAbility(self2.ability)
-		end)
+		local b = ns.MakeButton(battle, 166, 28, "", nil, function(self2) UI:CastAbility(self2.ability) end)
 		b:SetPoint("LEFT", attack, "RIGHT", 6 + (i - 1) * 172, 0)
 		self.abilityButtons[i] = b
 	end
 
 	self.supplyButtons = {}
-
 	for i, supply in ipairs(ns.CONSUMABLES) do
-		local b = ns.MakeButton(battle, 166, 28, "", supply.icon, function()
-			UI:SimpleAction(function()
-				C:UseSupply(supply.id)
-			end)
-		end)
-
+		local b = ns.MakeButton(battle, 166, 28, "", supply.icon, function() UI:SimpleAction(function() C:UseSupply(supply.id) end) end)
 		if i == 1 then
 			b:SetPoint("TOPLEFT", attack, "BOTTOMLEFT", 0, -6)
 		else
@@ -640,45 +511,34 @@ function UI:CreateActions(parent)
 		self.supplyButtons[i] = b
 	end
 
-	local flee = ns.MakeButton(battle, 166, 28, L.ACT_FLEE, "vanish", function()
-		UI:SimpleAction(function()
-			C:Flee()
-		end)
-	end)
+	local flee = ns.MakeButton(battle, 166, 28, L.ACT_FLEE, "vanish", function() UI:SimpleAction(function() C:Flee() end) end)
 	flee:SetPoint("LEFT", self.supplyButtons[#self.supplyButtons], "RIGHT", 6, 0)
 	ns.Tooltip(flee, L.ACT_FLEE, L.FLEE_DESC)
 	self.fleeButton = flee
-
 	local victory = CreateFrame("Frame", nil, area)
 	victory:SetAllPoints(area)
 	victory:Hide()
 	self.victoryActions = victory
-
-	local back = ns.MakeButton(victory, 339, 28, L.RETURN_CAMP, "Spell_nature_regeneration", function()
-		UI:ReturnToCamp()
-	end)
+	local back = ns.MakeButton(victory, 339, 28, L.RETURN_CAMP, "Spell_nature_regeneration", function() UI:ReturnToCamp() end)
 	back:SetPoint("TOPLEFT", 4, -18)
 	ns.Tooltip(back, L.RETURN_CAMP, "Walk back to the murloc camp.")
 	self.returnButton = back
-
-	local nextEnemy = ns.MakeButton(victory, 339, 28, L.NEXT_ENEMY, "stealth", function()
-		UI:NextEnemy()
-	end)
+	local nextEnemy = ns.MakeButton(victory, 339, 28, L.NEXT_ENEMY, "stealth", function() UI:NextEnemy() end)
 	nextEnemy:SetPoint("LEFT", back, "RIGHT", 6, 0)
 	ns.Tooltip(nextEnemy, L.NEXT_ENEMY, "Keep hunting without walking back.")
 	self.nextEnemyButton = nextEnemy
-
 	local dead = CreateFrame("Frame", nil, area)
 	dead:SetAllPoints(area)
 	dead:Hide()
 	self.deadActions = dead
-
-	local resurrect = ns.MakeButton(dead, 339, 28, L.RESURRECT, "ancestralspirit", function()
-		UI:DoResurrect()
-	end)
+	local resurrect = ns.MakeButton(dead, 339, 28, L.RESURRECT, "ancestralspirit", function() UI:DoResurrect() end)
 	resurrect:SetPoint("TOP", 0, -18)
 	ns.Tooltip(resurrect, L.RESURRECT, "The spirit healer revives you at 35% health.")
 	self.resurrectButton = resurrect
+end
+
+function UI:SetSceneBG(file)
+	if self.sceneBG then self.sceneBG:SetTexture(file) end
 end
 
 function UI:SetCampProps(shown)
@@ -706,9 +566,7 @@ function UI:EnterWorld(fresh)
 	G.battle = nil
 	G.turnLocked = false
 	G.victory = false
-
 	self.mode = G.db.dead and "dead" or "camp"
-
 	if self.mode == "dead" then
 		self:ShowDead()
 	else
@@ -716,7 +574,6 @@ function UI:EnterWorld(fresh)
 	end
 
 	self:ShowPage("world")
-
 	if fresh then
 		self:Log(ns.L.CAMP_TEXT, 0.7, 0.8, 0.75)
 		self:Log(ns.L.CLICK_BRAKIL, 0.6, 0.6, 0.6)
@@ -727,17 +584,13 @@ function UI:FadeOutEnemy()
 	self.enemy:StopMove()
 	self.enemyName:Hide()
 	self.enemyBar:Hide()
-
-	if self.enemy:IsShown() then
-		self.enemy:Fade(self.enemy:GetAlpha(), 0, 0.5, function(sp)
-			sp:Hide()
-		end)
-	end
+	if self.enemy:IsShown() then self.enemy:Fade(self.enemy:GetAlpha(), 0, 0.5, function(sp) sp:Hide() end) end
 end
 
 function UI:ShowCamp()
 	self:HidePanels()
 	self:HideHealer()
+	self:SetSceneBG(ns.BG_CAMP)
 	self.campActions:Show()
 	self.campLabel:Show()
 	self.brakil:Show()
@@ -748,22 +601,21 @@ function UI:ShowCamp()
 	self.merchantHit:Show()
 	self:SetCampProps(true)
 	self:FadeOutEnemy()
-
 	self.murk:StopMove()
 	self.murk:SetAlpha(1)
 	self.murk:SetTint(1, 1, 1)
 	self.murk:SetPos(MURK_CAMP_X, GROUND)
 	self.murk:SetFlip(false)
-	self.murk:Play(ns.SPRITES.MURK_IDLE, 10, true)
+	self.murk:Play(ns.SPRITES.MURK_IDLE, 40, true)
 end
 
 function UI:EnterBattle(chained)
 	self.busy = true
-
 	self:HideWindows()
 	self:HidePanels()
 	self:HideHealer()
 	self.battleActions:Show()
+	self:SetSceneBG(ns.SCENE_SHORE)
 	self.campLabel:Hide()
 	self.brakil:Hide()
 	self.brakilName:Hide()
@@ -772,28 +624,22 @@ function UI:EnterBattle(chained)
 	self.merchantName:Hide()
 	self.merchantHit:Hide()
 	self:SetCampProps(false)
-
 	local enemy = G.battle
-
 	self.enemy:StopMove()
 	self.enemy:SetDisplaySize(SPRITE_SIZE * (enemy.scale or 1))
 	self.enemy:SetPos(ENEMY_X, GROUND)
 	self.enemy:Show()
 	self.enemy:Play(ns.SPRITES[enemy.sprite], 10, true)
 	self.enemy:Fade(0, 1, 0.4)
-
 	self.enemyName:Show()
 	self.enemyBar:Show()
-
 	self.murk:SetAlpha(1)
 	self.murk:SetTint(1, 1, 1)
 	self.murk:SetFlip(false)
-
 	if chained then
 		self.murk:StopMove()
 		self.murk:SetPos(MURK_FIGHT_X, GROUND)
-		self.murk:Play(ns.SPRITES.MURK_IDLE, 10, true)
-
+		self.murk:Play(ns.SPRITES.MURK_IDLE, 40, true)
 		C_Timer.After(0.45, function()
 			UI.busy = false
 			UI:Refresh()
@@ -820,8 +666,8 @@ end
 function UI:ShowDead()
 	self:HidePanels()
 	self.deadActions:Show()
+	self:SetSceneBG(ns.SCENE_SHORE)
 	self:FadeOutEnemy()
-
 	self.campLabel:Hide()
 	self.brakil:Hide()
 	self.brakilName:Hide()
@@ -830,14 +676,12 @@ function UI:ShowDead()
 	self.merchantName:Hide()
 	self.merchantHit:Hide()
 	self:SetCampProps(false)
-
 	self.murk:StopMove()
 	self.murk:SetPos(MURK_FIGHT_X, GROUND)
 	self.murk:SetFlip(false)
-	self.murk:Play(ns.SPRITES.MURK_IDLE, 7, true)
+	self.murk:Play(ns.SPRITES.MURK_IDLE, 40, true)
 	self.murk:SetTint(0.55, 0.78, 1)
 	self.murk:SetAlpha(0.55)
-
 	self.healer:StopMove()
 	self.healer:SetPos(ENEMY_X, GROUND)
 	self.healer:SetTint(0.6, 0.88, 1)
@@ -845,7 +689,6 @@ function UI:ShowDead()
 	self.healer:Fade(0, 0.9, 0.8)
 	self.healerName:Show()
 	self.healerHit:Show()
-
 	self.busy = false
 end
 
@@ -853,7 +696,6 @@ function UI:EnterMode(mode)
 	local previous = self.mode
 	self.mode = mode
 	self.fx:Hide()
-
 	if mode == "battle" then
 		self:EnterBattle(previous == "victory")
 	elseif mode == "victory" then
@@ -866,22 +708,15 @@ function UI:EnterMode(mode)
 end
 
 function UI:NextEnemy()
-	if self.busy then
-		return
-	end
-
+	if self.busy then return end
 	C:Start()
 end
 
 function UI:ReturnToCamp()
-	if self.busy then
-		return
-	end
-
+	if self.busy then return end
 	self.busy = true
 	self.transition = true
 	self:HidePanels()
-
 	self.murk:SetFlip(true)
 	self.murk:Play(ns.SPRITES.MURK_WALK, 16, true)
 	self.murk:MoveTo(-100, 1.3, function()
@@ -894,22 +729,14 @@ function UI:ReturnToCamp()
 end
 
 function UI:DoResurrect()
-	if self.busy or not G.db.dead then
-		return
-	end
-
+	if self.busy or not G.db.dead then return end
 	self.busy = true
 	self.transition = true
 	self:HidePanels()
-
 	G:Resurrect()
-
-	self.healer:Fade(self.healer:GetAlpha(), 0, 0.6, function(sp)
-		sp:Hide()
-	end)
+	self.healer:Fade(self.healer:GetAlpha(), 0, 0.6, function(sp) sp:Hide() end)
 	self.healerName:Hide()
 	self.healerHit:Hide()
-
 	self.murk:SetTint(1, 1, 1)
 	self.murk:Fade(0.55, 1, 0.6)
 	self.murk:SetFlip(true)
@@ -923,129 +750,78 @@ function UI:DoResurrect()
 end
 
 function UI:StartHunt()
-	if self.busy or G.battle then
-		return
-	end
-
+	if self.busy or G.battle then return end
 	self.busy = true
 	self:HideWindows()
-
 	self.murk:SetFlip(false)
 	self.murk:Play(ns.SPRITES.MURK_WALK, 16, true)
-	self.murk:MoveTo(SCENE_W + 100, 1.5, function()
-		C:Start()
-	end)
-
+	self.murk:MoveTo(SCENE_W + 100, 1.5, function() C:Start() end)
 	self:Refresh()
 end
 
 function UI:Talk()
-	if self.busy or G.battle then
-		return
-	end
-
+	if self.busy or G.battle then return end
 	G:TalkToBrakil()
 end
 
 function UI:Rest()
-	if self.busy or G.battle then
-		return
-	end
-
+	if self.busy or G.battle then return end
 	G:Rest()
 end
 
 function UI:AttackSprite()
-	if G:HasWeapon() then
-		return ns.SPRITES.MURK_ATTACK_WEAPON
-	end
-
+	if G:HasWeapon() then return ns.SPRITES.MURK_ATTACK_WEAPON end
 	return ns.SPRITES.MURK_ATTACK
 end
 
 function UI:PlayEffect(ability)
 	local def = ability.fx and ns.SPRITES[ability.fx]
-
-	if not def then
-		return
-	end
-
+	if not def then return end
 	self.fx:StopMove()
 	self.fx:SetPos(ability.kind == "heal" and MURK_FIGHT_X or ENEMY_X, GROUND + 16)
 	self.fx:SetAlpha(1)
 	self.fx:Show()
-	self.fx:Play(def, 18, false, function(sp)
-		sp:Hide()
-	end)
+	self.fx:Play(def, 18, false, function(sp) sp:Hide() end)
 end
 
 function UI:CastAbility(ability)
-	if not ability then
-		return
-	end
-
+	if not ability then return end
 	if ability.school == "magic" then
 		self:CastSpell(ability)
-
 		return
 	end
 
-	self:PlayerStrike(function()
-		C:UseAbility(ability)
-	end)
+	self:PlayerStrike(function() C:UseAbility(ability) end)
 end
 
 function UI:CastSpell(ability)
-	if self.busy or not C:CanAct() then
-		return
-	end
-
+	if self.busy or not C:CanAct() then return end
 	self.busy = true
 	self:Refresh()
-
-	self.murk:Play(ns.SPRITES.MURK_CAST, 16, false, function(sp)
-		sp:Play(ns.SPRITES.MURK_IDLE, 10, true)
-	end)
-
+	self.murk:Play(ns.SPRITES.MURK_CAST, 16, false, function(sp) sp:Play(ns.SPRITES.MURK_IDLE, 10, true) end)
 	C_Timer.After(0.5, function()
 		if not C:CanAct() then
 			UI.busy = false
 			UI:Refresh()
-
 			return
 		end
 
 		UI:PlayEffect(ability)
 		C:UseAbility(ability)
-
-		if ability.kind ~= "heal" and UI.enemy:IsShown() then
-			UI.enemy:Flash()
-		end
-
+		if ability.kind ~= "heal" and UI.enemy:IsShown() then UI.enemy:Flash() end
 		UI.busy = false
 		UI:Refresh()
 	end)
 end
 
 function UI:PlayerStrike(action)
-	if self.busy or not C:CanAct() then
-		return
-	end
-
+	if self.busy or not C:CanAct() then return end
 	self.busy = true
 	self:Refresh()
-
-	self.murk:Play(self:AttackSprite(), 20, false, function(sp)
-		sp:Play(ns.SPRITES.MURK_IDLE, 10, true)
-	end)
-
+	self.murk:Play(self:AttackSprite(), 20, false, function(sp) sp:Play(ns.SPRITES.MURK_IDLE, 10, true) end)
 	self.murk:MoveTo(MURK_FIGHT_X + 90, 0.24, function()
 		action()
-
-		if UI.enemy:IsShown() then
-			UI.enemy:Flash()
-		end
-
+		if UI.enemy:IsShown() then UI.enemy:Flash() end
 		UI.murk:MoveTo(MURK_FIGHT_X, 0.34, function()
 			UI.busy = false
 			UI:Refresh()
@@ -1054,19 +830,13 @@ function UI:PlayerStrike(action)
 end
 
 function UI:SimpleAction(action)
-	if self.busy or not C:CanAct() then
-		return
-	end
-
+	if self.busy or not C:CanAct() then return end
 	action()
 	self:Refresh()
 end
 
 function UI:EnemyLunge()
-	if self.mode ~= "battle" or not self.enemy:IsShown() then
-		return
-	end
-
+	if self.mode ~= "battle" or not self.enemy:IsShown() then return end
 	self.enemy:MoveTo(ENEMY_X - 110, 0.18, function(sp)
 		UI.murk:Flash()
 		sp:MoveTo(ENEMY_X, 0.3)
@@ -1075,22 +845,17 @@ end
 
 function UI:RefreshAbilityButtons(canAct)
 	local class = G:Class()
-
 	for i, b in ipairs(self.abilityButtons) do
 		local a = class and class.abilities[i]
-
 		b.ability = a
-
 		if not a then
 			b:Hide()
 		else
 			b:Show()
 			b:SetText(a.name)
 			ns.SetIcon(b.icon, a.icon)
-
 			local cost = G:AbilityCost(a)
 			local known = G.db.level >= a.level
-
 			if known then
 				ns.Tooltip(b, a.name, ns.AbilityDesc(a), format(ns.L.COST, cost))
 				ns.Enable(b, canAct and G.db.mp >= cost)
@@ -1105,16 +870,11 @@ function UI:RefreshAbilityButtons(canAct)
 end
 
 function UI:Refresh()
-	if not self.frame or not G:HasSave() then
-		return
-	end
-
+	if not self.frame or not G:HasSave() then return end
 	local L = ns.L
 	local db = G.db
 	local s = G:Stats()
-
 	local mode = "camp"
-
 	if G.battle then
 		mode = "battle"
 	elseif db.dead then
@@ -1123,16 +883,12 @@ function UI:Refresh()
 		mode = "victory"
 	end
 
-	if mode ~= self.mode and not self.transition then
-		self:EnterMode(mode)
-	end
-
+	if mode ~= self.mode and not self.transition then self:EnterMode(mode) end
 	local class = G:Class()
 	self.nameText:SetText(class and format("Murk  |cff9ad8ff%s|r", class.name) or "Murk")
 	self.levelText:SetText(format(L.LEVEL, db.level))
 	ns.SetBar(self.hpBar, db.hp, s.maxHP, format(L.BARTEXT, db.hp, s.maxHP))
 	ns.SetBar(self.mpBar, db.mp, s.maxMP, format(L.BARTEXT, db.mp, s.maxMP))
-
 	if G:IsMaxLevel() then
 		ns.SetBar(self.xpBar, 1, 1, L.XP_MAX)
 	else
@@ -1140,12 +896,9 @@ function UI:Refresh()
 	end
 
 	self.bagText:SetText(format(L.BAG, db.meat) .. "    " .. ns.MoneyText(G:Money()))
-
 	local quest = G:CurrentQuest()
-
 	if quest and db.quest == "active" then
 		self.questText:SetText(format(L.Q_LINE, quest.name, G:QuestProgress(), quest.need))
-
 		if G:QuestReady() then
 			self.questText:SetTextColor(0.4, 1, 0.4)
 		else
@@ -1161,7 +914,6 @@ function UI:Refresh()
 
 	local idle = not self.busy
 	local points = G:TalentPoints()
-
 	ns.Enable(self.huntButton, idle)
 	ns.Enable(self.restButton, idle)
 	ns.Enable(self.talentsButton, idle)
@@ -1170,7 +922,6 @@ function UI:Refresh()
 	ns.Enable(self.nextEnemyButton, idle)
 	ns.Enable(self.returnButton, idle)
 	ns.Enable(self.resurrectButton, idle)
-
 	if points > 0 then
 		self.talentsButton:SetText(format("%s |cff20ff20(%d)|r", L.TALENTS, points))
 	else
@@ -1178,19 +929,16 @@ function UI:Refresh()
 	end
 
 	local enemy = G.battle
-
 	if enemy then
 		self.enemyName:SetText(format("%s  (%s)", enemy.name, format(L.LEVEL, enemy.level)))
 		ns.SetBar(self.enemyBar, enemy.hp, enemy.maxHP, format(L.BARTEXT, enemy.hp, enemy.maxHP))
 	end
 
 	local canAct = C:CanAct() and not self.busy
-
 	ns.Enable(self.attackButton, canAct)
 	ns.Enable(self.fleeButton, canAct)
 	for _, b in ipairs(self.supplyButtons) do
 		local count = G:SupplyCount(b.supply.id)
-
 		ns.Enable(b, canAct and count > 0)
 		b:SetText(format(L.ACT_ITEM, b.supply.name, count))
 		ns.Tooltip(b, b.supply.name, format(L.ITEM_DESC, b.supply.desc, count))
@@ -1205,18 +953,12 @@ function UI:Refresh()
 end
 
 function UI:Toggle()
-	if not self.frame then
-		return
-	end
-
+	if not self.frame then return end
 	if self.frame:IsShown() then
 		self.frame:Hide()
 		self:HideWindows()
 	else
 		self.frame:Show()
-
-		if not self.current or self.current == "loading" then
-			self:ShowPage("menu")
-		end
+		if not self.current or self.current == "loading" then self:ShowPage("menu") end
 	end
 end

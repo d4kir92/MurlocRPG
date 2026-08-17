@@ -2,36 +2,6 @@ local _, ns = ...
 
 local Sprite = {}
 
-ns.SMOOTH_ANIM = true
-
-local function SetFrame(self, texture, index)
-	local def = self.def
-	local col = index % def.cols
-	local row = math.floor(index / def.cols)
-	local l = col / def.cols
-	local r = (col + 1) / def.cols
-	local t = row / def.rows
-	local b = (row + 1) / def.rows
-
-	if self.flip then
-		texture:SetTexCoord(r, t, r, b, l, t, l, b)
-	else
-		texture:SetTexCoord(l, t, l, b, r, t, r, b)
-	end
-end
-
-local function NextIndex(self)
-	if self.index + 1 >= self.def.frames then
-		if self.loop then
-			return 0
-		end
-
-		return self.index
-	end
-
-	return self.index + 1
-end
-
 local function Apply(self)
 	local def = self.def
 
@@ -39,25 +9,18 @@ local function Apply(self)
 		return
 	end
 
-	SetFrame(self, self.texture, self.index)
+	local col = self.index % def.cols
+	local row = math.floor(self.index / def.cols)
+	local l = col / def.cols
+	local r = (col + 1) / def.cols
+	local t = row / def.rows
+	local b = (row + 1) / def.rows
 
-	if not ns.SMOOTH_ANIM then
-		self.blend:Hide()
-
-		return
+	if self.flip then
+		self.texture:SetTexCoord(r, t, r, b, l, t, l, b)
+	else
+		self.texture:SetTexCoord(l, t, l, b, r, t, r, b)
 	end
-
-	local nextIndex = NextIndex(self)
-
-	if not self.playing or nextIndex == self.index then
-		self.blend:Hide()
-
-		return
-	end
-
-	SetFrame(self, self.blend, nextIndex)
-	self.blend:SetAlpha(0)
-	self.blend:Show()
 end
 
 local function StepAnim(self, elapsed)
@@ -68,16 +31,6 @@ local function StepAnim(self, elapsed)
 	self.timer = self.timer + elapsed
 
 	local step = 1 / self.fps
-
-	if ns.SMOOTH_ANIM and self.blend:IsShown() then
-		local p = self.timer / step
-
-		if p > 1 then
-			p = 1
-		end
-
-		self.blend:SetAlpha(p)
-	end
 
 	while self.timer >= step do
 		self.timer = self.timer - step
@@ -169,7 +122,6 @@ local function StepFlash(self, elapsed)
 	if self.flashTimer <= 0 then
 		self.flashTimer = nil
 		self.texture:SetVertexColor(self.tintR, self.tintG, self.tintB)
-		self.blend:SetVertexColor(self.tintR, self.tintG, self.tintB)
 	end
 end
 
@@ -187,7 +139,6 @@ function Sprite:Play(def, fps, loop, onFinish)
 
 	if self.def ~= def then
 		self.texture:SetTexture(ns.MEDIA .. def.file)
-		self.blend:SetTexture(ns.MEDIA .. def.file)
 		self.def = def
 	end
 
@@ -239,7 +190,6 @@ end
 
 function Sprite:Flash()
 	self.texture:SetVertexColor(1, 0.35, 0.35)
-	self.blend:SetVertexColor(1, 0.35, 0.35)
 	self.flashTimer = 0.2
 end
 
@@ -247,7 +197,6 @@ function Sprite:SetTint(r, g, b)
 	self.tintR, self.tintG, self.tintB = r, g, b
 	self.flashTimer = nil
 	self.texture:SetVertexColor(r, g, b)
-	self.blend:SetVertexColor(r, g, b)
 end
 
 function Sprite:SetDisplaySize(size)
@@ -261,12 +210,6 @@ function ns.CreateSprite(parent, size)
 	local t = f:CreateTexture(nil, "ARTWORK")
 	t:SetAllPoints(f)
 	f.texture = t
-
-	local b = f:CreateTexture(nil, "ARTWORK", nil, 1)
-	b:SetAllPoints(f)
-	b:SetAlpha(0)
-	b:Hide()
-	f.blend = b
 
 	f.index = 0
 	f.timer = 0

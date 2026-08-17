@@ -112,7 +112,7 @@ function T:Refresh()
 		if known then
 			b.icon:SetVertexColor(1, 1, 1)
 			ns.SetBorderColor(b, 1, 0.82, 0, 1)
-			extra = "Learned."
+			extra = ns:Trans("LID_LEARNED_ALREADY")
 		elseif canLearn then
 			b.icon:SetVertexColor(1, 1, 1)
 			ns.SetBorderColor(b, 0.2, 1, 0.2, 1)

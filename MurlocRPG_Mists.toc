@@ -32,8 +32,6 @@
 
 libs\D4Lib\D4Lib.xml
 
-Icons.lua
-Data.lua
 locale\deDE.lua
 locale\enUS.lua
 locale\esES.lua
@@ -45,6 +43,9 @@ locale\ptBR.lua
 locale\ruRU.lua
 locale\zhCN.lua
 locale\zhTW.lua
+
+Icons.lua
+Data.lua
 Items.lua
 Classes.lua
 Widgets.lua

@@ -191,6 +191,11 @@ function Character:Create()
 		value:SetPoint("TOPLEFT", x + 96, y)
 		value:SetJustifyH("RIGHT")
 		value:SetWidth(56)
+		local hover = CreateFrame("Frame", nil, f)
+		hover:SetPoint("TOPLEFT", x - 4, y + 3)
+		hover:SetSize(160, 16)
+		hover:EnableMouse(true)
+		ns.Tooltip(hover, ns:Trans("LID_" .. key), ns:Trans("LID_STATTIP_" .. key:gsub("^STAT_", "")))
 		self.statLabels[i] = label
 		self.statValues[i] = value
 	end

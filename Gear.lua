@@ -26,13 +26,20 @@ local function ShowCompare(item)
 	if not item or not item.slotType then return end
 	local slotKey = G:TargetSlot(item)
 	local equipped = ns.ITEM_BY_ID[G:Equipped()[slotKey]]
-	if not equipped or equipped.id == item.id then return end
 	local tip = CompareTooltip()
 	tip:SetOwner(UIParent, "ANCHOR_NONE")
 	tip:ClearAllPoints()
 	tip:SetPoint("TOPLEFT", GameTooltip, "TOPRIGHT", 4, 0)
 	tip:ClearLines()
 	tip:AddLine(ns:Trans("LID_CURRENTLY_EQUIPPED"), 1, 0.82, 0)
+	if not equipped then
+		tip:AddLine(ns.SLOTS[slotKey] and ns:Trans(ns.SLOTS[slotKey].name) or item.slotType, 0.8, 0.8, 0.8)
+		tip:AddLine(ns:Trans("LID_EMPTY_SLOT"), 0.6, 0.6, 0.6)
+		tip:Show()
+
+		return
+	end
+
 	local r, g, b = ns.ItemColor(equipped)
 	tip:AddLine(equipped.name, r, g, b)
 	tip:AddLine(ns.SLOTS[slotKey] and ns:Trans(ns.SLOTS[slotKey].name) or equipped.slotType, 0.8, 0.8, 0.8)

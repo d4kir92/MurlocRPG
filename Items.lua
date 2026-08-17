@@ -3,72 +3,72 @@ ns.BAG_SIZE = 25
 ns.SLOT_ORDER = {"HEAD", "NECK", "SHOULDER", "BACK", "CHEST", "WRISTS", "HANDS", "WAIST", "LEGS", "FEET", "FINGER1", "FINGER2", "MAINHAND", "OFFHAND",}
 ns.SLOTS = {
 	HEAD = {
-		name = "Head",
+		name = "LID_SLOT_HEAD",
 		empty = "UI-PaperDoll-Slot-Head",
 		type = "HEAD"
 	},
 	NECK = {
-		name = "Neck",
+		name = "LID_SLOT_NECK",
 		empty = "UI-PaperDoll-Slot-Neck",
 		type = "NECK"
 	},
 	SHOULDER = {
-		name = "Shoulder",
+		name = "LID_SLOT_SHOULDER",
 		empty = "UI-PaperDoll-Slot-Shoulder",
 		type = "SHOULDER"
 	},
 	BACK = {
-		name = "Back",
+		name = "LID_SLOT_BACK",
 		empty = "UI-PaperDoll-Slot-Chest",
 		type = "BACK"
 	},
 	CHEST = {
-		name = "Chest",
+		name = "LID_SLOT_CHEST",
 		empty = "UI-PaperDoll-Slot-Chest",
 		type = "CHEST"
 	},
 	WRISTS = {
-		name = "Wrists",
+		name = "LID_SLOT_WRISTS",
 		empty = "UI-PaperDoll-Slot-Wrists",
 		type = "WRISTS"
 	},
 	HANDS = {
-		name = "Hands",
+		name = "LID_SLOT_HANDS",
 		empty = "UI-PaperDoll-Slot-Hands",
 		type = "HANDS"
 	},
 	WAIST = {
-		name = "Waist",
+		name = "LID_SLOT_WAIST",
 		empty = "UI-PaperDoll-Slot-Waist",
 		type = "WAIST"
 	},
 	LEGS = {
-		name = "Legs",
+		name = "LID_SLOT_LEGS",
 		empty = "UI-PaperDoll-Slot-Legs",
 		type = "LEGS"
 	},
 	FEET = {
-		name = "Feet",
+		name = "LID_SLOT_FEET",
 		empty = "UI-PaperDoll-Slot-Feet",
 		type = "FEET"
 	},
 	FINGER1 = {
-		name = "Ring",
+		name = "LID_SLOT_FINGER1",
 		empty = "UI-PaperDoll-Slot-Finger",
 		type = "FINGER"
 	},
 	FINGER2 = {
-		name = "Ring",
+		name = "LID_SLOT_FINGER2",
 		empty = "UI-PaperDoll-Slot-Finger",
 		type = "FINGER"
 	},
 	MAINHAND = {
-		name = "Main Hand",
+		name = "LID_SLOT_MAINHAND",
 		empty = "UI-PaperDoll-Slot-MainHand",
 		type = "MAINHAND"
 	},
 	OFFHAND = {
-		name = "Off Hand",
+		name = "LID_SLOT_OFFHAND",
 		empty = "UI-PaperDoll-Slot-SecondaryHand",
 		type = "OFFHAND"
 	},
@@ -76,37 +76,37 @@ ns.SLOTS = {
 
 ns.QUALITY = {
 	[1] = {
-		name = "Poor",
+		name = "LID_QUALITY_POOR",
 		r = 0.62,
 		g = 0.62,
 		b = 0.62
 	},
 	[2] = {
-		name = "Common",
+		name = "LID_QUALITY_COMMON",
 		r = 1,
 		g = 1,
 		b = 1
 	},
 	[3] = {
-		name = "Uncommon",
+		name = "LID_QUALITY_UNCOMMON",
 		r = 0.12,
 		g = 1,
 		b = 0
 	},
 	[4] = {
-		name = "Rare",
+		name = "LID_QUALITY_RARE",
 		r = 0,
 		g = 0.44,
 		b = 0.87
 	},
 	[5] = {
-		name = "Epic",
+		name = "LID_QUALITY_EPIC",
 		r = 0.64,
 		g = 0.21,
 		b = 0.93
 	},
 	[6] = {
-		name = "Legendary",
+		name = "LID_QUALITY_LEGENDARY",
 		r = 1,
 		g = 0.5,
 		b = 0
@@ -114,11 +114,11 @@ ns.QUALITY = {
 }
 
 ns.STAT_LABEL = {
-	str = "+%d Strength",
-	stm = "+%d Stamina",
-	int = "+%d Intellect",
-	agi = "+%d Agility",
-	armor = "%d Armor",
+	str = "LID_STATLINE_STR",
+	stm = "LID_STATLINE_STM",
+	int = "LID_STATLINE_INT",
+	agi = "LID_STATLINE_AGI",
+	armor = "LID_STATLINE_ARMOR",
 }
 
 local function Item(id, name, icon, slotType, quality, level, value, noDrop, stats)
@@ -1034,10 +1034,10 @@ end
 function ns.ItemStatLines(item)
 	local lines = {}
 	local stats = item.stats
-	if stats.maxDmg and stats.maxDmg > 0 then lines[#lines + 1] = format("%d - %d Damage", stats.minDmg or 0, stats.maxDmg) end
+	if stats.maxDmg and stats.maxDmg > 0 then lines[#lines + 1] = format(ns:Trans("LID_STATLINE_DAMAGE"), stats.minDmg or 0, stats.maxDmg) end
 	for _, key in ipairs({"str", "stm", "int", "agi", "armor"}) do
 		local value = stats[key]
-		if value and value ~= 0 then lines[#lines + 1] = format(ns.STAT_LABEL[key], value) end
+		if value and value ~= 0 then lines[#lines + 1] = format(ns:Trans(ns.STAT_LABEL[key]), value) end
 	end
 	return lines
 end

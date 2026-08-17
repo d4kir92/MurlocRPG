@@ -1,0 +1,590 @@
+[
+ [
+  "LID_CLASS_RAIDER",
+  "Raider"
+ ],
+ [
+  "LID_CLASS_RAIDER_DESC",
+  "Weapon masters, bloodthirsty berserker's, and defenders of the weak. Raiders are a force to be reckoned with on the battlefield."
+ ],
+ [
+  "LID_ABILITY_CHARGE",
+  "Charge"
+ ],
+ [
+  "LID_ABILITY_MORTAL_STRIKE",
+  "Mortal Strike"
+ ],
+ [
+  "LID_ABILITY_EXECUTE",
+  "Execute"
+ ],
+ [
+  "LID_TREE_PROTECTION",
+  "Protection"
+ ],
+ [
+  "LID_TALENT_TOUGHNESS",
+  "Toughness"
+ ],
+ [
+  "LID_TALENT_SHIELD_SPECIALIZATION",
+  "Shield Specialization"
+ ],
+ [
+  "LID_TALENT_IRON_WILL",
+  "Iron Will"
+ ],
+ [
+  "LID_TALENT_ANTICIPATION",
+  "Anticipation"
+ ],
+ [
+  "LID_TALENT_IMPROVED_REVENGE",
+  "Improved Revenge"
+ ],
+ [
+  "LID_TALENT_DEFIANCE",
+  "Defiance"
+ ],
+ [
+  "LID_TALENT_LAST_STAND",
+  "Last Stand"
+ ],
+ [
+  "LID_TALENT_SHIELD_SLAM",
+  "Shield Slam"
+ ],
+ [
+  "LID_TALENT_CONCUSSION_BLOW",
+  "Concussion Blow"
+ ],
+ [
+  "LID_TALENT_SHIELD_WALL",
+  "Shield Wall"
+ ],
+ [
+  "LID_TALENT_ARMS",
+  "Arms"
+ ],
+ [
+  "LID_TALENT_IMPROVED_HEROIC_STRIKE",
+  "Improved Heroic Strike"
+ ],
+ [
+  "LID_TALENT_DEFLECTION",
+  "Deflection"
+ ],
+ [
+  "LID_TALENT_DEEP_WOUNDS",
+  "Deep Wounds"
+ ],
+ [
+  "LID_TALENT_IMPALE",
+  "Impale"
+ ],
+ [
+  "LID_TALENT_BATTLE_SHOUT",
+  "Battle Shout"
+ ],
+ [
+  "LID_TALENT_SWEEPING_STRIKES",
+  "Sweeping Strikes"
+ ],
+ [
+  "LID_TALENT_POLEAXE_SPECIALIZATION",
+  "Poleaxe Specialization"
+ ],
+ [
+  "LID_TALENT_IMPROVED_OVERPOWER",
+  "Improved Overpower"
+ ],
+ [
+  "LID_TALENT_DEATH_WISH",
+  "Death Wish"
+ ],
+ [
+  "LID_TALENT_MORTAL_STRIKE",
+  "Mortal Strike"
+ ],
+ [
+  "LID_CLASS_ORACLE",
+  "Oracle"
+ ],
+ [
+  "LID_CLASS_ORACLE_DESC",
+  "Knowledgeable and powerful, oracles can assault their foes with raw arcane magic, burn their foes to ash with powerful fire magic, and chill and freeze their enemies to the bone with extremely cold frost magic."
+ ],
+ [
+  "LID_ABILITY_FROST_SHOCK",
+  "Frost Shock"
+ ],
+ [
+  "LID_ABILITY_DRAIN_LIFE",
+  "Drain Life"
+ ],
+ [
+  "LID_ABILITY_PYROBLAST",
+  "Pyroblast"
+ ],
+ [
+  "LID_TREE_FIRE",
+  "Fire"
+ ],
+ [
+  "LID_TALENT_IMPROVED_FIREBALL",
+  "Improved Fireball"
+ ],
+ [
+  "LID_TALENT_IGNITE",
+  "Ignite"
+ ],
+ [
+  "LID_TALENT_INCINERATION",
+  "Incineration"
+ ],
+ [
+  "LID_TALENT_BURNING_SOUL",
+  "Burning Soul"
+ ],
+ [
+  "LID_TALENT_FIRE_POWER",
+  "Fire Power"
+ ],
+ [
+  "LID_TALENT_PYROBLAST",
+  "Pyroblast"
+ ],
+ [
+  "LID_TALENT_BLAST_WAVE",
+  "Blast Wave"
+ ],
+ [
+  "LID_TALENT_COMBUSTION",
+  "Combustion"
+ ],
+ [
+  "LID_TALENT_MASTER_OF_ELEMENTS",
+  "Master of Elements"
+ ],
+ [
+  "LID_TALENT_LIVING_BOMB",
+  "Living Bomb"
+ ],
+ [
+  "LID_TALENT_FROST",
+  "Frost"
+ ],
+ [
+  "LID_TALENT_FROSTBITE",
+  "Frostbite"
+ ],
+ [
+  "LID_TALENT_ELEMENTAL_PRECISION",
+  "Elemental Precision"
+ ],
+ [
+  "LID_TALENT_ICE_SHARDS",
+  "Ice Shards"
+ ],
+ [
+  "LID_TALENT_FROST_CHANNELING",
+  "Frost Channeling"
+ ],
+ [
+  "LID_TALENT_SHATTER",
+  "Shatter"
+ ],
+ [
+  "LID_TALENT_ICE_BARRIER",
+  "Ice Barrier"
+ ],
+ [
+  "LID_TALENT_ARCTIC_REACH",
+  "Arctic Reach"
+ ],
+ [
+  "LID_TALENT_COLD_SNAP",
+  "Cold Snap"
+ ],
+ [
+  "LID_TALENT_WINTER_S_CHILL",
+  "Winter's Chill"
+ ],
+ [
+  "LID_TALENT_ICE_BLOCK",
+  "Ice Block"
+ ],
+ [
+  "LID_CLASS_TIDEHUNTER",
+  "Tide Hunter"
+ ],
+ [
+  "LID_CLASS_TIDEHUNTER_DESC",
+  "Swift hunters of the shallows. Tide hunters strike from ambush with poisoned blades and finish a fight before the tide turns."
+ ],
+ [
+  "LID_ABILITY_EVISCERATE",
+  "Eviscerate"
+ ],
+ [
+  "LID_ABILITY_COLD_BLOOD",
+  "Cold Blood"
+ ],
+ [
+  "LID_ABILITY_AMBUSH",
+  "Ambush"
+ ],
+ [
+  "LID_TREE_ASSASSINATION",
+  "Assassination"
+ ],
+ [
+  "LID_TALENT_MALICE",
+  "Malice"
+ ],
+ [
+  "LID_TALENT_IMPROVED_EVISCERATE",
+  "Improved Eviscerate"
+ ],
+ [
+  "LID_TALENT_LETHALITY",
+  "Lethality"
+ ],
+ [
+  "LID_TALENT_VILE_POISONS",
+  "Vile Poisons"
+ ],
+ [
+  "LID_TALENT_IMPROVED_POISONS",
+  "Improved Poisons"
+ ],
+ [
+  "LID_TALENT_COLD_BLOOD",
+  "Cold Blood"
+ ],
+ [
+  "LID_TALENT_MURDER",
+  "Murder"
+ ],
+ [
+  "LID_TALENT_SEAL_FATE",
+  "Seal Fate"
+ ],
+ [
+  "LID_TALENT_VIGOR",
+  "Vigor"
+ ],
+ [
+  "LID_TALENT_MUTILATE",
+  "Mutilate"
+ ],
+ [
+  "LID_TALENT_COMBAT",
+  "Combat"
+ ],
+ [
+  "LID_TALENT_IMPROVED_SINISTER_STRIKE",
+  "Improved Sinister Strike"
+ ],
+ [
+  "LID_TALENT_LIGHTNING_REFLEXES",
+  "Lightning Reflexes"
+ ],
+ [
+  "LID_TALENT_RIPOSTE",
+  "Riposte"
+ ],
+ [
+  "LID_TALENT_PRECISION",
+  "Precision"
+ ],
+ [
+  "LID_TALENT_ENDURANCE",
+  "Endurance"
+ ],
+ [
+  "LID_TALENT_BLADE_FLURRY",
+  "Blade Flurry"
+ ],
+ [
+  "LID_TALENT_DUAL_WIELD_SPECIALIZATION",
+  "Dual Wield Specialization"
+ ],
+ [
+  "LID_TALENT_AGGRESSION",
+  "Aggression"
+ ],
+ [
+  "LID_TALENT_ADRENALINE_RUSH",
+  "Adrenaline Rush"
+ ],
+ [
+  "LID_TALENT_WEAPON_EXPERTISE",
+  "Weapon Expertise"
+ ],
+ [
+  "LID_CLASS_CLASSIC",
+  "Classic"
+ ],
+ [
+  "LID_CLASS_CLASSIC_DESC",
+  "Murk's original combat skills, a true classic blend between magic, energy and rage. Still making use of the improved combat system this class will guarantee that nostalgic feeling."
+ ],
+ [
+  "LID_ABILITY_HEROIC_STRIKE",
+  "Heroic Strike"
+ ],
+ [
+  "LID_ABILITY_HEAL",
+  "Heal"
+ ],
+ [
+  "LID_ABILITY_DRAIN_LIFE",
+  "Drain Life"
+ ],
+ [
+  "LID_TREE_FURY",
+  "Fury"
+ ],
+ [
+  "LID_TALENT_CRUELTY",
+  "Cruelty"
+ ],
+ [
+  "LID_TALENT_UNBRIDLED_WRATH",
+  "Unbridled Wrath"
+ ],
+ [
+  "LID_TALENT_IMPROVED_HEROIC_STRIKE",
+  "Improved Heroic Strike"
+ ],
+ [
+  "LID_TALENT_BLOOD_CRAZE",
+  "Blood Craze"
+ ],
+ [
+  "LID_TALENT_PIERCING_HOWL",
+  "Piercing Howl"
+ ],
+ [
+  "LID_TALENT_ENRAGE",
+  "Enrage"
+ ],
+ [
+  "LID_TALENT_DEATH_WISH",
+  "Death Wish"
+ ],
+ [
+  "LID_TALENT_FLURRY",
+  "Flurry"
+ ],
+ [
+  "LID_TALENT_BLOODTHIRST",
+  "Bloodthirst"
+ ],
+ [
+  "LID_TALENT_RAMPAGE",
+  "Rampage"
+ ],
+ [
+  "LID_TALENT_RESTORATION",
+  "Restoration"
+ ],
+ [
+  "LID_TALENT_IMPROVED_HEAL",
+  "Improved Heal"
+ ],
+ [
+  "LID_TALENT_SPIRIT_TAP",
+  "Spirit Tap"
+ ],
+ [
+  "LID_TALENT_HEALING_FOCUS",
+  "Healing Focus"
+ ],
+ [
+  "LID_TALENT_IMPROVED_DRAIN_LIFE",
+  "Improved Drain Life"
+ ],
+ [
+  "LID_TALENT_MEDITATION",
+  "Meditation"
+ ],
+ [
+  "LID_TALENT_RENEW",
+  "Renew"
+ ],
+ [
+  "LID_TALENT_POWER_WORD_SHIELD",
+  "Power Word: Shield"
+ ],
+ [
+  "LID_TALENT_HEALING_WAVE",
+  "Healing Wave"
+ ],
+ [
+  "LID_TALENT_CHAIN_HEAL",
+  "Chain Heal"
+ ],
+ [
+  "LID_TALENT_ANCESTRAL_SPIRIT",
+  "Ancestral Spirit"
+ ],
+ [
+  "LID_TDESC_STR",
+  "Increases Strength by %d."
+ ],
+ [
+  "LID_TDESC_STM",
+  "Increases Stamina by %d."
+ ],
+ [
+  "LID_TDESC_INT",
+  "Increases Intellect by %d."
+ ],
+ [
+  "LID_TDESC_AGI",
+  "Increases Agility by %d."
+ ],
+ [
+  "LID_TDESC_DMG",
+  "Increases your damage by %d%%."
+ ],
+ [
+  "LID_TDESC_CRIT",
+  "Increases your critical strike chance by %d%%."
+ ],
+ [
+  "LID_TDESC_ARMOR",
+  "Increases Armor by %d."
+ ],
+ [
+  "LID_TDESC_REGEN",
+  "Restores %d additional energy each round."
+ ],
+ [
+  "LID_TDESC_COST",
+  "Reduces ability energy cost by %d%%."
+ ],
+ [
+  "LID_TDESC_LIFESTEAL",
+  "Heals you for %d%% of the damage you deal."
+ ],
+ [
+  "LID_ADESC_HEAL",
+  "Restores %d health per level."
+ ],
+ [
+  "LID_ADESC_MAGIC_DRAIN",
+  "Deals %d damage per level and heals you for the same amount."
+ ],
+ [
+  "LID_ADESC_MAGIC",
+  "Deals %d damage per level."
+ ],
+ [
+  "LID_ADESC_CRIT",
+  "A weapon strike with %d bonus damage per level that always critically strikes."
+ ],
+ [
+  "LID_ADESC_DRAIN",
+  "A weapon strike with %d bonus damage per level that heals you for the damage dealt."
+ ],
+ [
+  "LID_ADESC_WEAPON",
+  "A weapon strike with %d bonus damage per level."
+ ],
+ [
+  "LID_ENEMY_BOAR",
+  "Forest Boar"
+ ],
+ [
+  "LID_ENEMY_CRAB",
+  "Beach Crawler"
+ ],
+ [
+  "LID_ENEMY_CRAB_KING",
+  "Beach Crawler King"
+ ],
+ [
+  "LID_ENEMY_CROC",
+  "Young Crocolisk"
+ ],
+ [
+  "LID_ENEMY_CROC_MOTHER",
+  "Mother Crocolisk"
+ ],
+ [
+  "LID_SUPPLY_SPICED_WOLF_MEAT",
+  "Spiced Wolf Meat"
+ ],
+ [
+  "LID_SUPPLY_SPICED_WOLF_MEAT_DESC",
+  "Restores 150 Health."
+ ],
+ [
+  "LID_SUPPLY_MAGIC_DUST",
+  "Magic Dust"
+ ],
+ [
+  "LID_SUPPLY_MAGIC_DUST_DESC",
+  "Restores 50 Energy."
+ ],
+ [
+  "LID_SUPPLY_QUALITY_HEALTH_POTION",
+  "Quality Health Potion"
+ ],
+ [
+  "LID_SUPPLY_QUALITY_HEALTH_POTION_DESC",
+  "Restores 300 Health."
+ ],
+ [
+  "LID_ITEM_RAW_MEAT",
+  "Raw Meat"
+ ],
+ [
+  "LID_TIP_TALENTS",
+  "Spend your talent points."
+ ],
+ [
+  "LID_TIP_CHARACTER",
+  "Equipment and stats."
+ ],
+ [
+  "LID_TIP_INVENTORY",
+  "Your loot."
+ ],
+ [
+  "LID_TIP_SHOP",
+  "Buy and sell with Blacksmith Frazzak."
+ ],
+ [
+  "LID_TIP_REST",
+  "Restore all health and mana."
+ ],
+ [
+  "LID_TIP_HUNT",
+  "Walk out and look for prey."
+ ],
+ [
+  "LID_TIP_RETURN",
+  "Walk back to the murloc camp."
+ ],
+ [
+  "LID_TIP_NEXT",
+  "Keep hunting without walking back."
+ ],
+ [
+  "LID_TIP_RESURRECT",
+  "The spirit healer revives you at 35% health."
+ ],
+ [
+  "LID_BRAKIL",
+  "Chief Brakil"
+ ],
+ [
+  "LID_CLICK_LEARN",
+  "Click to learn."
+ ]
+]

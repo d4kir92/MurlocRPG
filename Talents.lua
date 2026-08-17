@@ -91,7 +91,7 @@ function T:Refresh()
 	self.activeTree = self.activeTree or 1
 	for i, tab in ipairs(self.tabs) do
 		local tree = class.trees[i]
-		tab:SetText(format("%s (%d)", tree.name, G:TreeSpent(i)))
+		tab:SetText(format("%s (%d)", ns:Trans(tree.name), G:TreeSpent(i)))
 		if i == self.activeTree then
 			tab:LockHighlight()
 		else
@@ -101,7 +101,7 @@ function T:Refresh()
 
 	local tree = class.trees[self.activeTree]
 	self.pointsText:SetText(format(ns:Trans("LID_TALENT_POINTS"), G:TalentPoints()))
-	self.spentText:SetText(format(ns:Trans("LID_TALENT_SPENT"), tree.name, G:TreeSpent(self.activeTree)))
+	self.spentText:SetText(format(ns:Trans("LID_TALENT_SPENT"), ns:Trans(tree.name), G:TreeSpent(self.activeTree)))
 	for i, b in ipairs(self.buttons) do
 		local talent = tree.talents[i]
 		ns.SetIcon(b.icon, talent.icon)
@@ -116,18 +116,18 @@ function T:Refresh()
 		elseif canLearn then
 			b.icon:SetVertexColor(1, 1, 1)
 			ns.SetBorderColor(b, 0.2, 1, 0.2, 1)
-			extra = "Click to learn."
+			extra = ns:Trans("LID_CLICK_LEARN")
 		else
 			b.icon:SetVertexColor(0.35, 0.35, 0.35)
 			ns.SetBorderColor(b, 0.3, 0.3, 0.3, 1)
 			if not unlocked then
-				extra = format(ns:Trans("LID_TALENT_NEED"), talent.tier - 1, tree.name)
+				extra = format(ns:Trans("LID_TALENT_NEED"), talent.tier - 1, ns:Trans(tree.name))
 			else
 				extra = ns:Trans("LID_TALENT_NONE")
 			end
 		end
 
-		ns.Tooltip(b, talent.name, ns.TalentDesc(talent), extra)
+		ns.Tooltip(b, ns:Trans(talent.name), ns.TalentDesc(talent), extra)
 		ns.RefreshTooltip(b)
 		local link = self.links[i]
 		if link then

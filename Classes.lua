@@ -1,46 +1,46 @@
 local _, ns = ...
 local STAT_TEXT = {
-	str = "Increases Strength by %d.",
-	stm = "Increases Stamina by %d.",
-	int = "Increases Intellect by %d.",
-	agi = "Increases Agility by %d.",
-	dmg = "Increases your damage by %d%%.",
-	crit = "Increases your critical strike chance by %d%%.",
-	armor = "Increases Armor by %d.",
-	regen = "Restores %d additional energy each round.",
-	cost = "Reduces ability energy cost by %d%%.",
-	lifesteal = "Heals you for %d%% of the damage you deal.",
+	str = "LID_TDESC_STR",
+	stm = "LID_TDESC_STM",
+	int = "LID_TDESC_INT",
+	agi = "LID_TDESC_AGI",
+	dmg = "LID_TDESC_DMG",
+	crit = "LID_TDESC_CRIT",
+	armor = "LID_TDESC_ARMOR",
+	regen = "LID_TDESC_REGEN",
+	cost = "LID_TDESC_COST",
+	lifesteal = "LID_TDESC_LIFESTEAL",
 }
 
 function ns.TalentDesc(talent)
-	local fmt = STAT_TEXT[talent.stat]
-	if not fmt then return "" end
-	return format(fmt, talent.value)
+	local key = STAT_TEXT[talent.stat]
+	if not key then return "" end
+	return format(ns:Trans(key), talent.value)
 end
 
 function ns.AbilityDesc(ability)
 	local mod = ability.mod or 0
-	if ability.kind == "heal" then return format("Restores %d health per level.", mod) end
+	if ability.kind == "heal" then return format(ns:Trans("LID_ADESC_HEAL"), mod) end
 	if ability.school == "magic" then
-		if ability.kind == "drain" then return format("Deals %d damage per level and heals you for the same amount.", mod) end
-		return format("Deals %d damage per level.", mod)
+		if ability.kind == "drain" then return format(ns:Trans("LID_ADESC_MAGIC_DRAIN"), mod) end
+		return format(ns:Trans("LID_ADESC_MAGIC"), mod)
 	end
 
-	if ability.kind == "critstrike" then return format("A weapon strike with %d bonus damage per level that always critically strikes.", mod) end
-	if ability.kind == "drain" then return format("A weapon strike with %d bonus damage per level that heals you for the damage dealt.", mod) end
-	return format("A weapon strike with %d bonus damage per level.", mod)
+	if ability.kind == "critstrike" then return format(ns:Trans("LID_ADESC_CRIT"), mod) end
+	if ability.kind == "drain" then return format(ns:Trans("LID_ADESC_DRAIN"), mod) end
+	return format(ns:Trans("LID_ADESC_WEAPON"), mod)
 end
 
 ns.CLASSES = {
 	{
 		id = "RAIDER",
-		name = "Raider",
+		name = "LID_CLASS_RAIDER",
 		icon = "Raider",
-		desc = "Weapon masters, bloodthirsty berserker's, and defenders of the weak. Raiders are a force to be reckoned with on the battlefield.",
+		desc = "LID_CLASS_RAIDER_DESC",
 		abilities = {
 			{
 				id = "CHARGE",
-				name = "Charge",
+				name = "LID_ABILITY_CHARGE",
 				icon = "charge",
 				level = 1,
 				cost = 20,
@@ -49,7 +49,7 @@ ns.CLASSES = {
 			},
 			{
 				id = "MORTALSTRIKE",
-				name = "Mortal Strike",
+				name = "LID_ABILITY_MORTAL_STRIKE",
 				icon = "mortalstrike",
 				level = 3,
 				cost = 15,
@@ -58,7 +58,7 @@ ns.CLASSES = {
 			},
 			{
 				id = "EXECUTE",
-				name = "Execute",
+				name = "LID_ABILITY_EXECUTE",
 				icon = "execute_icon",
 				level = 5,
 				cost = 25,
@@ -68,65 +68,65 @@ ns.CLASSES = {
 		},
 		trees = {
 			{
-				name = "Protection",
+				name = "LID_TREE_PROTECTION",
 				icon = "shieldblock",
 				talents = {
 					{
-						name = "Toughness",
+						name = "LID_TALENT_TOUGHNESS",
 						icon = "toughness",
 						stat = "stm",
 						value = 8
 					},
 					{
-						name = "Shield Specialization",
+						name = "LID_TALENT_SHIELD_SPECIALIZATION",
 						icon = "shieldblock",
 						stat = "armor",
 						value = 80
 					},
 					{
-						name = "Iron Will",
+						name = "LID_TALENT_IRON_WILL",
 						icon = "Spell_Holy_SealOfProtection",
 						stat = "stm",
 						value = 10
 					},
 					{
-						name = "Anticipation",
+						name = "LID_TALENT_ANTICIPATION",
 						icon = "INV_Shield_04",
 						stat = "armor",
 						value = 100
 					},
 					{
-						name = "Improved Revenge",
+						name = "LID_TALENT_IMPROVED_REVENGE",
 						icon = "revenge",
 						stat = "dmg",
 						value = 5
 					},
 					{
-						name = "Defiance",
+						name = "LID_TALENT_DEFIANCE",
 						icon = "shieldbash",
 						stat = "armor",
 						value = 100
 					},
 					{
-						name = "Last Stand",
+						name = "LID_TALENT_LAST_STAND",
 						icon = "laststand",
 						stat = "stm",
 						value = 14
 					},
 					{
-						name = "Shield Slam",
+						name = "LID_TALENT_SHIELD_SLAM",
 						icon = "shieldslam",
 						stat = "dmg",
 						value = 8
 					},
 					{
-						name = "Concussion Blow",
+						name = "LID_TALENT_CONCUSSION_BLOW",
 						icon = "pummel",
 						stat = "crit",
 						value = 4
 					},
 					{
-						name = "Shield Wall",
+						name = "LID_TALENT_SHIELD_WALL",
 						icon = "shieldwall",
 						stat = "armor",
 						value = 160
@@ -134,65 +134,65 @@ ns.CLASSES = {
 				},
 			},
 			{
-				name = "Arms",
+				name = "LID_TREE_ARMS",
 				icon = "mortalstrike",
 				talents = {
 					{
-						name = "Improved Heroic Strike",
+						name = "LID_TALENT_IMPROVED_HEROIC_STRIKE",
 						icon = "heroicstrike",
 						stat = "cost",
 						value = 12
 					},
 					{
-						name = "Deflection",
+						name = "LID_TALENT_DEFLECTION",
 						icon = "Ability_Warrior_Disarm",
 						stat = "crit",
 						value = 3
 					},
 					{
-						name = "Deep Wounds",
+						name = "LID_TALENT_DEEP_WOUNDS",
 						icon = "deepwounds",
 						stat = "dmg",
 						value = 6
 					},
 					{
-						name = "Impale",
+						name = "LID_TALENT_IMPALE",
 						icon = "rend",
 						stat = "crit",
 						value = 4
 					},
 					{
-						name = "Battle Shout",
+						name = "LID_TALENT_BATTLE_SHOUT",
 						icon = "battleshout",
 						stat = "dmg",
 						value = 6
 					},
 					{
-						name = "Sweeping Strikes",
+						name = "LID_TALENT_SWEEPING_STRIKES",
 						icon = "thunderclap",
 						stat = "dmg",
 						value = 7
 					},
 					{
-						name = "Poleaxe Specialization",
+						name = "LID_TALENT_POLEAXE_SPECIALIZATION",
 						icon = "INV_Sword_06",
 						stat = "crit",
 						value = 5
 					},
 					{
-						name = "Improved Overpower",
+						name = "LID_TALENT_IMPROVED_OVERPOWER",
 						icon = "overpower",
 						stat = "dmg",
 						value = 8
 					},
 					{
-						name = "Death Wish",
+						name = "LID_TALENT_DEATH_WISH",
 						icon = "recklessness",
 						stat = "dmg",
 						value = 10
 					},
 					{
-						name = "Mortal Strike",
+						name = "LID_TALENT_MORTAL_STRIKE",
 						icon = "mortalstrike",
 						stat = "dmg",
 						value = 12
@@ -203,13 +203,13 @@ ns.CLASSES = {
 	},
 	{
 		id = "ORACLE",
-		name = "Oracle",
+		name = "LID_CLASS_ORACLE",
 		icon = "Oracle",
-		desc = "Knowledgeable and powerful, oracles can assault their foes with raw arcane magic, burn their foes to ash with powerful fire magic, and chill and freeze their enemies to the bone with extremely cold frost magic.",
+		desc = "LID_CLASS_ORACLE_DESC",
 		abilities = {
 			{
 				id = "FROSTSHOCK",
-				name = "Frost Shock",
+				name = "LID_ABILITY_FROST_SHOCK",
 				icon = "frostshock",
 				level = 1,
 				cost = 20,
@@ -220,7 +220,7 @@ ns.CLASSES = {
 			},
 			{
 				id = "DRAINLIFE",
-				name = "Drain Life",
+				name = "LID_ABILITY_DRAIN_LIFE",
 				icon = "Spell_shadow_lifedrain02",
 				level = 3,
 				cost = 25,
@@ -231,7 +231,7 @@ ns.CLASSES = {
 			},
 			{
 				id = "PYROBLAST",
-				name = "Pyroblast",
+				name = "LID_ABILITY_PYROBLAST",
 				icon = "pyroblast_icon",
 				level = 5,
 				cost = 55,
@@ -243,65 +243,65 @@ ns.CLASSES = {
 		},
 		trees = {
 			{
-				name = "Fire",
+				name = "LID_TREE_FIRE",
 				icon = "pyroblast_icon",
 				talents = {
 					{
-						name = "Improved Fireball",
+						name = "LID_TALENT_IMPROVED_FIREBALL",
 						icon = "pyroblast_icon",
 						stat = "cost",
 						value = 12
 					},
 					{
-						name = "Ignite",
+						name = "LID_TALENT_IGNITE",
 						icon = "flameshock",
 						stat = "dmg",
 						value = 6
 					},
 					{
-						name = "Incineration",
+						name = "LID_TALENT_INCINERATION",
 						icon = "searingtotem",
 						stat = "crit",
 						value = 4
 					},
 					{
-						name = "Burning Soul",
+						name = "LID_TALENT_BURNING_SOUL",
 						icon = "Spell_shadow_bloodboil",
 						stat = "agi",
 						value = 5
 					},
 					{
-						name = "Fire Power",
+						name = "LID_TALENT_FIRE_POWER",
 						icon = "firenovatotem",
 						stat = "dmg",
 						value = 8
 					},
 					{
-						name = "Pyroblast",
+						name = "LID_TALENT_PYROBLAST",
 						icon = "Ability_Creature_Cursed_01",
 						stat = "dmg",
 						value = 10
 					},
 					{
-						name = "Blast Wave",
+						name = "LID_TALENT_BLAST_WAVE",
 						icon = "Ability_Creature_Cursed_02",
 						stat = "dmg",
 						value = 7
 					},
 					{
-						name = "Combustion",
+						name = "LID_TALENT_COMBUSTION",
 						icon = "bloodlust",
 						stat = "crit",
 						value = 6
 					},
 					{
-						name = "Master of Elements",
+						name = "LID_TALENT_MASTER_OF_ELEMENTS",
 						icon = "elementalmastery",
 						stat = "regen",
 						value = 1
 					},
 					{
-						name = "Living Bomb",
+						name = "LID_TALENT_LIVING_BOMB",
 						icon = "Spell_shadow_curse",
 						stat = "dmg",
 						value = 12
@@ -309,65 +309,65 @@ ns.CLASSES = {
 				},
 			},
 			{
-				name = "Frost",
+				name = "LID_TREE_FROST",
 				icon = "forstnova_icon",
 				talents = {
 					{
-						name = "Frostbite",
+						name = "LID_TALENT_FROSTBITE",
 						icon = "frostshock",
 						stat = "dmg",
 						value = 5
 					},
 					{
-						name = "Elemental Precision",
+						name = "LID_TALENT_ELEMENTAL_PRECISION",
 						icon = "Ability_Marksmanship",
 						stat = "crit",
 						value = 3
 					},
 					{
-						name = "Ice Shards",
+						name = "LID_TALENT_ICE_SHARDS",
 						icon = "forstnova_icon",
 						stat = "crit",
 						value = 5
 					},
 					{
-						name = "Frost Channeling",
+						name = "LID_TALENT_FROST_CHANNELING",
 						icon = "manaspring",
 						stat = "cost",
 						value = 12
 					},
 					{
-						name = "Shatter",
+						name = "LID_TALENT_SHATTER",
 						icon = "Spell_polymorph_icon",
 						stat = "crit",
 						value = 6
 					},
 					{
-						name = "Ice Barrier",
+						name = "LID_TALENT_ICE_BARRIER",
 						icon = "elementalshield",
 						stat = "armor",
 						value = 120
 					},
 					{
-						name = "Arctic Reach",
+						name = "LID_TALENT_ARCTIC_REACH",
 						icon = "Spell_nature_earthbindtotem",
 						stat = "dmg",
 						value = 7
 					},
 					{
-						name = "Cold Snap",
+						name = "LID_TALENT_COLD_SNAP",
 						icon = "naturesswiftness",
 						stat = "agi",
 						value = 8
 					},
 					{
-						name = "Winter's Chill",
+						name = "LID_TALENT_WINTER_S_CHILL",
 						icon = "INV_Misc_Orb_01",
 						stat = "dmg",
 						value = 9
 					},
 					{
-						name = "Ice Block",
+						name = "LID_TALENT_ICE_BLOCK",
 						icon = "hex",
 						stat = "armor",
 						value = 160
@@ -378,13 +378,13 @@ ns.CLASSES = {
 	},
 	{
 		id = "TIDEHUNTER",
-		name = "Tide Hunter",
+		name = "LID_CLASS_TIDEHUNTER",
 		icon = "Tide_Hunter",
-		desc = "Swift hunters of the shallows. Tide hunters strike from ambush with poisoned blades and finish a fight before the tide turns.",
+		desc = "LID_CLASS_TIDEHUNTER_DESC",
 		abilities = {
 			{
 				id = "EVISCERATE",
-				name = "Eviscerate",
+				name = "LID_ABILITY_EVISCERATE",
 				icon = "Ability_rogue_eviscerate",
 				level = 1,
 				cost = 15,
@@ -393,7 +393,7 @@ ns.CLASSES = {
 			},
 			{
 				id = "COLDBLOOD",
-				name = "Cold Blood",
+				name = "LID_ABILITY_COLD_BLOOD",
 				icon = "cold_blood_icon",
 				level = 3,
 				cost = 20,
@@ -402,7 +402,7 @@ ns.CLASSES = {
 			},
 			{
 				id = "AMBUSH",
-				name = "Ambush",
+				name = "LID_ABILITY_AMBUSH",
 				icon = "Ability_rogue_ambush",
 				level = 5,
 				cost = 60,
@@ -412,65 +412,65 @@ ns.CLASSES = {
 		},
 		trees = {
 			{
-				name = "Assassination",
+				name = "LID_TREE_ASSASSINATION",
 				icon = "deadlypoison",
 				talents = {
 					{
-						name = "Malice",
+						name = "LID_TALENT_MALICE",
 						icon = "coldblood",
 						stat = "crit",
 						value = 3
 					},
 					{
-						name = "Improved Eviscerate",
+						name = "LID_TALENT_IMPROVED_EVISCERATE",
 						icon = "eviscerate",
 						stat = "dmg",
 						value = 6
 					},
 					{
-						name = "Lethality",
+						name = "LID_TALENT_LETHALITY",
 						icon = "Ability_rogue_eviscerate",
 						stat = "crit",
 						value = 5
 					},
 					{
-						name = "Vile Poisons",
+						name = "LID_TALENT_VILE_POISONS",
 						icon = "instantpoison",
 						stat = "dmg",
 						value = 7
 					},
 					{
-						name = "Improved Poisons",
+						name = "LID_TALENT_IMPROVED_POISONS",
 						icon = "deadlypoison",
 						stat = "dmg",
 						value = 8
 					},
 					{
-						name = "Cold Blood",
+						name = "LID_TALENT_COLD_BLOOD",
 						icon = "cold_blood_icon",
 						stat = "crit",
 						value = 6
 					},
 					{
-						name = "Murder",
+						name = "LID_TALENT_MURDER",
 						icon = "backstab",
 						stat = "dmg",
 						value = 8
 					},
 					{
-						name = "Seal Fate",
+						name = "LID_TALENT_SEAL_FATE",
 						icon = "destiny",
 						stat = "crit",
 						value = 5
 					},
 					{
-						name = "Vigor",
+						name = "LID_TALENT_VIGOR",
 						icon = "vigor",
 						stat = "agi",
 						value = 8
 					},
 					{
-						name = "Mutilate",
+						name = "LID_TALENT_MUTILATE",
 						icon = "ambush",
 						stat = "dmg",
 						value = 12
@@ -478,65 +478,65 @@ ns.CLASSES = {
 				},
 			},
 			{
-				name = "Combat",
+				name = "LID_TREE_COMBAT",
 				icon = "sinisterstrike",
 				talents = {
 					{
-						name = "Improved Sinister Strike",
+						name = "LID_TALENT_IMPROVED_SINISTER_STRIKE",
 						icon = "sinisterstrike",
 						stat = "cost",
 						value = 12
 					},
 					{
-						name = "Lightning Reflexes",
+						name = "LID_TALENT_LIGHTNING_REFLEXES",
 						icon = "evasion",
 						stat = "armor",
 						value = 80
 					},
 					{
-						name = "Riposte",
+						name = "LID_TALENT_RIPOSTE",
 						icon = "kick",
 						stat = "armor",
 						value = 100
 					},
 					{
-						name = "Precision",
+						name = "LID_TALENT_PRECISION",
 						icon = "Ability_rogue_ambush",
 						stat = "crit",
 						value = 4
 					},
 					{
-						name = "Endurance",
+						name = "LID_TALENT_ENDURANCE",
 						icon = "preparation",
 						stat = "stm",
 						value = 10
 					},
 					{
-						name = "Blade Flurry",
+						name = "LID_TALENT_BLADE_FLURRY",
 						icon = "hemorage",
 						stat = "dmg",
 						value = 8
 					},
 					{
-						name = "Dual Wield Specialization",
+						name = "LID_TALENT_DUAL_WIELD_SPECIALIZATION",
 						icon = "INV_Sword_06",
 						stat = "dmg",
 						value = 7
 					},
 					{
-						name = "Aggression",
+						name = "LID_TALENT_AGGRESSION",
 						icon = "bloodcraze",
 						stat = "dmg",
 						value = 8
 					},
 					{
-						name = "Adrenaline Rush",
+						name = "LID_TALENT_ADRENALINE_RUSH",
 						icon = "adrenaline_icon",
 						stat = "regen",
 						value = 1
 					},
 					{
-						name = "Weapon Expertise",
+						name = "LID_TALENT_WEAPON_EXPERTISE",
 						icon = "addrenalinerush",
 						stat = "lifesteal",
 						value = 10
@@ -547,13 +547,13 @@ ns.CLASSES = {
 	},
 	{
 		id = "CLASSIC",
-		name = "Classic",
+		name = "LID_CLASS_CLASSIC",
 		icon = "Classic",
-		desc = "Murk's original combat skills, a true classic blend between magic, energy and rage. Still making use of the improved combat system this class will guarantee that nostalgic feeling.",
+		desc = "LID_CLASS_CLASSIC_DESC",
 		abilities = {
 			{
 				id = "HEROIC_STRIKE",
-				name = "Heroic Strike",
+				name = "LID_ABILITY_HEROIC_STRIKE",
 				icon = "heroicstrike",
 				level = 1,
 				cost = 15,
@@ -562,7 +562,7 @@ ns.CLASSES = {
 			},
 			{
 				id = "HEAL",
-				name = "Heal",
+				name = "LID_ABILITY_HEAL",
 				icon = "Spell_holy_heal",
 				level = 3,
 				cost = 45,
@@ -573,7 +573,7 @@ ns.CLASSES = {
 			},
 			{
 				id = "DRAINLIFE",
-				name = "Drain Life",
+				name = "LID_ABILITY_DRAIN_LIFE",
 				icon = "Spell_shadow_lifedrain02",
 				level = 5,
 				cost = 25,
@@ -585,65 +585,65 @@ ns.CLASSES = {
 		},
 		trees = {
 			{
-				name = "Fury",
+				name = "LID_TREE_FURY",
 				icon = "bloodrage_icon",
 				talents = {
 					{
-						name = "Cruelty",
+						name = "LID_TALENT_CRUELTY",
 						icon = "bloodrage_icon",
 						stat = "crit",
 						value = 3
 					},
 					{
-						name = "Unbridled Wrath",
+						name = "LID_TALENT_UNBRIDLED_WRATH",
 						icon = "bloodrage",
 						stat = "regen",
 						value = 1
 					},
 					{
-						name = "Improved Heroic Strike",
+						name = "LID_TALENT_IMPROVED_HEROIC_STRIKE",
 						icon = "heroicstrike",
 						stat = "cost",
 						value = 12
 					},
 					{
-						name = "Blood Craze",
+						name = "LID_TALENT_BLOOD_CRAZE",
 						icon = "bloodcraze",
 						stat = "lifesteal",
 						value = 8
 					},
 					{
-						name = "Piercing Howl",
+						name = "LID_TALENT_PIERCING_HOWL",
 						icon = "Ability_GhoulFrenzy",
 						stat = "dmg",
 						value = 6
 					},
 					{
-						name = "Enrage",
+						name = "LID_TALENT_ENRAGE",
 						icon = "Bloodpower",
 						stat = "dmg",
 						value = 8
 					},
 					{
-						name = "Death Wish",
+						name = "LID_TALENT_DEATH_WISH",
 						icon = "recklessness",
 						stat = "dmg",
 						value = 10
 					},
 					{
-						name = "Flurry",
+						name = "LID_TALENT_FLURRY",
 						icon = "windfurytotem",
 						stat = "crit",
 						value = 5
 					},
 					{
-						name = "Bloodthirst",
+						name = "LID_TALENT_BLOODTHIRST",
 						icon = "Spell_shadow_bloodboil",
 						stat = "lifesteal",
 						value = 12
 					},
 					{
-						name = "Rampage",
+						name = "LID_TALENT_RAMPAGE",
 						icon = "bloodlust",
 						stat = "dmg",
 						value = 12
@@ -651,65 +651,65 @@ ns.CLASSES = {
 				},
 			},
 			{
-				name = "Restoration",
+				name = "LID_TREE_RESTORATION",
 				icon = "Spell_holy_heal",
 				talents = {
 					{
-						name = "Improved Heal",
+						name = "LID_TALENT_IMPROVED_HEAL",
 						icon = "Spell_holy_heal",
 						stat = "cost",
 						value = 12
 					},
 					{
-						name = "Spirit Tap",
+						name = "LID_TALENT_SPIRIT_TAP",
 						icon = "Spell_nature_regeneration",
 						stat = "agi",
 						value = 5
 					},
 					{
-						name = "Healing Focus",
+						name = "LID_TALENT_HEALING_FOCUS",
 						icon = "healingstream",
 						stat = "stm",
 						value = 10
 					},
 					{
-						name = "Improved Drain Life",
+						name = "LID_TALENT_IMPROVED_DRAIN_LIFE",
 						icon = "Spell_shadow_lifedrain02",
 						stat = "lifesteal",
 						value = 10
 					},
 					{
-						name = "Meditation",
+						name = "LID_TALENT_MEDITATION",
 						icon = "magic_dust",
 						stat = "regen",
 						value = 1
 					},
 					{
-						name = "Renew",
+						name = "LID_TALENT_RENEW",
 						icon = "renew_icon",
 						stat = "stm",
 						value = 12
 					},
 					{
-						name = "Power Word: Shield",
+						name = "LID_TALENT_POWER_WORD_SHIELD",
 						icon = "powerwordshield_icon",
 						stat = "armor",
 						value = 120
 					},
 					{
-						name = "Healing Wave",
+						name = "LID_TALENT_HEALING_WAVE",
 						icon = "healingwave",
 						stat = "stm",
 						value = 14
 					},
 					{
-						name = "Chain Heal",
+						name = "LID_TALENT_CHAIN_HEAL",
 						icon = "chainheal",
 						stat = "lifesteal",
 						value = 12
 					},
 					{
-						name = "Ancestral Spirit",
+						name = "LID_TALENT_ANCESTRAL_SPIRIT",
 						icon = "ancestralspirit",
 						stat = "armor",
 						value = 160

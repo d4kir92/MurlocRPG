@@ -256,7 +256,7 @@ function G:LearnTalent(treeIndex, talent)
 			ns.UI:Log(ns:Trans("LID_TALENT_NONE"), 1, 0.4, 0.4)
 		elseif reason == "tier" then
 			local tree = self:Class().trees[treeIndex]
-			ns.UI:Log(format(ns:Trans("LID_TALENT_NEED"), talent.tier - 1, tree.name), 1, 0.4, 0.4)
+			ns.UI:Log(format(ns:Trans("LID_TALENT_NEED"), talent.tier - 1, ns:Trans(tree.name)), 1, 0.4, 0.4)
 		end
 		return false
 	end
@@ -266,7 +266,7 @@ function G:LearnTalent(treeIndex, talent)
 	local s = self:Stats()
 	self.db.hp = math.min(self.db.hp, s.maxHP)
 	self.db.mp = math.min(self.db.mp, s.maxMP)
-	ns.UI:Log(format(ns:Trans("LID_TALENT_LEARNED"), talent.name), 0.4, 0.8, 1)
+	ns.UI:Log(format(ns:Trans("LID_TALENT_LEARNED"), ns:Trans(talent.name)), 0.4, 0.8, 1)
 	ns.Sound("IG_CHARACTER_INFO_TAB")
 	return true
 end
@@ -360,13 +360,13 @@ function G:BuySupply(id)
 	local supply = ns.CONSUMABLE_BY_ID[id]
 	if not supply then return false end
 	if not self:CanAfford(supply.value) then
-		ns.UI:Log(format(ns:Trans("LID_SHOP_NO_MONEY"), supply.name), 1, 0.4, 0.4)
+		ns.UI:Log(format(ns:Trans("LID_SHOP_NO_MONEY"), ns:Trans(supply.name)), 1, 0.4, 0.4)
 		return false
 	end
 
 	self.db.money = self:Money() - supply.value
 	self:AddSupply(id, 1)
-	ns.UI:Log(format(ns:Trans("LID_SHOP_BOUGHT"), supply.name, ns.MoneyText(supply.value)), 0.8, 0.8, 0.8)
+	ns.UI:Log(format(ns:Trans("LID_SHOP_BOUGHT"), ns:Trans(supply.name), ns.MoneyText(supply.value)), 0.8, 0.8, 0.8)
 	ns.Sound("IG_BACKPACK_OPEN")
 	return true
 end
@@ -481,7 +481,7 @@ function G:AddXP(amount)
 		local class = self:Class()
 		if class then
 			for _, a in ipairs(class.abilities) do
-				if a.level == db.level then ns.UI:Log(format(ns:Trans("LID_LEARNED"), a.name), 0.4, 0.8, 1) end
+				if a.level == db.level then ns.UI:Log(format(ns:Trans("LID_LEARNED"), ns:Trans(a.name)), 0.4, 0.8, 1) end
 			end
 		end
 	end
@@ -532,7 +532,7 @@ function G:GiveQuestReward(q)
 		local supply = ns.CONSUMABLE_BY_ID[q.supply.id]
 		if supply then
 			self:AddSupply(supply.id, q.supply.count)
-			ns.UI:Log(format(ns:Trans("LID_Q_REWARD_SUPPLY"), q.supply.count, supply.name), 0.9, 0.85, 0.5)
+			ns.UI:Log(format(ns:Trans("LID_Q_REWARD_SUPPLY"), q.supply.count, ns:Trans(supply.name)), 0.9, 0.85, 0.5)
 		end
 	end
 

@@ -187,7 +187,7 @@ function UI:CreateClassPage(parent)
 		ns.SetIcon(b.icon, class.icon)
 		b.label = b:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 		b.label:SetPoint("LEFT", b.icon, "RIGHT", 8, 0)
-		b.label:SetText(class.name)
+		b.label:SetText(ns:Trans(class.name))
 		b.classIndex = i
 		b:SetScript("OnClick", function()
 			UI.selectedClass = i
@@ -295,7 +295,7 @@ function UI:ShowGameOver(summary)
 	self.overLines[2]:SetText(format(ns:Trans("LID_RUN_QUESTS"), summary.questsDone, summary.questTotal))
 	self.overLines[3]:SetText(format(ns:Trans("LID_RUN_KILLS"), summary.kills))
 	self.overLines[4]:SetText(format(ns:Trans("LID_RUN_MONEY"), ns.MoneyText(summary.earned)))
-	self.overLines[5]:SetText(format(ns:Trans("LID_RUN_KILLED_BY"), summary.killedBy or "?"))
+	self.overLines[5]:SetText(format(ns:Trans("LID_RUN_KILLED_BY"), summary.killedBy and ns:Trans(summary.killedBy) or "?"))
 	ns.Sound("IG_QUEST_FAILED")
 	self:ShowPage("gameover")
 end
@@ -314,14 +314,14 @@ function UI:RefreshClassPage()
 		end
 	end
 
-	self.classTitle:SetText(class.name)
-	self.classDesc:SetText(class.desc)
+	self.classTitle:SetText(ns:Trans(class.name))
+	self.classDesc:SetText(ns:Trans(class.desc))
 	for i, b in ipairs(self.classSkills) do
 		local a = class.abilities[i]
 		if a then
 			b:Show()
 			ns.SetIcon(b.icon, a.icon)
-			ns.Tooltip(b, a.name, ns.AbilityDesc(a), format("%s  %s", format(ns:Trans("LID_COST"), a.cost), format(ns:Trans("LID_LOCKED"), a.level)))
+			ns.Tooltip(b, ns:Trans(a.name), ns.AbilityDesc(a), format("%s  %s", format(ns:Trans("LID_COST"), a.cost), format(ns:Trans("LID_LOCKED"), a.level)))
 		else
 			b:Hide()
 		end
@@ -414,7 +414,7 @@ function UI:CreateScene(parent)
 	self.brakil:Play(ns.SPRITES.BRAKIL_IDLE, 12, true)
 	self.brakilName = scene:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	self.brakilName:SetPoint("BOTTOM", scene, "BOTTOMLEFT", BRAKIL_X, GROUND - 12)
-	self.brakilName:SetText("Chief Brakil")
+	self.brakilName:SetText(ns:Trans("LID_BRAKIL"))
 	local brakilHit = CreateFrame("Button", nil, scene)
 	brakilHit:SetSize(110, 150)
 	brakilHit:SetPoint("BOTTOM", scene, "BOTTOMLEFT", BRAKIL_X, GROUND)
@@ -423,7 +423,7 @@ function UI:CreateScene(parent)
 	brakilHit:SetScript("OnEnter", function(self2)
 		UI.brakil.texture:SetVertexColor(1.25, 1.25, 1.25)
 		GameTooltip:SetOwner(self2, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("Chief Brakil", 1, 0.82, 0)
+		GameTooltip:AddLine(ns:Trans("LID_BRAKIL"), 1, 0.82, 0)
 		GameTooltip:AddLine(ns:Trans("LID_TALK"), 1, 1, 1)
 		local quest = G:CurrentQuest()
 		if not quest then
@@ -530,27 +530,27 @@ function UI:CreateActions(parent)
 	self.campActions = camp
 	local talents = ns.MakeButton(camp, 339, 28, ns:Trans("LID_TALENTS"), "Ability_Marksmanship", function() ns.Talents:Toggle() end)
 	talents:SetPoint("TOPLEFT", 4, -2)
-	ns.Tooltip(talents, ns:Trans("LID_TALENTS"), "Spend your talent points.")
+	ns.Tooltip(talents, ns:Trans("LID_TALENTS"), ns:Trans("LID_TIP_TALENTS"))
 	self.talentsButton = talents
 	local character = ns.MakeButton(camp, 339, 28, ns:Trans("LID_CHARACTER"), "Murloc_icon", function() ns.Character:Toggle() end)
 	character:SetPoint("LEFT", talents, "RIGHT", 8, 0)
-	ns.Tooltip(character, ns:Trans("LID_CHARACTER"), "Equipment and stats.")
+	ns.Tooltip(character, ns:Trans("LID_CHARACTER"), ns:Trans("LID_TIP_CHARACTER"))
 	self.characterButton = character
 	local inventory = ns.MakeButton(camp, 339, 28, ns:Trans("LID_INVENTORY"), "Inv_misc_bag_08", function() ns.Inventory:Toggle() end)
 	inventory:SetPoint("TOPLEFT", talents, "BOTTOMLEFT", 0, -6)
-	ns.Tooltip(inventory, ns:Trans("LID_INVENTORY"), "Your loot.")
+	ns.Tooltip(inventory, ns:Trans("LID_INVENTORY"), ns:Trans("LID_TIP_INVENTORY"))
 	self.inventoryButton = inventory
 	local shop = ns.MakeButton(camp, 339, 28, ns:Trans("LID_SHOP"), "gold_coin_icon", function() ns.Shop:Toggle() end)
 	shop:SetPoint("LEFT", inventory, "RIGHT", 8, 0)
-	ns.Tooltip(shop, ns:Trans("LID_SHOP"), "Buy and sell with Blacksmith Frazzak.")
+	ns.Tooltip(shop, ns:Trans("LID_SHOP"), ns:Trans("LID_TIP_SHOP"))
 	self.shopButton = shop
 	local rest = ns.MakeButton(camp, 339, 28, ns:Trans("LID_REST"), "Spell_nature_regeneration", function() UI:Rest() end)
 	rest:SetPoint("TOPLEFT", inventory, "BOTTOMLEFT", 0, -6)
-	ns.Tooltip(rest, ns:Trans("LID_REST"), "Restore all health and mana.")
+	ns.Tooltip(rest, ns:Trans("LID_REST"), ns:Trans("LID_TIP_REST"))
 	self.restButton = rest
 	local hunt = ns.MakeButton(camp, 339, 28, ns:Trans("LID_HUNT"), "stealth", function() UI:StartHunt() end)
 	hunt:SetPoint("LEFT", rest, "RIGHT", 8, 0)
-	ns.Tooltip(hunt, ns:Trans("LID_HUNT"), "Walk out and look for prey.")
+	ns.Tooltip(hunt, ns:Trans("LID_HUNT"), ns:Trans("LID_TIP_HUNT"))
 	self.huntButton = hunt
 	local dungeon = ns.MakeButton(camp, 686, 28, ns:Trans("LID_DUNGEON"), "Ability_Creature_Cursed_02", function() UI:StartDungeon() end)
 	dungeon:SetPoint("TOPLEFT", rest, "BOTTOMLEFT", 0, -6)
@@ -593,11 +593,11 @@ function UI:CreateActions(parent)
 	self.victoryActions = victory
 	local back = ns.MakeButton(victory, 339, 28, ns:Trans("LID_RETURN_CAMP"), "Spell_nature_regeneration", function() UI:ReturnToCamp() end)
 	back:SetPoint("TOPLEFT", 4, -18)
-	ns.Tooltip(back, ns:Trans("LID_RETURN_CAMP"), "Walk back to the murloc camp.")
+	ns.Tooltip(back, ns:Trans("LID_RETURN_CAMP"), ns:Trans("LID_TIP_RETURN"))
 	self.returnButton = back
 	local nextEnemy = ns.MakeButton(victory, 339, 28, ns:Trans("LID_NEXT_ENEMY"), "stealth", function() UI:NextEnemy() end)
 	nextEnemy:SetPoint("LEFT", back, "RIGHT", 6, 0)
-	ns.Tooltip(nextEnemy, ns:Trans("LID_NEXT_ENEMY"), "Keep hunting without walking back.")
+	ns.Tooltip(nextEnemy, ns:Trans("LID_NEXT_ENEMY"), ns:Trans("LID_TIP_NEXT"))
 	self.nextEnemyButton = nextEnemy
 	local dead = CreateFrame("Frame", nil, area)
 	dead:SetAllPoints(area)
@@ -605,7 +605,7 @@ function UI:CreateActions(parent)
 	self.deadActions = dead
 	local resurrect = ns.MakeButton(dead, 339, 28, ns:Trans("LID_RESURRECT"), "ancestralspirit", function() UI:DoResurrect() end)
 	resurrect:SetPoint("TOP", 0, -18)
-	ns.Tooltip(resurrect, ns:Trans("LID_RESURRECT"), "The spirit healer revives you at 35% health.")
+	ns.Tooltip(resurrect, ns:Trans("LID_RESURRECT"), ns:Trans("LID_TIP_RESURRECT"))
 	self.resurrectButton = resurrect
 end
 
@@ -934,15 +934,15 @@ function UI:RefreshAbilityButtons(canAct)
 			b:Hide()
 		else
 			b:Show()
-			b:SetText(a.name)
+			b:SetText(ns:Trans(a.name))
 			ns.SetIcon(b.icon, a.icon)
 			local cost = G:AbilityCost(a)
 			local known = G.db.level >= a.level
 			if known then
-				ns.Tooltip(b, a.name, ns.AbilityDesc(a), format(ns:Trans("LID_COST"), cost))
+				ns.Tooltip(b, ns:Trans(a.name), ns.AbilityDesc(a), format(ns:Trans("LID_COST"), cost))
 				ns.Enable(b, canAct and G.db.mp >= cost)
 			else
-				ns.Tooltip(b, a.name, ns.AbilityDesc(a), format(ns:Trans("LID_LOCKED"), a.level))
+				ns.Tooltip(b, ns:Trans(a.name), ns.AbilityDesc(a), format(ns:Trans("LID_LOCKED"), a.level))
 				ns.Enable(b, false)
 			end
 
@@ -967,7 +967,7 @@ function UI:Refresh()
 	if mode ~= self.mode and not self.transition then self:EnterMode(mode) end
 	local class = G:Class()
 	local hardcoreTag = G:Hardcore() and format("  |cffff4040%s|r", ns:Trans("LID_HARDCORE")) or ""
-	self.nameText:SetText((class and format("Murk  |cff9ad8ff%s|r", class.name) or "Murk") .. hardcoreTag)
+	self.nameText:SetText((class and format("Murk  |cff9ad8ff%s|r", ns:Trans(class.name)) or "Murk") .. hardcoreTag)
 	self.levelText:SetText(format(ns:Trans("LID_LEVEL"), db.level))
 	ns.SetBar(self.hpBar, db.hp, s.maxHP, format(ns:Trans("LID_BARTEXT"), db.hp, s.maxHP))
 	ns.SetBar(self.mpBar, db.mp, s.maxMP, format(ns:Trans("LID_BARTEXT"), db.mp, s.maxMP))
@@ -1028,7 +1028,7 @@ function UI:Refresh()
 	local enemy = G.battle
 	if enemy then
 		local eliteTag = enemy.elite and format("  |cffff8000%s|r", ns:Trans("LID_ELITE")) or ""
-		self.enemyName:SetText(format("%s  (%s)%s", enemy.name, format(ns:Trans("LID_LEVEL"), enemy.level), eliteTag))
+		self.enemyName:SetText(format("%s  (%s)%s", ns:Trans(enemy.name), format(ns:Trans("LID_LEVEL"), enemy.level), eliteTag))
 		ns.SetBar(self.enemyBar, enemy.hp, enemy.maxHP, format(ns:Trans("LID_BARTEXT"), enemy.hp, enemy.maxHP))
 	end
 
@@ -1038,8 +1038,8 @@ function UI:Refresh()
 	for _, b in ipairs(self.supplyButtons) do
 		local count = G:SupplyCount(b.supply.id)
 		ns.Enable(b, canAct and count > 0)
-		b:SetText(format(ns:Trans("LID_ACT_ITEM"), b.supply.name, count))
-		ns.Tooltip(b, b.supply.name, format(ns:Trans("LID_ITEM_DESC"), b.supply.desc, count))
+		b:SetText(format(ns:Trans("LID_ACT_ITEM"), ns:Trans(b.supply.name), count))
+		ns.Tooltip(b, ns:Trans(b.supply.name), format(ns:Trans("LID_ITEM_DESC"), ns:Trans(b.supply.desc), count))
 		ns.RefreshTooltip(b)
 	end
 

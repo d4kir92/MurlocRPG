@@ -58,7 +58,7 @@ function C:Start()
 	G.battle = enemy
 	G.turnLocked = false
 	G.victory = false
-	ns.UI:Log(format(ns:Trans("LID_BATTLE_START"), enemy.name), 1, 0.6, 0.2)
+	ns.UI:Log(format(ns:Trans("LID_BATTLE_START"), ns:Trans(enemy.name)), 1, 0.6, 0.2)
 	ns.UI:Refresh()
 end
 
@@ -71,7 +71,7 @@ end
 function C:DamageEnemy(damage, crit)
 	local enemy = G.battle
 	enemy.hp = math.max(0, enemy.hp - damage)
-	ns.UI:Log(format(crit and ns:Trans("LID_P_CRIT") or ns:Trans("LID_P_HIT"), enemy.name, damage), 1, 1, 0.6)
+	ns.UI:Log(format(crit and ns:Trans("LID_P_CRIT") or ns:Trans("LID_P_HIT"), ns:Trans(enemy.name), damage), 1, 1, 0.6)
 	local s = G:Stats()
 	if s.lifesteal > 0 then
 		local heal = Heal(math.floor(damage * s.lifesteal / 100 + 0.5))
@@ -114,7 +114,7 @@ function C:UseAbility(ability)
 	end
 
 	G.db.mp = G.db.mp - cost
-	ns.UI:Log(format(ns:Trans("LID_P_CAST"), ability.name), 0.4, 0.8, 1)
+	ns.UI:Log(format(ns:Trans("LID_P_CAST"), ns:Trans(ability.name)), 0.4, 0.8, 1)
 	ns.Sound("IG_ABILITY_ICON_DROP")
 	local level = G.db.level or 1
 	local bonus = (ability.mod or 0) * level
@@ -163,7 +163,7 @@ function C:UseSupply(id)
 		ns.UI:Log(format(ns:Trans("LID_CONSUMABLE_ENERGY"), math.max(0, gain)), 0.4, 0.8, 1)
 	else
 		local heal = Heal(supply.amount)
-		ns.UI:Log(format(ns:Trans("LID_USE_ITEM"), supply.name, heal), 0.4, 1, 0.4)
+		ns.UI:Log(format(ns:Trans("LID_USE_ITEM"), ns:Trans(supply.name), heal), 0.4, 1, 0.4)
 	end
 
 	self:ScheduleEnemyTurn()
@@ -194,7 +194,7 @@ function C:EnemyTurn()
 	G.db.hp = math.max(0, G.db.hp - damage)
 	G.turnLocked = false
 	ns.UI:EnemyLunge()
-	ns.UI:Log(format(crit and ns:Trans("LID_E_CRIT") or ns:Trans("LID_E_HIT"), enemy.name, damage), 1, 0.5, 0.5)
+	ns.UI:Log(format(crit and ns:Trans("LID_E_CRIT") or ns:Trans("LID_E_HIT"), ns:Trans(enemy.name), damage), 1, 0.5, 0.5)
 	if G.db.hp <= 0 then
 		self:Defeat()
 	else
@@ -210,10 +210,10 @@ function C:Victory()
 	G.victory = true
 	local xp = ns.XPFromEnemy(enemy.level, G.db.level)
 	if enemy.elite then xp = xp * ns.ELITE_XP end
-	ns.UI:Log(format(ns:Trans("LID_WIN"), enemy.name, xp), 0.4, 1, 0.4)
+	ns.UI:Log(format(ns:Trans("LID_WIN"), ns:Trans(enemy.name), xp), 0.4, 1, 0.4)
 	if enemy.meat > 0 then
 		G.db.meat = G.db.meat + enemy.meat
-		ns.UI:Log(format(ns:Trans("LID_LOOT"), enemy.meat, ns.ITEMS.MEAT.name), 0.8, 0.8, 0.8)
+		ns.UI:Log(format(ns:Trans("LID_LOOT"), enemy.meat, ns:Trans(ns.ITEMS.MEAT.name)), 0.8, 0.8, 0.8)
 	end
 
 	G:AddKill()
@@ -227,10 +227,10 @@ function C:Victory()
 	local drop = ns.RollDrop(G.db.level, enemy.elite)
 	if drop then
 		if G:AddItem(drop.id) then
-			ns.UI:Log(format(ns:Trans("LID_ITEM_DROP"), enemy.name, ns.ItemLink(drop)), 0.9, 0.9, 0.6)
+			ns.UI:Log(format(ns:Trans("LID_ITEM_DROP"), ns:Trans(enemy.name), ns.ItemLink(drop)), 0.9, 0.9, 0.6)
 			ns.Sound("IG_BACKPACK_OPEN")
 		else
-			ns.UI:Log(format(ns:Trans("LID_ITEM_DROP_LOST"), enemy.name, ns.ItemLink(drop)), 1, 0.4, 0.4)
+			ns.UI:Log(format(ns:Trans("LID_ITEM_DROP_LOST"), ns:Trans(enemy.name), ns.ItemLink(drop)), 1, 0.4, 0.4)
 		end
 	end
 
@@ -246,7 +246,7 @@ function C:Defeat()
 	G.dungeon = false
 	G.db.hp = 0
 	if G:Hardcore() then
-		ns.UI:ShowGameOver(G:EndRun(enemy and enemy.name))
+		ns.UI:ShowGameOver(G:EndRun(enemy and ns:Trans(enemy.name)))
 
 		return
 	end

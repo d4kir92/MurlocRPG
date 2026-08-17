@@ -218,6 +218,7 @@ ns.ENEMIES = {
 	},
 	{
 		id = "CRAB_KING",
+		unique = true,
 		rounds = 6.5,
 		share = 0.105,
 		name = "Beach Crawler King",
@@ -244,6 +245,7 @@ ns.ENEMIES = {
 	},
 	{
 		id = "CROC_MOTHER",
+		unique = true,
 		rounds = 8,
 		share = 0.125,
 		name = "Mother Crocolisk",

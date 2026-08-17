@@ -5,6 +5,7 @@ ns.SCENE_SHORE = ns.MEDIA .. "scene_shore"
 ns.BG_WORLD = ns.MEDIA .. "bg_world"
 ns.BG_LOADING = ns.MEDIA .. "bg_loading"
 ns.BG_CAMP = ns.MEDIA .. "bg_camp"
+ns.BG_DUNGEON = ns.MEDIA .. "bg_dungeon"
 ns.TITLE_ART = ns.MEDIA .. "title"
 ns.CAMP_HUT = ns.MEDIA .. "camp_hut"
 ns.CAMP_TENT = ns.MEDIA .. "camp_tent"
@@ -378,6 +379,11 @@ ns.BASE_STATS = {
 ns.CRIT_ROLL = 95
 ns.ARMOR_DIVISOR = 20
 ns.XP_PER_MOB_LEVEL = 100
+ns.DUNGEON_LEVEL = 5
+ns.ELITE_HP = 2
+ns.ELITE_DMG = 2
+ns.ELITE_XP = 2
+ns.ELITE_MONEY = 3
 function ns.MaxHealth(stm, level)
 	local hp = 85 + stm * 10
 	if level > 1 then hp = hp + 48 * (level - 1) + 11 end
@@ -415,4 +421,12 @@ function ns.ScaleEnemy(enemy, playerLevel, stats)
 	end
 
 	enemy.maxHP = enemy.hp
+end
+
+function ns.MakeElite(enemy)
+	enemy.elite = true
+	enemy.hp = enemy.hp * ns.ELITE_HP
+	enemy.maxHP = enemy.hp
+	enemy.minDmg = enemy.minDmg * ns.ELITE_DMG
+	enemy.maxDmg = enemy.maxDmg * ns.ELITE_DMG
 end

@@ -35,7 +35,7 @@ local function QuestTarget()
 end
 
 local function PickEnemy()
-	local target = QuestTarget()
+	local target = not G.dungeon and QuestTarget()
 	if target and (target.unique or math.random(100) <= QUEST_TARGET_CHANCE) then return target end
 	local pool = {}
 	for _, enemy in ipairs(ns.ENEMIES) do
@@ -54,6 +54,7 @@ function C:Start()
 
 	enemy.maxHP = template.hp
 	ns.ScaleEnemy(enemy, G.db.level, G:Stats())
+	if G.dungeon then ns.MakeElite(enemy) end
 	G.battle = enemy
 	G.turnLocked = false
 	G.victory = false
@@ -173,6 +174,7 @@ function C:Flee()
 	if math.random(100) <= FLEE_CHANCE then
 		G.battle = nil
 		G.turnLocked = false
+		G.dungeon = false
 		ns.UI:Log(ns:Trans("LID_FLEE_OK"), 0.7, 0.7, 0.7)
 		ns.UI:Refresh()
 	else
@@ -207,6 +209,7 @@ function C:Victory()
 	G.turnLocked = false
 	G.victory = true
 	local xp = ns.XPFromEnemy(enemy.level, G.db.level)
+	if enemy.elite then xp = xp * ns.ELITE_XP end
 	ns.UI:Log(format(ns:Trans("LID_WIN"), enemy.name, xp), 0.4, 1, 0.4)
 	if enemy.meat > 0 then
 		G.db.meat = G.db.meat + enemy.meat
@@ -214,14 +217,14 @@ function C:Victory()
 	end
 
 	G:AddKill()
-	G:QuestKill(enemy.id)
-	local money = ns.MoneyFromEnemy(enemy.level)
+	if not enemy.elite then G:QuestKill(enemy.id) end
+	local money = ns.MoneyFromEnemy(enemy.level) * (enemy.elite and ns.ELITE_MONEY or 1)
 	if money > 0 then
 		G:AddMoney(money)
 		ns.UI:Log(format(ns:Trans("LID_LOOT_MONEY"), ns.MoneyText(money)), 0.9, 0.85, 0.5)
 	end
 
-	local drop = ns.RollDrop(G.db.level)
+	local drop = ns.RollDrop(G.db.level, enemy.elite)
 	if drop then
 		if G:AddItem(drop.id) then
 			ns.UI:Log(format(ns:Trans("LID_ITEM_DROP"), enemy.name, ns.ItemLink(drop)), 0.9, 0.9, 0.6)
@@ -240,6 +243,7 @@ function C:Defeat()
 	G.battle = nil
 	G.turnLocked = false
 	G.victory = false
+	G.dungeon = false
 	G.db.hp = 0
 	if G:Hardcore() then
 		ns.UI:ShowGameOver(G:EndRun(enemy and enemy.name))

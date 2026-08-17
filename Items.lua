@@ -1042,12 +1042,14 @@ function ns.ItemStatLines(item)
 	return lines
 end
 
-function ns.RollDrop(playerLevel)
-	if math.random(100) > 40 then return nil end
+function ns.RollDrop(playerLevel, elite)
+	if math.random(100) > (elite and 75 or 40) then return nil end
 	local pool = {}
+	local top = playerLevel + (elite and 4 or 1)
+	local bottom = playerLevel - (elite and 2 or 4)
 	for _, item in ipairs(ns.ITEM_LIST) do
-		if not item.noDrop and item.level <= playerLevel + 1 and item.level >= playerLevel - 4 then
-			local weight = 7 - item.quality
+		if not item.noDrop and item.level <= top and item.level >= bottom then
+			local weight = elite and (item.quality - 1) or (7 - item.quality)
 			for _ = 1, math.max(1, weight) do
 				pool[#pool + 1] = item
 			end

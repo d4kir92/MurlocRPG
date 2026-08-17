@@ -366,7 +366,7 @@ function UI:CreateWorldPage(parent)
 	self:CreateActions(p)
 	local log = CreateFrame("ScrollingMessageFrame", nil, p)
 	log:SetPoint("TOPLEFT", self.actions, "BOTTOMLEFT", 2, -6)
-	log:SetSize(688, 194)
+	log:SetSize(688, 160)
 	log:SetFontObject(GameFontHighlightSmall)
 	log:SetJustifyH("LEFT")
 	log:SetFading(false)
@@ -523,7 +523,7 @@ end
 function UI:CreateActions(parent)
 	local area = CreateFrame("Frame", nil, parent)
 	area:SetPoint("TOPLEFT", self.scene, "BOTTOMLEFT", 0, -8)
-	area:SetSize(SCENE_W, 102)
+	area:SetSize(SCENE_W, 136)
 	self.actions = area
 	local camp = CreateFrame("Frame", nil, area)
 	camp:SetAllPoints(area)
@@ -552,6 +552,9 @@ function UI:CreateActions(parent)
 	hunt:SetPoint("LEFT", rest, "RIGHT", 8, 0)
 	ns.Tooltip(hunt, ns:Trans("LID_HUNT"), "Walk out and look for prey.")
 	self.huntButton = hunt
+	local dungeon = ns.MakeButton(camp, 686, 28, ns:Trans("LID_DUNGEON"), "Ability_Creature_Cursed_02", function() UI:StartDungeon() end)
+	dungeon:SetPoint("TOPLEFT", rest, "BOTTOMLEFT", 0, -6)
+	self.dungeonButton = dungeon
 	local battle = CreateFrame("Frame", nil, area)
 	battle:SetAllPoints(area)
 	battle:Hide()
@@ -635,6 +638,7 @@ function UI:EnterWorld(fresh)
 	G.battle = nil
 	G.turnLocked = false
 	G.victory = false
+	G.dungeon = false
 	self.mode = G.db.dead and "dead" or "camp"
 	if self.mode == "dead" then
 		self:ShowDead()
@@ -684,7 +688,7 @@ function UI:EnterBattle(chained)
 	self:HidePanels()
 	self:HideHealer()
 	self.battleActions:Show()
-	self:SetSceneBG(ns.SCENE_SHORE)
+	self:SetSceneBG(G.dungeon and ns.BG_DUNGEON or ns.SCENE_SHORE)
 	self.campLabel:Hide()
 	self.brakil:Hide()
 	self.brakilName:Hide()
@@ -790,6 +794,7 @@ function UI:ReturnToCamp()
 	self.murk:Play(ns.SPRITES.MURK_WALK, 16, true)
 	self.murk:MoveTo(-100, 1.3, function()
 		G.victory = false
+		G.dungeon = false
 		UI.transition = false
 		UI.busy = false
 		UI:EnterMode("camp")
@@ -826,6 +831,14 @@ function UI:StartHunt()
 	self.murk:Play(ns.SPRITES.MURK_WALK, 16, true)
 	self.murk:MoveTo(SCENE_W + 100, 1.5, function() C:Start() end)
 	self:Refresh()
+end
+
+function UI:StartDungeon()
+	if self.busy or G.battle then return end
+	if (G.db.level or 1) < ns.DUNGEON_LEVEL then return end
+	G.dungeon = true
+	self:Log(ns:Trans("LID_DUNGEON_TEXT"), 0.75, 0.6, 1)
+	self:StartHunt()
 end
 
 function UI:Talk()
@@ -990,6 +1003,14 @@ function UI:Refresh()
 	ns.Enable(self.characterButton, idle)
 	ns.Enable(self.inventoryButton, idle)
 	ns.Enable(self.shopButton, idle)
+	local dungeonReady = (G.db.level or 1) >= ns.DUNGEON_LEVEL
+	ns.Enable(self.dungeonButton, idle and dungeonReady)
+	if dungeonReady then
+		ns.Tooltip(self.dungeonButton, ns:Trans("LID_DUNGEON"), ns:Trans("LID_DUNGEON_DESC"))
+	else
+		ns.Tooltip(self.dungeonButton, ns:Trans("LID_DUNGEON"), ns:Trans("LID_DUNGEON_DESC"), format(ns:Trans("LID_ITEM_LEVEL"), ns.DUNGEON_LEVEL))
+	end
+
 	ns.Enable(self.nextEnemyButton, idle)
 	ns.Enable(self.returnButton, idle)
 	ns.Enable(self.resurrectButton, idle)
@@ -1006,7 +1027,8 @@ function UI:Refresh()
 
 	local enemy = G.battle
 	if enemy then
-		self.enemyName:SetText(format("%s  (%s)", enemy.name, format(ns:Trans("LID_LEVEL"), enemy.level)))
+		local eliteTag = enemy.elite and format("  |cffff8000%s|r", ns:Trans("LID_ELITE")) or ""
+		self.enemyName:SetText(format("%s  (%s)%s", enemy.name, format(ns:Trans("LID_LEVEL"), enemy.level), eliteTag))
 		ns.SetBar(self.enemyBar, enemy.hp, enemy.maxHP, format(ns:Trans("LID_BARTEXT"), enemy.hp, enemy.maxHP))
 	end
 

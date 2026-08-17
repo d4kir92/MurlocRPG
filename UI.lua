@@ -583,32 +583,33 @@ function UI:CreateActions(parent)
 	battle:SetAllPoints(area)
 	battle:Hide()
 	self.battleActions = battle
-	local attack = ns.MakeButton(battle, 166, 28, ns:Trans("LID_ACT_ATTACK"), "INV_Sword_06", function() UI:PlayerStrike(function() C:Attack() end) end)
-	attack:SetPoint("TOPLEFT", 4, -2)
+	local function BattleSlot(button, index)
+		local col = (index - 1) % 2
+		local row = math.floor((index - 1) / 2)
+		button:SetPoint("TOPLEFT", 4 + col * 347, -2 - row * 34)
+	end
+
+	local attack = ns.MakeButton(battle, 339, 28, ns:Trans("LID_ACT_ATTACK"), "INV_Sword_06", function() UI:PlayerStrike(function() C:Attack() end) end)
+	BattleSlot(attack, 1)
 	ns.Tooltip(attack, ns:Trans("LID_ACT_ATTACK"), ns:Trans("LID_ATTACK_DESC"))
 	self.attackButton = attack
 	self.abilityButtons = {}
 	for i = 1, 3 do
-		local b = ns.MakeButton(battle, 166, 28, "", nil, function(self2) UI:CastAbility(self2.ability) end)
-		b:SetPoint("LEFT", attack, "RIGHT", 6 + (i - 1) * 172, 0)
+		local b = ns.MakeButton(battle, 339, 28, "", nil, function(self2) UI:CastAbility(self2.ability) end)
+		BattleSlot(b, i + 1)
 		self.abilityButtons[i] = b
 	end
 
 	self.supplyButtons = {}
 	for i, supply in ipairs(ns.CONSUMABLES) do
-		local b = ns.MakeButton(battle, 224, 28, "", supply.icon, function() UI:SimpleAction(function() C:UseSupply(supply.id) end) end)
-		if i == 1 then
-			b:SetPoint("TOPLEFT", attack, "BOTTOMLEFT", 0, -6)
-		else
-			b:SetPoint("LEFT", self.supplyButtons[i - 1], "RIGHT", 6, 0)
-		end
-
+		local b = ns.MakeButton(battle, 339, 28, "", supply.icon, function() UI:SimpleAction(function() C:UseSupply(supply.id) end) end)
+		BattleSlot(b, i + 4)
 		b.supply = supply
 		self.supplyButtons[i] = b
 	end
 
-	local flee = ns.MakeButton(battle, 684, 28, ns:Trans("LID_ACT_FLEE"), "vanish", function() UI:SimpleAction(function() C:Flee() end) end)
-	flee:SetPoint("TOPLEFT", self.supplyButtons[1], "BOTTOMLEFT", 0, -6)
+	local flee = ns.MakeButton(battle, 339, 28, ns:Trans("LID_ACT_FLEE"), "vanish", function() UI:SimpleAction(function() C:Flee() end) end)
+	BattleSlot(flee, #ns.CONSUMABLES + 5)
 	ns.Tooltip(flee, ns:Trans("LID_ACT_FLEE"), ns:Trans("LID_FLEE_DESC"))
 	self.fleeButton = flee
 	local victory = CreateFrame("Frame", nil, area)

@@ -75,7 +75,6 @@ end
 
 function G:RunScore()
 	local questsDone = math.max(0, (self.db.questIndex or 1) - 1)
-
 	return (self.db.level or 1) * 100 + questsDone * 250 + (self.db.kills or 0) * 10 + math.floor((self.db.earned or 0) / 100)
 end
 
@@ -95,7 +94,6 @@ function G:EndRun(killedBy)
 	self.battle = nil
 	self.turnLocked = false
 	self.victory = false
-
 	return summary
 end
 
@@ -313,7 +311,6 @@ function G:AddItem(itemId)
 	if self:BagFull() then return false end
 	tinsert(self:Bag(), itemId)
 	self.db.newItems = (self.db.newItems or 0) + 1
-
 	return true
 end
 
@@ -623,7 +620,7 @@ loader:RegisterEvent("PLAYER_LOGIN")
 loader:SetScript("OnEvent", function(self)
 	self:UnregisterEvent("PLAYER_LOGIN")
 	ns:SetAddonOutput("MurlocRPG", 134169)
-	ns:SetVersion(134169, "0.11.2")
+	ns:SetVersion(134169, "0.1.0")
 	G:Init()
 	ns.UI:Create()
 	print(ns:Trans("LID_LOADED"))

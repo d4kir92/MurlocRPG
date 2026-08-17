@@ -8,6 +8,15 @@ local BAG_COLS = 5
 local LEFT_SLOTS = {"HEAD", "NECK", "SHOULDER", "BACK", "CHEST", "WRISTS"}
 local RIGHT_SLOTS = {"HANDS", "WAIST", "LEGS", "FEET", "FINGER1", "FINGER2"}
 local WEAPON_SLOTS = {"MAINHAND", "OFFHAND"}
+local function SlotName(slotKey, slotType)
+	local slot = ns.SLOTS[slotKey or ""] or ns.SLOTS[slotType or ""]
+	if slot then return ns:Trans(slot.name) end
+	if slotType == "FINGER" then return ns:Trans("LID_SLOT_FINGER") end
+
+	return slotType or ""
+end
+
+ns.SlotName = SlotName
 local function CompareTooltip()
 	if not ns.compareTooltip then
 		ns.compareTooltip = CreateFrame("GameTooltip", "MurlocRPGCompareTooltip", UIParent, "GameTooltipTemplate")
@@ -33,7 +42,7 @@ local function ShowCompare(item)
 	tip:ClearLines()
 	tip:AddLine(ns:Trans("LID_CURRENTLY_EQUIPPED"), 1, 0.82, 0)
 	if not equipped then
-		tip:AddLine(ns.SLOTS[slotKey] and ns:Trans(ns.SLOTS[slotKey].name) or item.slotType, 0.8, 0.8, 0.8)
+		tip:AddLine(SlotName(slotKey, item.slotType), 0.8, 0.8, 0.8)
 		tip:AddLine(ns:Trans("LID_EMPTY_SLOT"), 0.6, 0.6, 0.6)
 		tip:Show()
 
@@ -42,7 +51,7 @@ local function ShowCompare(item)
 
 	local r, g, b = ns.ItemColor(equipped)
 	tip:AddLine(equipped.name, r, g, b)
-	tip:AddLine(ns.SLOTS[slotKey] and ns:Trans(ns.SLOTS[slotKey].name) or equipped.slotType, 0.8, 0.8, 0.8)
+	tip:AddLine(SlotName(slotKey, equipped.slotType), 0.8, 0.8, 0.8)
 	for _, line in ipairs(ns.ItemStatLines(equipped)) do
 		tip:AddLine(line, 0.2, 1, 0.2)
 	end
@@ -63,7 +72,7 @@ local function ShowItemTooltip(button, item, hint, priceLabel)
 
 	local r, g, b = ns.ItemColor(item)
 	GameTooltip:AddLine(item.name, r, g, b)
-	GameTooltip:AddLine(ns.SLOTS[button.slotKey or ""] and ns:Trans(ns.SLOTS[button.slotKey].name) or item.slotType, 0.8, 0.8, 0.8)
+	GameTooltip:AddLine(SlotName(button.slotKey, item.slotType), 0.8, 0.8, 0.8)
 	for _, line in ipairs(ns.ItemStatLines(item)) do
 		GameTooltip:AddLine(line, 0.2, 1, 0.2)
 	end

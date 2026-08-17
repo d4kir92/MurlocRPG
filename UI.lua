@@ -531,6 +531,28 @@ function UI:CreateScene(parent)
 	self.murk:SetPos(MURK_CAMP_X, GROUND)
 	self.murk:SetFlip(false)
 	self.murk:Play(ns.SPRITES.MURK_IDLE, 40, true)
+	local murkHit = CreateFrame("Button", nil, scene)
+	murkHit:SetAllPoints(self.murk)
+	murkHit:SetFrameLevel(scene:GetFrameLevel() + 20)
+	murkHit:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	murkHit:SetScript("OnClick", function(_, button)
+		if UI.busy then return end
+		if button == "RightButton" then
+			ns.Inventory:Toggle()
+		else
+			ns.Character:Toggle()
+		end
+	end)
+
+	murkHit:SetScript("OnEnter", function(self2)
+		GameTooltip:SetOwner(self2, "ANCHOR_RIGHT")
+		GameTooltip:AddLine("Murk", 1, 0.82, 0)
+		GameTooltip:AddLine(ns:Trans("LID_MURK_HINT"), 1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+
+	murkHit:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	self.murkHit = murkHit
 	self.fx = ns.CreateSprite(scene, 177)
 	self.fx:SetPos(ENEMY_X, GROUND + 18)
 	self.fx:SetFrameLevel(scene:GetFrameLevel() + 30)

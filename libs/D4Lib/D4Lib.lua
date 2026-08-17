@@ -1,8 +1,4 @@
 local _, D4 = ...
-function GetLocale()
-    return "enUS"
-end
-
 local hooksecurefunc = _G["hooksecurefunc"]
 local GetBuildInfo = _G["GetBuildInfo"]
 local CreateFrame = _G["CreateFrame"]

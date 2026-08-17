@@ -128,9 +128,12 @@ function C:UseAbility(ability)
 
 	local damage, crit
 	if ability.school == "magic" then
-		damage = math.max(1, math.floor(bonus * G:Stats().spellFactor + 0.5))
-		crit = ability.kind == "critstrike"
-		if crit then damage = damage * 2 end
+		damage, crit = self:RollDamage((ability.mod or 0) / ns.SPELL_DIVISOR)
+		damage = math.max(1, math.floor(damage * G:Stats().spellFactor + 0.5))
+		if ability.kind == "critstrike" and not crit then
+			crit = true
+			damage = damage * 2
+		end
 	else
 		damage, crit = self:RollDamage(1)
 		damage = damage + bonus

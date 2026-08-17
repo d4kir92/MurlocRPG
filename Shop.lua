@@ -4,7 +4,7 @@ local SLOT = 44
 local STEP = 52
 local COLS = 5
 local BUY_ROWS = 5
-local SELL_ROWS = 5
+local BLOCK_GAP = 26
 local Shop = {}
 ns.Shop = Shop
 function Shop:Create()
@@ -34,11 +34,9 @@ function Shop:Create()
 	buyHeader:SetPoint("TOPLEFT", 14, -56)
 	buyHeader:SetText(ns:Trans("LID_SHOP_BUY"))
 	self.buySlots = {}
-	for i = 1, COLS * BUY_ROWS do
-		local col = (i - 1) % COLS
-		local row = math.floor((i - 1) / COLS)
+	for i = 1, #ns.VENDOR_STOCK + #ns.VENDOR_BAGS do
 		local b = ns.ItemSlot(f, SLOT, function(self2) Shop:OnBuy(self2.itemId, self2) end)
-		b:SetPoint("TOPLEFT", 14 + col * STEP, -78 - row * STEP)
+		b:SetPoint("TOPLEFT", 14 + ((i - 1) % COLS) * STEP, -78 - math.floor((i - 1) / COLS) * STEP)
 		b:SetScript("OnEnter", function(self2)
 			local item = ns.ITEM_BY_ID[self2.itemId]
 			ns.ShowItemTooltip(self2, item, ns:Trans("LID_SHOP_BUY_HINT"), ns:Trans("LID_SHOP_COST"))
@@ -79,11 +77,8 @@ function Shop:Create()
 	sellHeader:SetPoint("TOPLEFT", 14, -424)
 	sellHeader:SetText(ns:Trans("LID_SHOP_SELL"))
 	self.sellSlots = {}
-	for i = 1, COLS * SELL_ROWS do
-		local col = (i - 1) % COLS
-		local row = math.floor((i - 1) / COLS)
+	for i = 1, ns.BAG_MAX_SIZE do
 		local b = ns.ItemSlot(f, SLOT, function(self2) Shop:OnSell(self2.bagIndex, self2) end)
-		b:SetPoint("TOPLEFT", 14 + col * STEP, -446 - row * STEP)
 		b.bagIndex = i
 		b:SetScript("OnEnter", function(self2)
 			local item = ns.ITEM_BY_ID[G:Bag()[self2.bagIndex]]
@@ -93,6 +88,7 @@ function Shop:Create()
 		self.sellSlots[i] = b
 	end
 
+	self.sellHeaders = ns.MakeBagHeaders(f)
 	self.hint = f:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 	self.hint:SetPoint("BOTTOM", 0, 12)
 	self.hint:SetWidth(276)
@@ -133,10 +129,17 @@ function Shop:Refresh()
 	self.money:SetText(format(ns:Trans("LID_SHOP_MONEY"), ns.MoneyText(G:Money())))
 	local stock = G:ShopStock()
 	self.empty:SetShown(#stock == 0)
+	local perBlock = COLS * BUY_ROWS
+	local blockWidth = COLS * SLOT + (COLS - 1) * (STEP - SLOT)
+	local blocks = math.max(1, math.ceil(#stock / perBlock))
+	local buyWidth = blocks * blockWidth + (blocks - 1) * BLOCK_GAP
 	for i, b in ipairs(self.buySlots) do
 		local item = stock[i]
 		b.itemId = item and item.id or nil
 		if item then
+			local inBlock = (i - 1) % perBlock
+			b:ClearAllPoints()
+			b:SetPoint("TOPLEFT", 14 + math.floor((i - 1) / perBlock) * (blockWidth + BLOCK_GAP) + (inBlock % COLS) * STEP, -78 - math.floor(inBlock / COLS) * STEP)
 			b:Show()
 			ns.SetIcon(b.icon, item.icon)
 			b.icon:SetVertexColor(G:CanAfford(item.value) and 1 or 0.9, G:CanAfford(item.value) and 1 or 0.4, G:CanAfford(item.value) and 1 or 0.4)
@@ -153,6 +156,9 @@ function Shop:Refresh()
 	end
 
 	local bag = G:Bag()
+	local width, height = ns.LayoutBags(self.sellSlots, self.sellHeaders, 14, -466)
+	self.frame:SetSize(math.max(300, width + 28, buyWidth + 28), 466 + height + 40)
+	self.hint:SetWidth(math.max(276, width))
 	for i, b in ipairs(self.sellSlots) do
 		local item = ns.ITEM_BY_ID[bag[i]]
 		if item then

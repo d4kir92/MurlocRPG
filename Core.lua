@@ -304,8 +304,26 @@ function G:HasWeapon()
 	return self:Equipped().MAINHAND ~= nil
 end
 
+function G:BagSize()
+	local size = ns.BAG_SIZE
+	local equipped = self:Equipped()
+	for _, slotKey in ipairs(ns.BAG_SLOT_ORDER) do
+		local item = ns.ITEM_BY_ID[equipped[slotKey]]
+		if item then size = size + (item.stats.slots or 0) end
+	end
+	return size
+end
+
 function G:BagFull()
-	return #self:Bag() >= ns.BAG_SIZE
+	return #self:Bag() >= self:BagSize()
+end
+
+function G:BagFits(removedId, addedItem, extraItems)
+	local removed = ns.ITEM_BY_ID[removedId]
+	local size = self:BagSize()
+	if removed then size = size - (removed.stats.slots or 0) end
+	if addedItem then size = size + (addedItem.stats.slots or 0) end
+	return #self:Bag() + (extraItems or 0) <= size
 end
 
 function G:AddItem(itemId)
@@ -330,8 +348,22 @@ function G:ClampVitals()
 end
 
 function G:TargetSlot(item)
-	if item.slotType ~= "FINGER" then return item.slotType end
 	local equipped = self:Equipped()
+	if item.slotType == "BAG" then
+		local weakest, weakestSlots
+		for _, slotKey in ipairs(ns.BAG_SLOT_ORDER) do
+			local current = ns.ITEM_BY_ID[equipped[slotKey]]
+			if not current then return slotKey end
+			local slots = current.stats.slots or 0
+			if not weakestSlots or slots < weakestSlots then
+				weakest = slotKey
+				weakestSlots = slots
+			end
+		end
+		return weakest
+	end
+
+	if item.slotType ~= "FINGER" then return item.slotType end
 	if not equipped.FINGER1 then return "FINGER1" end
 	if not equipped.FINGER2 then return "FINGER2" end
 	return "FINGER1"
@@ -387,6 +419,11 @@ function G:ShopStock()
 		local item = ns.ITEM_BY_ID[itemId]
 		if item and item.level <= (self.db.level or 1) + 2 then list[#list + 1] = item end
 	end
+
+	for _, entry in ipairs(ns.VENDOR_BAGS) do
+		local item = ns.ITEM_BY_ID[entry.id]
+		if item and (self.db.level or 1) >= entry.level then list[#list + 1] = item end
+	end
 	return list
 end
 
@@ -437,6 +474,11 @@ function G:Equip(bagIndex)
 	local slotKey = self:TargetSlot(item)
 	local equipped = self:Equipped()
 	local previous = equipped[slotKey]
+	if item.slotType == "BAG" and not self:BagFits(previous, item) then
+		ns.UI:Log(ns:Trans("LID_BAG_KEEP"), 1, 0.4, 0.4)
+		return false
+	end
+
 	tremove(bag, bagIndex)
 	equipped[slotKey] = item.id
 	if previous then tinsert(bag, previous) end
@@ -452,6 +494,11 @@ function G:Unequip(slotKey)
 	if not item then return false end
 	if self:BagFull() then
 		ns.UI:Log(ns:Trans("LID_BAG_FULL"), 1, 0.4, 0.4)
+		return false
+	end
+
+	if item.slotType == "BAG" and not self:BagFits(item.id, nil, 1) then
+		ns.UI:Log(ns:Trans("LID_BAG_KEEP"), 1, 0.4, 0.4)
 		return false
 	end
 
@@ -625,7 +672,7 @@ loader:RegisterEvent("PLAYER_LOGIN")
 loader:SetScript("OnEvent", function(self)
 	self:UnregisterEvent("PLAYER_LOGIN")
 	ns:SetAddonOutput("MurlocRPG", 134169)
-	ns:SetVersion(134169, "0.3.0")
+	ns:SetVersion(134169, "0.4.0")
 	G:Init()
 	ns.UI:Create()
 	print(ns:Trans("LID_LOADED"))

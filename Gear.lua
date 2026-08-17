@@ -5,6 +5,92 @@ local SLOT_STEP = 52
 local BAG_SLOT = 46
 local BAG_STEP = 54
 local BAG_COLS = 5
+local BAG_SECTION_COLS = 3
+local BAG_GAP = 26
+local function SectionWidth(cols)
+	return cols * BAG_SLOT + (cols - 1) * (BAG_STEP - BAG_SLOT)
+end
+
+local function BagSections()
+	local sections = {
+		{
+			first = 1,
+			count = ns.BAG_SIZE,
+			cols = BAG_COLS
+		},
+	}
+
+	local index = ns.BAG_SIZE + 1
+	for _, slotKey in ipairs(ns.BAG_SLOT_ORDER) do
+		local item = ns.ITEM_BY_ID[G:Equipped()[slotKey]]
+		if item then
+			local count = item.stats.slots or 0
+			sections[#sections + 1] = {
+				first = index,
+				count = count,
+				cols = BAG_SECTION_COLS,
+				label = item.name
+			}
+
+			index = index + count
+		end
+	end
+	return sections
+end
+
+local function LayoutBags(slots, headers, x0, yTop)
+	local sections = BagSections()
+	local x = x0
+	local maxRows = 0
+	local index = 1
+	for i, section in ipairs(sections) do
+		local header = i > 1 and headers[i - 1] or nil
+		if header then
+			header:ClearAllPoints()
+			header:SetPoint("TOPLEFT", x, yTop + 20)
+			header:SetText(section.label)
+			header:Show()
+		end
+
+		for n = 1, section.count do
+			local b = slots[index]
+			if b then
+				b:ClearAllPoints()
+				b:SetPoint("TOPLEFT", x + ((n - 1) % section.cols) * BAG_STEP, yTop - math.floor((n - 1) / section.cols) * BAG_STEP)
+				b:Show()
+			end
+
+			index = index + 1
+		end
+
+		maxRows = math.max(maxRows, math.ceil(section.count / section.cols))
+		x = x + SectionWidth(section.cols) + BAG_GAP
+	end
+
+	for i = index, #slots do
+		slots[i]:Hide()
+	end
+
+	for i = #sections, #headers do
+		headers[i]:Hide()
+	end
+
+	return x - BAG_GAP - x0, maxRows * BAG_SLOT + (maxRows - 1) * (BAG_STEP - BAG_SLOT)
+end
+
+ns.LayoutBags = LayoutBags
+local function MakeBagHeaders(parent)
+	local headers = {}
+	for i = 1, #ns.BAG_SLOT_ORDER do
+		local text = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+		text:SetJustifyH("LEFT")
+		text:Hide()
+		headers[i] = text
+	end
+	return headers
+end
+
+ns.MakeBagHeaders = MakeBagHeaders
 local LEFT_SLOTS = {"HEAD", "NECK", "SHOULDER", "BACK", "CHEST", "WRISTS"}
 local RIGHT_SLOTS = {"HANDS", "WAIST", "LEGS", "FEET", "FINGER1", "FINGER2"}
 local WEAPON_SLOTS = {"MAINHAND", "OFFHAND"}
@@ -62,7 +148,19 @@ local function ShowCompare(item)
 end
 
 ns.ShowCompare = ShowCompare
-local function ShowItemTooltip(button, item, hint, priceLabel)
+local function BagUnequipWarning(item)
+	if not item or item.slotType ~= "BAG" then return nil end
+	if G:BagFits(item.id, nil, 1) then return nil end
+	return ns:Trans("LID_BAG_KEEP")
+end
+
+local function BagSwapWarning(item)
+	if not item or item.slotType ~= "BAG" then return nil end
+	local previous = G:Equipped()[G:TargetSlot(item)]
+	if not previous or G:BagFits(previous, item) then return nil end
+	return ns:Trans("LID_BAG_KEEP")
+end
+local function ShowItemTooltip(button, item, hint, priceLabel, warning)
 	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 	if not item then
 		GameTooltip:AddLine(button.slotLabel or ns:Trans("LID_EMPTY_SLOT"), 0.6, 0.6, 0.6)
@@ -84,6 +182,7 @@ local function ShowItemTooltip(button, item, hint, priceLabel)
 	end
 
 	if item.value and item.value > 0 then GameTooltip:AddLine(format(priceLabel or ns:Trans("LID_ITEM_VALUE"), ns.MoneyText(item.value)), 0.9, 0.85, 0.5) end
+	if warning then GameTooltip:AddLine(warning, 1, 0.2, 0.2, true) end
 	if hint then GameTooltip:AddLine(hint, 0.5, 0.5, 0.5, true) end
 	GameTooltip:Show()
 end
@@ -154,7 +253,10 @@ function Character:Create()
 		b:SetPoint("TOPLEFT", x, y)
 		b.slotKey = slotKey
 		b.slotLabel = ns:Trans(ns.SLOTS[slotKey].name)
-		b:SetScript("OnEnter", function(self2) ShowItemTooltip(self2, ns.ITEM_BY_ID[G:Equipped()[slotKey]], ns:Trans("LID_EQUIPPED_HINT")) end)
+		b:SetScript("OnEnter", function(self2)
+			local item = ns.ITEM_BY_ID[G:Equipped()[slotKey]]
+			ShowItemTooltip(self2, item, ns:Trans("LID_EQUIPPED_HINT"), nil, BagUnequipWarning(item))
+		end)
 		self.slots[slotKey] = b
 	end
 
@@ -170,6 +272,12 @@ function Character:Create()
 	local weaponLeft = (340 - weaponWidth) / 2
 	for i, slotKey in ipairs(WEAPON_SLOTS) do
 		MakeSlot(slotKey, weaponLeft + (i - 1) * SLOT_STEP, -300)
+	end
+
+	local bagWidth = #ns.BAG_SLOT_ORDER * SLOT_SIZE + (#ns.BAG_SLOT_ORDER - 1) * (SLOT_STEP - SLOT_SIZE)
+	local bagLeft = (340 - bagWidth) / 2
+	for i, slotKey in ipairs(ns.BAG_SLOT_ORDER) do
+		MakeSlot(slotKey, bagLeft + (i - 1) * SLOT_STEP, -352)
 	end
 
 	local statsHeader = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -271,20 +379,18 @@ function Inventory:Create()
 	self.title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	self.title:SetPoint("TOP", 0, -8)
 	self.slots = {}
-	for i = 1, ns.BAG_SIZE do
-		local col = (i - 1) % BAG_COLS
-		local row = math.floor((i - 1) / BAG_COLS)
+	for i = 1, ns.BAG_MAX_SIZE do
 		local b = ItemSlot(f, BAG_SLOT, function(self2, button) Inventory:OnSlotClick(self2.bagIndex, button, self2) end)
-		b:SetPoint("TOPLEFT", 14 + col * BAG_STEP, -40 - row * BAG_STEP)
 		b.bagIndex = i
 		b:SetScript("OnEnter", function(self2)
 			local item = ns.ITEM_BY_ID[G:Bag()[self2.bagIndex]]
-			ShowItemTooltip(self2, item, ns:Trans("LID_BAG_HINT"))
+			ShowItemTooltip(self2, item, ns:Trans("LID_BAG_HINT"), nil, BagSwapWarning(item))
 			ShowCompare(item)
 		end)
 		self.slots[i] = b
 	end
 
+	self.headers = MakeBagHeaders(f)
 	self.hint = f:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 	self.hint:SetPoint("BOTTOM", 0, 12)
 	self.hint:SetWidth(276)
@@ -313,7 +419,10 @@ end
 function Inventory:Refresh()
 	if not self.frame or not self.frame:IsShown() or not G:HasSave() then return end
 	local bag = G:Bag()
-	self.title:SetText(format(ns:Trans("LID_INVENTORY_TITLE"), #bag, ns.BAG_SIZE))
+	local width, height = LayoutBags(self.slots, self.headers, 14, -58)
+	self.frame:SetSize(width + 28, height + 100)
+	self.hint:SetWidth(width)
+	self.title:SetText(format(ns:Trans("LID_INVENTORY_TITLE"), #bag, G:BagSize()))
 	for i, b in ipairs(self.slots) do
 		local item = ns.ITEM_BY_ID[bag[i]]
 		if item then

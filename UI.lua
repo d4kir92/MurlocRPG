@@ -1080,7 +1080,7 @@ function UI:Refresh()
 	end
 
 	local newItems = G:NewItems()
-	local bagLabel = format("%s (%d/%d)", ns:Trans("LID_INVENTORY"), #G:Bag(), ns.BAG_SIZE)
+	local bagLabel = format("%s (%d/%d)", ns:Trans("LID_INVENTORY"), #G:Bag(), G:BagSize())
 	if newItems > 0 then bagLabel = format("%s |cff20ff20(%s)|r", bagLabel, format(ns:Trans("LID_NEW_ITEMS"), newItems)) end
 	self.inventoryButton:SetText(bagLabel)
 

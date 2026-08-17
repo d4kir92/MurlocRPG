@@ -21,6 +21,13 @@ function ns.IconSlot(name)
 end
 
 function ns.SetIcon(texture, name)
+	if type(name) == "number" then
+		local lookup = C_Item and C_Item.GetItemIconByID or GetItemIcon
+		texture:SetTexture(lookup and lookup(name) or nil)
+		texture:SetTexCoord(0, 1, 0, 1)
+		return
+	end
+
 	local i = ns.IconSlot(name)
 	if not i then
 		texture:SetTexture(nil)

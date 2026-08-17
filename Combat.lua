@@ -230,6 +230,16 @@ function C:Victory()
 		ns.UI:Log(format(ns:Trans("LID_LOOT_MONEY"), ns.MoneyText(money)), 0.9, 0.85, 0.5)
 	end
 
+	local bagDrop = ns.RollBagDrop(G.db.level, enemy.elite)
+	if bagDrop then
+		if G:AddItem(bagDrop.id) then
+			ns.UI:Log(format(ns:Trans("LID_ITEM_DROP"), ns:Trans(enemy.name), ns.ItemLink(bagDrop)), 0.9, 0.9, 0.6)
+			ns.Sound("IG_BACKPACK_OPEN")
+		else
+			ns.UI:Log(format(ns:Trans("LID_ITEM_DROP_LOST"), ns:Trans(enemy.name), ns.ItemLink(bagDrop)), 1, 0.4, 0.4)
+		end
+	end
+
 	local drop = ns.RollDrop(G.db.level, enemy.elite, G:Streak())
 	if drop then
 		if G:AddItem(drop.id) then

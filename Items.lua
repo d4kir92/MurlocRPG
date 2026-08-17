@@ -1,5 +1,6 @@
 local _, ns = ...
 ns.BAG_SIZE = 25
+ns.BAG_SLOT_ORDER = {"BAG1", "BAG2", "BAG3", "BAG4",}
 ns.SLOT_ORDER = {"HEAD", "NECK", "SHOULDER", "BACK", "CHEST", "WRISTS", "HANDS", "WAIST", "LEGS", "FEET", "FINGER1", "FINGER2", "MAINHAND", "OFFHAND",}
 ns.SLOTS = {
 	HEAD = {
@@ -72,6 +73,26 @@ ns.SLOTS = {
 		empty = "UI-PaperDoll-Slot-SecondaryHand",
 		type = "OFFHAND"
 	},
+	BAG1 = {
+		name = "LID_SLOT_BAG",
+		empty = "UI-PaperDoll-Slot-Bag",
+		type = "BAG"
+	},
+	BAG2 = {
+		name = "LID_SLOT_BAG",
+		empty = "UI-PaperDoll-Slot-Bag",
+		type = "BAG"
+	},
+	BAG3 = {
+		name = "LID_SLOT_BAG",
+		empty = "UI-PaperDoll-Slot-Bag",
+		type = "BAG"
+	},
+	BAG4 = {
+		name = "LID_SLOT_BAG",
+		empty = "UI-PaperDoll-Slot-Bag",
+		type = "BAG"
+	},
 }
 
 ns.QUALITY = {
@@ -119,6 +140,7 @@ ns.STAT_LABEL = {
 	int = "LID_STATLINE_INT",
 	agi = "LID_STATLINE_AGI",
 	armor = "LID_STATLINE_ARMOR",
+	slots = "LID_STATLINE_SLOTS",
 }
 
 local function Item(id, name, icon, slotType, quality, level, value, noDrop, stats)
@@ -1017,6 +1039,75 @@ ns.ITEM_LIST = {
 
 ns.VENDOR_STOCK = {"worn_shortsword", "small_shield", "tarnished_chain_vest", "tarnished_chain_leggings", "embossed_plate_helmet", "embossed_plate_girdle", "embossed_plate_gauntlets", "embossed_plate_bracers", "embossed_plate_armor", "embossed_plate_leggings", "embossed_plate_boots", "embossed_plate_pauldrons", "embossed_plate_shield", "barbaric_loincloth", "clamshell_bracers", "willow_gloves", "soldier_s_boots", "clergy_ring", "bloodspattered_shield", "dalaran_wizard_s_robe", "willow_branch", "the_ice_king_s_band", "scout_s_medallion", "sentinel_s_medallion", "zandalar_illusionist_s_robe", "zandalar_vindicator_s_plate", "zandalar_madcap_s_tunic", "blood_tailisman", "belt_of_the_fang", "footpads_of_the_fang", "leggings_of_the_fang", "serpent_gloves", "armor_of_the_fang", "grand_marshal_s_claymore", "grand_marshal_s_stave", "grand_marshal_s_aegis", "grand_marshal_s_dirk",}
 ns.ITEM_BY_ID = {}
+ns.BAG_ITEMS = {
+	Item("linen_bag", "Linen Bag", 4238, "BAG", 2, 1, 500, true, {
+		slots = 6
+	}),
+	Item("woolen_bag", "Woolen Bag", 4240, "BAG", 2, 4, 2500, true, {
+		slots = 8
+	}),
+	Item("small_silk_pack", "Small Silk Pack", 4245, "BAG", 2, 8, 12500, true, {
+		slots = 10
+	}),
+	Item("mageweave_bag", "Mageweave Bag", 10050, "BAG", 2, 12, 62500, true, {
+		slots = 12
+	}),
+	Item("runecloth_bag", "Runecloth Bag", 14046, "BAG", 2, 16, 312500, true, {
+		slots = 14
+	}),
+}
+
+ns.VENDOR_BAGS = {
+	{
+		id = "linen_bag",
+		level = 6
+	},
+	{
+		id = "woolen_bag",
+		level = 12
+	},
+}
+
+ns.BAG_DROPS = {
+	{
+		id = "runecloth_bag",
+		min = 16,
+		chance = 1
+	},
+	{
+		id = "mageweave_bag",
+		min = 12,
+		max = 18,
+		chance = 2
+	},
+	{
+		id = "small_silk_pack",
+		min = 8,
+		max = 14,
+		chance = 4
+	},
+	{
+		id = "woolen_bag",
+		min = 4,
+		max = 10,
+		chance = 8
+	},
+	{
+		id = "linen_bag",
+		min = 1,
+		max = 6,
+		chance = 16
+	},
+}
+
+local best = 0
+for _, item in ipairs(ns.BAG_ITEMS) do
+	ns.ITEM_LIST[#ns.ITEM_LIST + 1] = item
+	best = math.max(best, item.stats.slots)
+end
+
+ns.BAG_MAX_SIZE = ns.BAG_SIZE + best * #ns.BAG_SLOT_ORDER
+
 for _, item in ipairs(ns.ITEM_LIST) do
 	ns.ITEM_BY_ID[item.id] = item
 end
@@ -1035,11 +1126,21 @@ function ns.ItemStatLines(item)
 	local lines = {}
 	local stats = item.stats
 	if stats.maxDmg and stats.maxDmg > 0 then lines[#lines + 1] = format(ns:Trans("LID_STATLINE_DAMAGE"), stats.minDmg or 0, stats.maxDmg) end
-	for _, key in ipairs({"str", "stm", "int", "agi", "armor"}) do
+	for _, key in ipairs({"str", "stm", "int", "agi", "armor", "slots"}) do
 		local value = stats[key]
 		if value and value ~= 0 then lines[#lines + 1] = format(ns:Trans(ns.STAT_LABEL[key]), value) end
 	end
 	return lines
+end
+
+function ns.RollBagDrop(playerLevel, dungeon)
+	for _, entry in ipairs(ns.BAG_DROPS) do
+		if playerLevel >= entry.min and (not entry.max or playerLevel <= entry.max) then
+			local chance = entry.chance * (dungeon and 2 or 1)
+			if math.random(100) <= chance then return ns.ITEM_BY_ID[entry.id] end
+		end
+	end
+	return nil
 end
 
 function ns.RollDrop(playerLevel, elite, streak)

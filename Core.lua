@@ -188,6 +188,7 @@ function G:Stats()
 		maxMP = ns.MaxMana(m.int),
 		minDmg = math.max(1, math.floor(lowMult * wMin * dmgFactor + 0.5)),
 		maxDmg = math.max(1, math.floor(highMult * wMax * dmgFactor + 0.5)),
+		spellFactor = 1 + m.int / 100,
 		crit = math.min(95, m.agi + m.crit),
 		armor = m.armor,
 		soak = math.floor(m.armor / ns.ARMOR_DIVISOR),

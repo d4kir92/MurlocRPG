@@ -360,7 +360,7 @@ ns.CRIT_ROLL = 95
 ns.ARMOR_DIVISOR = 20
 ns.XP_PER_MOB_LEVEL = 100
 ns.DUNGEON_LEVEL = 5
-ns.MOB_HP = 1.575
+ns.MOB_HP = 0.5
 ns.STREAK_STEP = 0.05
 ns.ELITE_HP = 2
 ns.ELITE_DMG = 2
@@ -394,15 +394,15 @@ end
 function ns.ScaleEnemy(enemy, playerLevel, stats)
 	enemy.level = playerLevel
 	if stats then
-		local avg = (stats.minDmg + stats.maxDmg) / 2
 		local ramp = math.min(1, 0.45 + 0.55 * (playerLevel - 1) / 3)
 		local hit = stats.maxHP * enemy.share * ramp
-		enemy.hp = math.max(enemy.hp, math.floor(avg * enemy.rounds + 0.5))
+		enemy.hp = math.max(enemy.hp, math.floor(stats.maxHP * ns.MOB_HP + 0.5))
 		enemy.minDmg = math.max(1, math.floor(hit + 0.5))
 		enemy.maxDmg = math.max(enemy.minDmg, math.floor(hit * 1.18 + 0.5))
+	else
+		enemy.hp = math.floor(enemy.hp * ns.MOB_HP + 0.5)
 	end
 
-	enemy.hp = math.floor(enemy.hp * ns.MOB_HP + 0.5)
 	enemy.maxHP = enemy.hp
 end
 

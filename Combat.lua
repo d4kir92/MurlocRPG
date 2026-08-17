@@ -128,7 +128,7 @@ function C:UseAbility(ability)
 
 	local damage, crit
 	if ability.school == "magic" then
-		damage = bonus
+		damage = math.max(1, math.floor(bonus * G:Stats().spellFactor + 0.5))
 		crit = ability.kind == "critstrike"
 		if crit then damage = damage * 2 end
 	else

@@ -58,6 +58,7 @@ ns:AddTrans("ruRU", "LID_LOCKED", "Открывается на %d уровне."
 ns:AddTrans("ruRU", "LID_LOOT", "Вы получаете %d x %s.")
 ns:AddTrans("ruRU", "LID_LOOT_MONEY", "Вы получаете %s.")
 ns:AddTrans("ruRU", "LID_NEW_GAME", "Новая игра")
+ns:AddTrans("ruRU", "LID_NEW_ITEMS", "%d нов.")
 ns:AddTrans("ruRU", "LID_NEXT_ENEMY", "Следующий противник")
 ns:AddTrans("ruRU", "LID_NO_ITEM", "У вас больше нет.")
 ns:AddTrans("ruRU", "LID_NO_MANA", "Недостаточно энергии.")

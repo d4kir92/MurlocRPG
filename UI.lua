@@ -528,24 +528,24 @@ function UI:CreateActions(parent)
 	local camp = CreateFrame("Frame", nil, area)
 	camp:SetAllPoints(area)
 	self.campActions = camp
-	local talents = ns.MakeButton(camp, 166, 28, ns:Trans("LID_TALENTS"), "Ability_Marksmanship", function() ns.Talents:Toggle() end)
+	local talents = ns.MakeButton(camp, 339, 28, ns:Trans("LID_TALENTS"), "Ability_Marksmanship", function() ns.Talents:Toggle() end)
 	talents:SetPoint("TOPLEFT", 4, -2)
 	ns.Tooltip(talents, ns:Trans("LID_TALENTS"), "Spend your talent points.")
 	self.talentsButton = talents
-	local character = ns.MakeButton(camp, 166, 28, ns:Trans("LID_CHARACTER"), "Murloc_icon", function() ns.Character:Toggle() end)
+	local character = ns.MakeButton(camp, 339, 28, ns:Trans("LID_CHARACTER"), "Murloc_icon", function() ns.Character:Toggle() end)
 	character:SetPoint("LEFT", talents, "RIGHT", 8, 0)
 	ns.Tooltip(character, ns:Trans("LID_CHARACTER"), "Equipment and stats.")
 	self.characterButton = character
-	local inventory = ns.MakeButton(camp, 166, 28, ns:Trans("LID_INVENTORY"), "Inv_misc_bag_08", function() ns.Inventory:Toggle() end)
-	inventory:SetPoint("LEFT", character, "RIGHT", 8, 0)
+	local inventory = ns.MakeButton(camp, 339, 28, ns:Trans("LID_INVENTORY"), "Inv_misc_bag_08", function() ns.Inventory:Toggle() end)
+	inventory:SetPoint("TOPLEFT", talents, "BOTTOMLEFT", 0, -6)
 	ns.Tooltip(inventory, ns:Trans("LID_INVENTORY"), "Your loot.")
 	self.inventoryButton = inventory
-	local shop = ns.MakeButton(camp, 166, 28, ns:Trans("LID_SHOP"), "gold_coin_icon", function() ns.Shop:Toggle() end)
+	local shop = ns.MakeButton(camp, 339, 28, ns:Trans("LID_SHOP"), "gold_coin_icon", function() ns.Shop:Toggle() end)
 	shop:SetPoint("LEFT", inventory, "RIGHT", 8, 0)
 	ns.Tooltip(shop, ns:Trans("LID_SHOP"), "Buy and sell with Blacksmith Frazzak.")
 	self.shopButton = shop
 	local rest = ns.MakeButton(camp, 339, 28, ns:Trans("LID_REST"), "Spell_nature_regeneration", function() UI:Rest() end)
-	rest:SetPoint("TOPLEFT", talents, "BOTTOMLEFT", 0, -6)
+	rest:SetPoint("TOPLEFT", inventory, "BOTTOMLEFT", 0, -6)
 	ns.Tooltip(rest, ns:Trans("LID_REST"), "Restore all health and mana.")
 	self.restButton = rest
 	local hunt = ns.MakeButton(camp, 339, 28, ns:Trans("LID_HUNT"), "stealth", function() UI:StartHunt() end)
@@ -998,6 +998,11 @@ function UI:Refresh()
 	else
 		self.talentsButton:SetText(ns:Trans("LID_TALENTS"))
 	end
+
+	local newItems = G:NewItems()
+	local bagLabel = format("%s (%d/%d)", ns:Trans("LID_INVENTORY"), #G:Bag(), ns.BAG_SIZE)
+	if newItems > 0 then bagLabel = format("%s |cff20ff20(%s)|r", bagLabel, format(ns:Trans("LID_NEW_ITEMS"), newItems)) end
+	self.inventoryButton:SetText(bagLabel)
 
 	local enemy = G.battle
 	if enemy then

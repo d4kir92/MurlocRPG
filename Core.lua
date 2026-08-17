@@ -300,7 +300,17 @@ end
 function G:AddItem(itemId)
 	if self:BagFull() then return false end
 	tinsert(self:Bag(), itemId)
+	self.db.newItems = (self.db.newItems or 0) + 1
+
 	return true
+end
+
+function G:NewItems()
+	return math.min(self.db.newItems or 0, #self:Bag())
+end
+
+function G:ClearNewItems()
+	self.db.newItems = 0
 end
 
 function G:ClampVitals()

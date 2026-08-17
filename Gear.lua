@@ -283,7 +283,9 @@ function Inventory:Toggle()
 	end
 
 	self.frame:Show()
+	G:ClearNewItems()
 	self:Refresh()
+	ns.UI:Refresh()
 end
 
 function Inventory:Hide()

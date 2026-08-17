@@ -372,7 +372,7 @@ function ns.MaxHealth(stm, level)
 	return hp
 end
 
-function ns.MaxEnergy(int)
+function ns.MaxMana(int)
 	return 100 + (int - 9) * 2
 end
 

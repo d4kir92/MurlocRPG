@@ -360,7 +360,7 @@ ns.CRIT_ROLL = 95
 ns.ARMOR_DIVISOR = 20
 ns.XP_PER_MOB_LEVEL = 100
 ns.DUNGEON_LEVEL = 5
-ns.MOB_HP = 2
+ns.MOB_HP = 1.75
 ns.STREAK_STEP = 0.05
 ns.ELITE_HP = 2
 ns.ELITE_DMG = 2
@@ -402,7 +402,7 @@ function ns.ScaleEnemy(enemy, playerLevel, stats)
 		enemy.maxDmg = math.max(enemy.minDmg, math.floor(hit * 1.18 + 0.5))
 	end
 
-	enemy.hp = enemy.hp * ns.MOB_HP
+	enemy.hp = math.floor(enemy.hp * ns.MOB_HP + 0.5)
 	enemy.maxHP = enemy.hp
 end
 

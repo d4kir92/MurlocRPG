@@ -260,13 +260,13 @@ ns.ENEMIES = {
 	},
 }
 
+function ns.QuestText(quest, field)
+	return ns:Trans(format("LID_QUEST_%s_%s", quest.id, field))
+end
+
 ns.QUESTS = {
 	{
 		id = "BANQUET",
-		name = "A Banquet for the Warriors",
-		offer = "Brakil: \"Ah, Murk. There you are! The camp has grown empty ever since we sent our finest warriors against the Kobolds -- and word is, they won. We are holding a banquet for them. We need Tender Wolf Meat to cook, and with the warriors gone we are depending on you.\"",
-		hint = "Brakil: \"Venture out to the shore and return with %d meat. Stay close to the camp -- the further you go, the more dangerous it is.\"",
-		turnin = "Brakil: \"I see you have got the meat. Good work, Murk. Take this to Ketchin so he can prepare it for the banquet.\"",
 		kind = "meat",
 		need = 6,
 		xp = 300,
@@ -278,10 +278,6 @@ ns.QUESTS = {
 	},
 	{
 		id = "BAIT",
-		name = "Bait Thieves",
-		offer = "Brakil: \"Fisherman Kagle came by, red in the face. Those damn crabs keep stealing his bait and he cannot land a single fish. Go fend them off -- we still need something for dessert.\"",
-		hint = "Kagle: \"Keep it up, Murk! %d of %d crawlers down.\"",
-		turnin = "Brakil: \"Kagle says you cleared the whole shoreline. We have enough fish to prepare dessert now.\"",
 		kind = "kill",
 		enemy = "CRAB",
 		need = 4,
@@ -294,10 +290,6 @@ ns.QUESTS = {
 	},
 	{
 		id = "HOLD_FAST",
-		name = "Hold Fast",
-		offer = "Brakil: \"Kagle sent word again. One more crawler came out of the water after you left -- a big one. He says to hold fast and finish it before it takes his whole catch.\"",
-		hint = "Kagle: \"Wait -- this one looks like it could be a big one. Hold fast!\"",
-		turnin = "Brakil: \"That crawler was nearly your size, Murk. The camp is talking about it.\"",
 		kind = "kill",
 		enemy = "CRAB_KING",
 		need = 1,
@@ -307,10 +299,6 @@ ns.QUESTS = {
 	},
 	{
 		id = "BOARS",
-		name = "Boars at the Tower",
-		offer = "Brakil: \"One of the guards asked for you by name. Boars have swarmed the tower at the edge of the forest. He says he can make it worth your while -- talent recognises talent, apparently.\"",
-		hint = "Guard: \"Stop talking to me and go put those boars in their place. %d of %d down.\"",
-		turnin = "Brakil: \"The guard says you put those boars in their place. He sent your reward along.\"",
 		kind = "kill",
 		enemy = "BOAR",
 		need = 5,
@@ -323,10 +311,6 @@ ns.QUESTS = {
 	},
 	{
 		id = "CROCS",
-		name = "The Trip to the Princess",
-		offer = "Brakil: \"Kagle is taking his boat out past the reeds and wants you aboard. He swears the waters are empty. He also swore the crabs were harmless, so bring your weapon.\"",
-		hint = "Kagle: \"These empty waters are filled with Crocolisks, Murk. %d of %d handled.\"",
-		turnin = "Brakil: \"Kagle made it back in one piece, which surprises everyone including Kagle.\"",
 		kind = "kill",
 		enemy = "CROC",
 		need = 4,
@@ -336,10 +320,6 @@ ns.QUESTS = {
 	},
 	{
 		id = "MOTHER",
-		name = "Mother of Crocolisks",
-		offer = "Brakil: \"The young crocolisks did not crawl out of the water on their own, Murk. Something laid them. Kagle saw her in the shallows and has not been back on the water since. End it.\"",
-		hint = "Brakil: \"She is still out there. Do not go alone if you are not ready.\"",
-		turnin = "Brakil: \"Mrglglgl! The shore is ours again. Rest now, Murk -- bigger things await.\"",
 		kind = "kill",
 		enemy = "CROC_MOTHER",
 		need = 1,

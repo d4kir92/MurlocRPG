@@ -562,19 +562,19 @@ function G:TalkToBrakil()
 	if db.quest ~= "active" then
 		db.quest = "active"
 		db.questProgress = 0
-		ns.UI:Log(q.offer, 1, 0.85, 0.2)
-		ns.UI:Log(format(ns:Trans("LID_Q_ACCEPTED"), q.name), 0.4, 1, 0.4)
+		ns.UI:Log(ns.QuestText(q, "OFFER"), 1, 0.85, 0.2)
+		ns.UI:Log(format(ns:Trans("LID_Q_ACCEPTED"), ns.QuestText(q, "NAME")), 0.4, 1, 0.4)
 		ns.UI:Refresh()
 		return
 	end
 
 	if not self:QuestReady() then
 		if q.kind == "meat" then
-			ns.UI:Log(format(q.hint, self:QuestProgress(), q.need), 1, 0.85, 0.2)
+			ns.UI:Log(format(ns.QuestText(q, "HINT"), self:QuestProgress(), q.need), 1, 0.85, 0.2)
 		elseif q.need > 1 then
-			ns.UI:Log(format(q.hint, self:QuestProgress(), q.need), 1, 0.85, 0.2)
+			ns.UI:Log(format(ns.QuestText(q, "HINT"), self:QuestProgress(), q.need), 1, 0.85, 0.2)
 		else
-			ns.UI:Log(q.hint, 1, 0.85, 0.2)
+			ns.UI:Log(ns.QuestText(q, "HINT"), 1, 0.85, 0.2)
 		end
 
 		ns.UI:Refresh()
@@ -582,7 +582,7 @@ function G:TalkToBrakil()
 	end
 
 	if q.kind == "meat" then db.meat = db.meat - q.need end
-	ns.UI:Log(q.turnin, 1, 0.85, 0.2)
+	ns.UI:Log(ns.QuestText(q, "TURNIN"), 1, 0.85, 0.2)
 	ns.Sound("IG_QUEST_LIST_COMPLETE")
 	self:GiveQuestReward(q)
 	db.questProgress = 0

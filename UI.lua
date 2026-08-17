@@ -429,11 +429,11 @@ function UI:CreateScene(parent)
 		if not quest then
 			GameTooltip:AddLine(ns:Trans("LID_Q_ALL_DONE"), 0.6, 0.6, 0.6)
 		elseif G.db.quest ~= "active" then
-			GameTooltip:AddLine(format(ns:Trans("LID_Q_LINE_NEW"), quest.name), 1, 0.82, 0)
+			GameTooltip:AddLine(format(ns:Trans("LID_Q_LINE_NEW"), ns.QuestText(quest, "NAME")), 1, 0.82, 0)
 		elseif G:QuestReady() then
-			GameTooltip:AddLine(format(ns:Trans("LID_Q_LINE_DONE"), quest.name), 0.4, 1, 0.4)
+			GameTooltip:AddLine(format(ns:Trans("LID_Q_LINE_DONE"), ns.QuestText(quest, "NAME")), 0.4, 1, 0.4)
 		else
-			GameTooltip:AddLine(format(ns:Trans("LID_Q_LINE"), quest.name, G:QuestProgress(), quest.need), 1, 0.82, 0)
+			GameTooltip:AddLine(format(ns:Trans("LID_Q_LINE"), ns.QuestText(quest, "NAME"), G:QuestProgress(), quest.need), 1, 0.82, 0)
 		end
 
 		GameTooltip:Show()
@@ -981,14 +981,14 @@ function UI:Refresh()
 	self.bagText:SetText(format(ns:Trans("LID_BAG"), db.meat))
 	local quest = G:CurrentQuest()
 	if quest and db.quest == "active" then
-		self.questText:SetText(format(ns:Trans("LID_Q_LINE"), quest.name, G:QuestProgress(), quest.need))
+		self.questText:SetText(format(ns:Trans("LID_Q_LINE"), ns.QuestText(quest, "NAME"), G:QuestProgress(), quest.need))
 		if G:QuestReady() then
 			self.questText:SetTextColor(0.4, 1, 0.4)
 		else
 			self.questText:SetTextColor(1, 0.82, 0)
 		end
 	elseif quest then
-		self.questText:SetText(format(ns:Trans("LID_Q_LINE_NEW"), quest.name))
+		self.questText:SetText(format(ns:Trans("LID_Q_LINE_NEW"), ns.QuestText(quest, "NAME")))
 		self.questText:SetTextColor(1, 0.82, 0)
 	else
 		self.questText:SetText(ns:Trans("LID_Q_ALL_DONE"))

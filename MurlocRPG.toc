@@ -1,0 +1,41 @@
+## Interface-Classic: 11509
+## Interface-BCC: 20506
+## Interface-Wrath: 30403
+## Interface-Cata: 40402
+## Interface-Mists: 50504
+## Interface: 120100
+
+## Version: 0.11.2
+## Title: Murloc RPG |T135994:16:16:0:0|t by |cff55d2ffD4KiR |T132115:16:16:0:0|t
+## Notes: A small turn-based Murloc RPG inside World of Warcraft. Type /murloc
+## Notes-deDE: Ein kleines rundenbasiertes Murloc-RPG in World of Warcraft. Tippe /murloc
+## Author: D4KiR
+## Category: Minigames
+## Category-deDE: Minispiele
+## Category-esES: Minijuegos
+## Category-esMX: Minijuegos
+## Category-frFR: Mini-jeux
+## Category-itIT: Minigiochi
+## Category-koKR: 미니게임
+## Category-ptBR: Minijogos
+## Category-ruRU: Мини-игры
+## Category-zhCN: 迷你游戏
+## Category-zhTW: 迷你遊戲
+## DefaultState: enabled
+## SavedVariablesPerCharacter: MurlocRPGDB
+## X-Curse-Project-ID: 646134
+## X-Wago-ID: e56n3pK9
+## IconTexture: Interface\Icons\INV_Misc_Head_Murloc_01
+
+Icons.lua
+Data.lua
+Items.lua
+Classes.lua
+Widgets.lua
+Core.lua
+Combat.lua
+Anim.lua
+Talents.lua
+Gear.lua
+Shop.lua
+UI.lua

@@ -1,0 +1,395 @@
+local _, ns = ...
+
+local G = ns.Game
+
+local SLOT_SIZE = 44
+local SLOT_STEP = 52
+local BAG_SLOT = 46
+local BAG_STEP = 54
+local BAG_COLS = 5
+
+local LEFT_SLOTS = {"HEAD", "NECK", "SHOULDER", "BACK", "CHEST", "WRISTS"}
+local RIGHT_SLOTS = {"HANDS", "WAIST", "LEGS", "FEET", "FINGER1", "FINGER2"}
+local WEAPON_SLOTS = {"MAINHAND", "OFFHAND"}
+
+local function ShowItemTooltip(button, item, hint, priceLabel)
+	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+
+	if not item then
+		GameTooltip:AddLine(button.slotLabel or ns.L.EMPTY_SLOT, 0.6, 0.6, 0.6)
+		GameTooltip:Show()
+
+		return
+	end
+
+	local r, g, b = ns.ItemColor(item)
+	GameTooltip:AddLine(item.name, r, g, b)
+	GameTooltip:AddLine(ns.SLOTS[button.slotKey or ""] and ns.SLOTS[button.slotKey].name or item.slotType, 0.8, 0.8, 0.8)
+
+	for _, line in ipairs(ns.ItemStatLines(item)) do
+		GameTooltip:AddLine(line, 0.2, 1, 0.2)
+	end
+
+	if (G.db.level or 1) < item.level then
+		GameTooltip:AddLine(format(ns.L.ITEM_SLOT_REQ, item.level), 1, 0.2, 0.2)
+	else
+		GameTooltip:AddLine(format(ns.L.ITEM_SLOT_REQ, item.level), 0.7, 0.7, 0.7)
+	end
+
+	if item.value and item.value > 0 then
+		GameTooltip:AddLine(format(priceLabel or ns.L.ITEM_VALUE, ns.MoneyText(item.value)), 0.9, 0.85, 0.5)
+	end
+
+	if hint then
+		GameTooltip:AddLine(hint, 0.5, 0.5, 0.5, true)
+	end
+
+	GameTooltip:Show()
+end
+
+ns.ShowItemTooltip = ShowItemTooltip
+
+local function ItemSlot(parent, size, onClick)
+	local b = CreateFrame("Button", nil, parent)
+	b:SetSize(size, size)
+	b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+
+	ns.Fill(b, 0, 0, 0, 0.85)
+
+	b.icon = b:CreateTexture(nil, "ARTWORK")
+	b.icon:SetPoint("TOPLEFT", 2, -2)
+	b.icon:SetPoint("BOTTOMRIGHT", -2, 2)
+
+	ns.Border(b, 0.3, 0.3, 0.3, 1)
+
+	b:SetScript("OnClick", onClick)
+	b:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+
+	return b
+end
+
+ns.ItemSlot = ItemSlot
+
+local Character = {}
+ns.Character = Character
+
+function Character:Create()
+	if self.frame then
+		return
+	end
+
+	local f = CreateFrame("Frame", "MurlocRPGCharacterFrame", UIParent)
+	f:SetSize(340, 570)
+	f:SetFrameStrata("DIALOG")
+	f:SetClampedToScreen(true)
+	f:SetMovable(true)
+	f:EnableMouse(true)
+	f:RegisterForDrag("LeftButton")
+	f:SetScript("OnDragStart", f.StartMoving)
+	f:SetScript("OnDragStop", f.StopMovingOrSizing)
+	f:Hide()
+
+	ns.Fill(f, 0.05, 0.06, 0.09, 0.97)
+	ns.Border(f, 0.45, 0.35, 0.15, 1)
+	tinsert(UISpecialFrames, "MurlocRPGCharacterFrame")
+
+	self.frame = f
+
+	local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
+	close:SetPoint("TOPRIGHT", -3, -3)
+
+	self.title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	self.title:SetPoint("TOP", 0, -8)
+	self.title:SetText(ns.L.CHARACTER)
+
+	self.subtitle = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	self.subtitle:SetPoint("TOP", self.title, "BOTTOM", 0, -2)
+
+	local stage = CreateFrame("Frame", nil, f)
+	stage:SetPoint("TOPLEFT", 72, -60)
+	stage:SetSize(196, 200)
+
+	self.murk = ns.CreateSprite(stage, 150)
+	self.murk:SetPos(98, 4)
+	self.murk:SetFlip(false)
+	self.murk:Play(ns.SPRITES.MURK_IDLE, 10, true)
+
+	self.slots = {}
+
+	local function MakeSlot(slotKey, x, y)
+		local b = ItemSlot(f, SLOT_SIZE, function(self2)
+			if G:Unequip(slotKey) then
+				Character:Refresh()
+				ns.Inventory:Refresh()
+				ns.UI:Refresh()
+				ns.RefreshTooltip(self2)
+			end
+		end)
+		b:SetPoint("TOPLEFT", x, y)
+		b.slotKey = slotKey
+		b.slotLabel = ns.SLOTS[slotKey].name
+		b:SetScript("OnEnter", function(self2)
+			ShowItemTooltip(self2, ns.ITEM_BY_ID[G:Equipped()[slotKey]], ns.L.EQUIPPED_HINT)
+		end)
+		self.slots[slotKey] = b
+	end
+
+	for i, slotKey in ipairs(LEFT_SLOTS) do
+		MakeSlot(slotKey, 12, -44 - (i - 1) * SLOT_STEP)
+	end
+
+	for i, slotKey in ipairs(RIGHT_SLOTS) do
+		MakeSlot(slotKey, 340 - 12 - SLOT_SIZE, -44 - (i - 1) * SLOT_STEP)
+	end
+
+	local weaponWidth = #WEAPON_SLOTS * SLOT_SIZE + (#WEAPON_SLOTS - 1) * (SLOT_STEP - SLOT_SIZE)
+	local weaponLeft = (340 - weaponWidth) / 2
+
+	for i, slotKey in ipairs(WEAPON_SLOTS) do
+		MakeSlot(slotKey, weaponLeft + (i - 1) * SLOT_STEP, -300)
+	end
+
+	local statsHeader = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	statsHeader:SetPoint("TOPLEFT", 14, -414)
+	statsHeader:SetText(ns.L.STATS)
+
+	self.statLabels = {}
+	self.statValues = {}
+
+	local keys = {
+		"STAT_STR", "STAT_STM", "STAT_INT", "STAT_AGI",
+		"STAT_HEALTH", "STAT_MANA", "STAT_DAMAGE", "STAT_CRIT",
+		"STAT_ARMOR", "STAT_REGEN", "STAT_LIFESTEAL",
+	}
+
+	for i, key in ipairs(keys) do
+		local column = (i - 1) % 2
+		local row = math.floor((i - 1) / 2)
+		local x = 20 + column * 160
+		local y = -438 - row * 18
+
+		local label = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+		label:SetPoint("TOPLEFT", x, y)
+		label:SetText(ns.L[key])
+		label:SetTextColor(0.7, 0.7, 0.7)
+
+		local value = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+		value:SetPoint("TOPLEFT", x + 96, y)
+		value:SetJustifyH("RIGHT")
+		value:SetWidth(56)
+
+		self.statLabels[i] = label
+		self.statValues[i] = value
+	end
+end
+
+function Character:Refresh()
+	if not self.frame or not self.frame:IsShown() or not G:HasSave() then
+		return
+	end
+
+	local class = G:Class()
+	local s = G:Stats()
+	local db = G.db
+
+	self.subtitle:SetText(format("Murk  -  %s  -  %s", class and class.name or "?", format(ns.L.LEVEL, db.level)))
+
+	for slotKey, b in pairs(self.slots) do
+		local item = ns.ITEM_BY_ID[G:Equipped()[slotKey]]
+
+		if item then
+			ns.SetIcon(b.icon, item.icon)
+			b.icon:SetVertexColor(1, 1, 1)
+			ns.SetBorderColor(b, ns.ItemColor(item))
+		else
+			ns.SetIcon(b.icon, ns.SLOTS[slotKey].empty)
+			b.icon:SetVertexColor(0.55, 0.55, 0.55)
+			ns.SetBorderColor(b, 0.3, 0.3, 0.3, 1)
+		end
+	end
+
+	local values = {
+		format("%d", s.str),
+		format("%d", s.stm),
+		format("%d", s.int),
+		format("%d", s.agi),
+		format("%d / %d", db.hp, s.maxHP),
+		format("%d / %d", db.mp, s.maxMP),
+		format("%d - %d", s.minDmg, s.maxDmg),
+		format("%d%%", s.crit),
+		format("%d", s.armor),
+		format("%d", s.regen),
+		format("%d%%", s.lifesteal),
+	}
+
+	for i, value in ipairs(values) do
+		self.statValues[i]:SetText(value)
+	end
+end
+
+function Character:Toggle()
+	self:Create()
+
+	if self.frame:IsShown() then
+		self.frame:Hide()
+
+		return
+	end
+
+	self.frame:ClearAllPoints()
+
+	if ns.UI.frame and ns.UI.frame:IsShown() then
+		self.frame:SetPoint("TOPRIGHT", ns.UI.frame, "TOPLEFT", -8, 0)
+	else
+		self.frame:SetPoint("CENTER")
+	end
+
+	self.frame:Show()
+	self:Refresh()
+end
+
+function Character:Hide()
+	if self.frame then
+		self.frame:Hide()
+	end
+end
+
+local Inventory = {}
+ns.Inventory = Inventory
+
+function Inventory:Create()
+	if self.frame then
+		return
+	end
+
+	local f = CreateFrame("Frame", "MurlocRPGInventoryFrame", UIParent)
+	f:SetSize(300, 380)
+	f:SetFrameStrata("DIALOG")
+	f:SetClampedToScreen(true)
+	f:SetMovable(true)
+	f:EnableMouse(true)
+	f:RegisterForDrag("LeftButton")
+	f:SetScript("OnDragStart", f.StartMoving)
+	f:SetScript("OnDragStop", f.StopMovingOrSizing)
+	f:Hide()
+
+	ns.Fill(f, 0.05, 0.06, 0.09, 0.97)
+	ns.Border(f, 0.45, 0.35, 0.15, 1)
+	tinsert(UISpecialFrames, "MurlocRPGInventoryFrame")
+
+	self.frame = f
+
+	local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
+	close:SetPoint("TOPRIGHT", -3, -3)
+
+	self.title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	self.title:SetPoint("TOP", 0, -8)
+
+	self.slots = {}
+
+	for i = 1, ns.BAG_SIZE do
+		local col = (i - 1) % BAG_COLS
+		local row = math.floor((i - 1) / BAG_COLS)
+
+		local b = ItemSlot(f, BAG_SLOT, function(self2, button)
+			Inventory:OnSlotClick(self2.bagIndex, button, self2)
+		end)
+		b:SetPoint("TOPLEFT", 14 + col * BAG_STEP, -40 - row * BAG_STEP)
+		b.bagIndex = i
+		b:SetScript("OnEnter", function(self2)
+			ShowItemTooltip(self2, ns.ITEM_BY_ID[G:Bag()[self2.bagIndex]], ns.L.BAG_HINT)
+		end)
+
+		self.slots[i] = b
+	end
+
+	self.hint = f:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+	self.hint:SetPoint("BOTTOM", 0, 12)
+	self.hint:SetWidth(276)
+	self.hint:SetText(ns.L.BAG_HINT)
+end
+
+function Inventory:OnSlotClick(bagIndex, button, slot)
+	if not G:Bag()[bagIndex] then
+		return
+	end
+
+	if button == "RightButton" then
+		if IsShiftKeyDown() and G:DestroyItem(bagIndex) then
+			self:Refresh()
+			ns.UI:Refresh()
+			ns.RefreshTooltip(slot)
+		end
+
+		return
+	end
+
+	if G:Equip(bagIndex) then
+		self:Refresh()
+		ns.Character:Refresh()
+		ns.UI:Refresh()
+		ns.RefreshTooltip(slot)
+	end
+end
+
+function Inventory:Refresh()
+	if not self.frame or not self.frame:IsShown() or not G:HasSave() then
+		return
+	end
+
+	local bag = G:Bag()
+
+	self.title:SetText(format(ns.L.INVENTORY_TITLE, #bag, ns.BAG_SIZE))
+
+	for i, b in ipairs(self.slots) do
+		local item = ns.ITEM_BY_ID[bag[i]]
+
+		if item then
+			ns.SetIcon(b.icon, item.icon)
+
+			if (G.db.level or 1) < item.level then
+				b.icon:SetVertexColor(1, 0.4, 0.4)
+			else
+				b.icon:SetVertexColor(1, 1, 1)
+			end
+
+			ns.SetBorderColor(b, ns.ItemColor(item))
+		else
+			ns.SetIcon(b.icon, "empty_inv_slot")
+			b.icon:SetVertexColor(0.4, 0.4, 0.4)
+			ns.SetBorderColor(b, 0.25, 0.25, 0.25, 1)
+		end
+	end
+end
+
+function Inventory:Toggle()
+	self:Create()
+
+	if self.frame:IsShown() then
+		self.frame:Hide()
+
+		return
+	end
+
+	ns.Talents:Hide()
+	ns.Shop:Hide()
+
+	self.frame:ClearAllPoints()
+
+	if ns.UI.frame and ns.UI.frame:IsShown() then
+		self.frame:SetPoint("TOPLEFT", ns.UI.frame, "TOPRIGHT", 8, 0)
+	else
+		self.frame:SetPoint("CENTER")
+	end
+
+	self.frame:Show()
+	self:Refresh()
+end
+
+function Inventory:Hide()
+	if self.frame then
+		self.frame:Hide()
+	end
+end

@@ -185,7 +185,7 @@ function G:Stats()
 		int = m.int,
 		agi = m.agi,
 		maxHP = ns.MaxHealth(m.stm, level),
-		maxMP = ns.MaxEnergy(m.agi),
+		maxMP = ns.MaxEnergy(m.int),
 		minDmg = math.max(1, math.floor(lowMult * wMin * dmgFactor + 0.5)),
 		maxDmg = math.max(1, math.floor(highMult * wMax * dmgFactor + 0.5)),
 		crit = math.min(95, m.agi + m.crit),

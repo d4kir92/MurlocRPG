@@ -372,8 +372,8 @@ function ns.MaxHealth(stm, level)
 	return hp
 end
 
-function ns.MaxEnergy(agi)
-	return 100 + (agi - 9) * 2
+function ns.MaxEnergy(int)
+	return 100 + (int - 9) * 2
 end
 
 function ns.XPToLevel(level)

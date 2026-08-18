@@ -649,12 +649,12 @@ function UI:CreateActions(parent)
 	victory:SetAllPoints(area)
 	victory:Hide()
 	self.victoryActions = victory
-	local back = ns.MakeButton(victory, 339, 28, ns:Trans("LID_RETURN_CAMP"), "Spell_nature_regeneration", function() UI:ReturnToCamp() end)
-	back:SetPoint("TOPLEFT", 4, -18)
+	local back = ns.MakeButton(victory, 686, 28, ns:Trans("LID_RETURN_CAMP"), "Spell_nature_regeneration", function() UI:ReturnToCamp() end)
+	back:SetPoint("TOPLEFT", 4, -104)
 	ns.Tooltip(back, ns:Trans("LID_RETURN_CAMP"), ns:Trans("LID_TIP_RETURN"))
 	self.returnButton = back
-	local nextEnemy = ns.MakeButton(victory, 339, 28, ns:Trans("LID_NEXT_ENEMY"), "stealth", function() UI:NextEnemy() end)
-	nextEnemy:SetPoint("LEFT", back, "RIGHT", 6, 0)
+	local nextEnemy = ns.MakeButton(victory, 686, 28, ns:Trans("LID_NEXT_ENEMY"), "stealth", function() UI:NextEnemy() end)
+	nextEnemy:SetPoint("TOPLEFT", 4, -2)
 	ns.Tooltip(nextEnemy, ns:Trans("LID_NEXT_ENEMY"), ns:Trans("LID_TIP_NEXT"), ns:Trans("LID_STREAK_TIP"))
 	self.nextEnemyButton = nextEnemy
 	local dead = CreateFrame("Frame", nil, area)

@@ -43,7 +43,7 @@ ns.CLASSES = {
 				name = "LID_ABILITY_CHARGE",
 				icon = "charge",
 				level = 1,
-				cost = 20,
+				cost = 10,
 				kind = "damage",
 				mod = 3
 			},
@@ -54,7 +54,7 @@ ns.CLASSES = {
 				level = 3,
 				cost = 15,
 				kind = "damage",
-				mod = 7
+				mod = 6
 			},
 			{
 				id = "EXECUTE",
@@ -63,7 +63,7 @@ ns.CLASSES = {
 				level = 5,
 				cost = 25,
 				kind = "damage",
-				mod = 6
+				mod = 12
 			},
 		},
 		trees = {
@@ -405,9 +405,9 @@ ns.CLASSES = {
 				name = "LID_ABILITY_AMBUSH",
 				icon = "Ability_rogue_ambush",
 				level = 5,
-				cost = 60,
+				cost = 50,
 				kind = "damage",
-				mod = 6
+				mod = 12
 			},
 		},
 		trees = {

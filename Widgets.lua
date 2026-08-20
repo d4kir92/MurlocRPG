@@ -99,6 +99,25 @@ function ns.MakeButton(parent, w, h, text, iconName, onClick)
 	return b
 end
 
+function ns.MakeSquareButton(parent, size, iconName, onClick)
+	local b = CreateFrame("Button", nil, parent)
+	b:SetSize(size, size)
+	if b.SetMotionScriptsWhileDisabled then b:SetMotionScriptsWhileDisabled(true) end
+	b:SetScript("OnClick", onClick)
+	b.icon = b:CreateTexture(nil, "ARTWORK")
+	b.icon:SetPoint("TOPLEFT", 1, -1)
+	b.icon:SetPoint("BOTTOMRIGHT", -1, 1)
+	ns.SetIcon(b.icon, iconName)
+	ns.Border(b, 0, 0, 0, 1)
+	b.count = b:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
+	b.count:SetPoint("BOTTOMRIGHT", -3, 3)
+	b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
+	b:SetPushedTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+	b:SetScript("OnEnable", function(self) self.icon:SetDesaturated(false) end)
+	b:SetScript("OnDisable", function(self) self.icon:SetDesaturated(true) end)
+	return b
+end
+
 function ns.IconButton(parent, size, iconName, onClick)
 	local b = CreateFrame("Button", nil, parent)
 	b:SetSize(size, size)

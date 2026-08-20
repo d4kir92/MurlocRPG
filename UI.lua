@@ -13,6 +13,7 @@ local MERCHANT_X = 556
 local MURK_FIGHT_X = 160
 local ENEMY_X = 500
 local LOAD_TIME = 1.6
+local BATTLE_ICON = 62
 local BG_LEFT = 0.2404
 local BG_RIGHT = 0.7596
 local function SetShown(frame, shown)
@@ -30,6 +31,22 @@ local function PageBackground(page, texture)
 	bg:SetTexCoord(BG_LEFT, BG_RIGHT, 0, 1)
 	return bg
 end
+
+StaticPopupDialogs["MURLOCRPG_DELETE_SLOT"] = {
+	text = "%s",
+	button1 = YES,
+	button2 = NO,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true,
+	showAlert = true,
+	preferredIndex = 3,
+	OnAccept = function(_, data)
+		G:DeleteSlot(data)
+		ns.Sound("IG_QUEST_FAILED")
+		UI:RefreshMenu()
+	end,
+}
 
 function UI:UpdateLogJump()
 	if not self.logJumpButton or not self.log then return end
@@ -92,8 +109,7 @@ function UI:ShowPage(name)
 	SetShown(self.titleText, name ~= "menu")
 	if name ~= "world" then self:HideWindows() end
 	if name == "menu" then
-		ns.Enable(self.loadButton, G:HasSave())
-		self.menuHint:SetText(G:HasSave() and ns:Trans("LID_OVERWRITE") or "")
+		self:RefreshMenu()
 	elseif name == "class" then
 		self:RefreshClassPage()
 	elseif name == "world" then
@@ -122,13 +138,49 @@ function UI:CreateMenuPage(parent)
 	local sub = p:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	sub:SetPoint("TOP", logo, "BOTTOM", 0, 4)
 	sub:SetText(ns:Trans("LID_SUBTITLE"))
-	self.newGameButton = ns.MakeButton(p, 240, 34, ns:Trans("LID_NEW_GAME"), nil, function() UI:StartLoading("class") end)
-	self.newGameButton:SetPoint("TOP", sub, "BOTTOM", 0, -46)
-	self.loadButton = ns.MakeButton(p, 240, 34, ns:Trans("LID_LOAD_GAME"), nil, function() UI:StartLoading("world") end)
-	self.loadButton:SetPoint("TOP", self.newGameButton, "BOTTOM", 0, -10)
-	self.menuHint = p:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-	self.menuHint:SetPoint("TOP", self.loadButton, "BOTTOM", 0, -16)
-	self.menuHint:SetWidth(480)
+	self.slotButtons = {}
+	self.slotDeletes = {}
+	for i = 1, ns.SAVE_SLOTS do
+		local b = ns.MakeButton(p, 260, 34, "", nil, function() UI:PickSlot(i) end)
+		b:SetPoint("TOP", sub, "BOTTOM", -21, -46 - (i - 1) * 44)
+		local del = ns.MakeButton(p, 34, 34, "X", nil, function() UI:ConfirmDeleteSlot(i) end)
+		del:SetPoint("LEFT", b, "RIGHT", 8, 0)
+		if del.GetFontString and del:GetFontString() then del:GetFontString():SetTextColor(1, 0.35, 0.35) end
+		ns.Tooltip(del, ns:Trans("LID_DELETE_SAVE"), ns:Trans("LID_DELETE_SAVE_TIP"))
+		self.slotButtons[i] = b
+		self.slotDeletes[i] = del
+	end
+end
+
+function UI:RefreshMenu()
+	for i, b in ipairs(self.slotButtons) do
+		local used = G:SlotUsed(i)
+		if used then
+			local slot = G:SlotData(i)
+			local class = ns.CLASS_BY_ID[slot.class]
+			b:SetText(format(ns:Trans("LID_LOAD_SLOT"), G:SlotName(i)))
+			ns.Tooltip(b, G:SlotName(i), format("%s  -  %s", class and ns:Trans(class.name) or "?", format(ns:Trans("LID_LEVEL"), slot.level or 1)), slot.hardcore and ns:Trans("LID_HARDCORE") or nil)
+		else
+			b:SetText(ns:Trans("LID_NEW_GAME"))
+			ns.Tooltip(b, ns:Trans("LID_NEW_GAME"), nil)
+		end
+
+		SetShown(self.slotDeletes[i], used)
+	end
+end
+
+function UI:PickSlot(index)
+	G:SelectSlot(index)
+	if G:HasSave() then
+		self:StartLoading("world")
+	else
+		self:ResetCharName()
+		self:StartLoading("class")
+	end
+end
+
+function UI:ConfirmDeleteSlot(index)
+	StaticPopup_Show("MURLOCRPG_DELETE_SLOT", format(ns:Trans("LID_DELETE_CONFIRM"), G:SlotName(index)), nil, index)
 end
 
 function UI:CreateLoadingPage(parent)
@@ -236,6 +288,19 @@ function UI:CreateClassPage(parent)
 		self.classSkills[i] = b
 	end
 
+	local nameBox = CreateFrame("EditBox", nil, p, "InputBoxTemplate")
+	nameBox:SetSize(180, 22)
+	nameBox:SetPoint("BOTTOM", 24, 92)
+	nameBox:SetAutoFocus(false)
+	nameBox:SetMaxLetters(12)
+	nameBox:SetText(ns.DEFAULT_NAME)
+	nameBox:SetScript("OnEscapePressed", function(self2) self2:ClearFocus() end)
+	nameBox:SetScript("OnEnterPressed", function(self2) self2:ClearFocus() end)
+	nameBox:SetScript("OnTextChanged", function() UI:RefreshNameState() end)
+	local nameLabel = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	nameLabel:SetPoint("RIGHT", nameBox, "LEFT", -8, 0)
+	nameLabel:SetText(ns:Trans("LID_CHAR_NAME"))
+	self.nameBox = nameBox
 	local hardcore = CreateFrame("CheckButton", nil, p, "UICheckButtonTemplate")
 	hardcore:SetSize(26, 26)
 	hardcore:SetPoint("BOTTOM", 0, 56)
@@ -252,11 +317,27 @@ function UI:CreateClassPage(parent)
 
 	self.hardcoreCheck = hardcore
 	self.enterButton = ns.MakeButton(p, 240, 34, ns:Trans("LID_ENTER_WORLD"), nil, function()
-		G:NewGame(ns.CLASSES[UI.selectedClass or 1].id, UI.hardcore)
+		G:NewGame(ns.CLASSES[UI.selectedClass or 1].id, UI.hardcore, UI:CharName())
 		UI:EnterWorld(true)
 	end)
 
 	self.enterButton:SetPoint("BOTTOM", 0, 16)
+end
+
+function UI:CharName()
+	local name = self.nameBox and strtrim(self.nameBox:GetText()) or ""
+	return name ~= "" and name or ns.DEFAULT_NAME
+end
+
+function UI:ResetCharName()
+	if not self.nameBox then return end
+	self.nameBox:SetText(ns.DEFAULT_NAME)
+	self.nameBox:ClearFocus()
+end
+
+function UI:RefreshNameState()
+	if not self.enterButton or not self.nameBox then return end
+	ns.Enable(self.enterButton, strtrim(self.nameBox:GetText()) ~= "")
 end
 
 function UI:CreateGameOverPage(parent)
@@ -292,6 +373,7 @@ function UI:CreateGameOverPage(parent)
 
 	self.overNewButton = ns.MakeButton(p, 240, 34, ns:Trans("LID_GAMEOVER_NEW_CHAR"), nil, function()
 		G:DeleteSave()
+		UI:ResetCharName()
 		UI:StartLoading("class")
 	end)
 
@@ -322,6 +404,7 @@ end
 function UI:RefreshClassPage()
 	self.selectedClass = self.selectedClass or 1
 	self.hardcoreCheck:SetChecked(self.hardcore and true or false)
+	self:RefreshNameState()
 	local class = ns.CLASSES[self.selectedClass]
 	for i, b in ipairs(self.classButtons) do
 		if i == self.selectedClass then
@@ -363,7 +446,7 @@ function UI:CreateWorldPage(parent)
 	self.portrait:Play(ns.SPRITES.MURK_IDLE, 10, true)
 	self.nameText = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	self.nameText:SetPoint("TOPLEFT", portrait, "TOPRIGHT", 8, 0)
-	self.nameText:SetText("Murk")
+	self.nameText:SetText(G:Name())
 	self.levelText = p:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	self.levelText:SetPoint("LEFT", self.nameText, "RIGHT", 8, 0)
 	self.hpBar = ns.Bar(p, 260, 12, 0.15, 0.65, 0.2)
@@ -557,7 +640,7 @@ function UI:CreateScene(parent)
 
 	murkHit:SetScript("OnEnter", function(self2)
 		GameTooltip:SetOwner(self2, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("Murk", 1, 0.82, 0)
+		GameTooltip:AddLine(G:Name(), 1, 0.82, 0)
 		GameTooltip:AddLine(ns:Trans("LID_MURK_HINT"), 1, 1, 1, true)
 		GameTooltip:Show()
 	end)
@@ -609,40 +692,51 @@ function UI:CreateActions(parent)
 	hunt:SetPoint("LEFT", rest, "RIGHT", 8, 0)
 	ns.Tooltip(hunt, ns:Trans("LID_HUNT"), ns:Trans("LID_TIP_HUNT"))
 	self.huntButton = hunt
-	local dungeon = ns.MakeButton(camp, 686, 28, ns:Trans("LID_DUNGEON"), "Ability_Creature_Cursed_02", function() UI:StartDungeon() end)
+	local dungeon = ns.MakeButton(camp, 339, 28, ns:Trans("LID_DUNGEON"), "Ability_Creature_Cursed_02", function() UI:StartDungeon() end)
 	dungeon:SetPoint("TOPLEFT", rest, "BOTTOMLEFT", 0, -6)
 	self.dungeonButton = dungeon
+	local logout = ns.MakeButton(camp, 339, 28, ns:Trans("LID_LOGOUT"), "rune_of_teleportation_icon", function() UI:Logout() end)
+	logout:SetPoint("LEFT", dungeon, "RIGHT", 8, 0)
+	ns.Tooltip(logout, ns:Trans("LID_LOGOUT"), ns:Trans("LID_TIP_LOGOUT"))
+	self.logoutButton = logout
 	local battle = CreateFrame("Frame", nil, area)
 	battle:SetAllPoints(area)
 	battle:Hide()
 	self.battleActions = battle
-	local function BattleSlot(button, index)
-		local col = (index - 1) % 2
-		local row = math.floor((index - 1) / 2)
-		button:SetPoint("TOPLEFT", 4 + col * 347, -2 - row * 34)
+	local step = BATTLE_ICON + 8
+	local abilityEnd = 4 + 4 * step - 8
+	local fleeStart = SCENE_W - 4 - BATTLE_ICON
+	local supplySpan = #ns.CONSUMABLES * step - 8
+	local supplyStart = math.floor(abilityEnd + (fleeStart - abilityEnd - supplySpan) / 2)
+	local function BattleIconSlot(button, index)
+		button:SetPoint("TOPLEFT", 4 + (index - 1) * step, -2)
 	end
 
-	local attack = ns.MakeButton(battle, 339, 28, ns:Trans("LID_ACT_ATTACK"), "INV_Sword_06", function() UI:PlayerStrike(function() C:Attack() end) end)
-	BattleSlot(attack, 1)
+	local function BattleSupplySlot(button, index)
+		button:SetPoint("TOPLEFT", supplyStart + (index - 1) * step, -2)
+	end
+
+	local attack = ns.MakeSquareButton(battle, BATTLE_ICON, "INV_Sword_06", function() UI:PlayerStrike(function() C:Attack() end) end)
+	BattleIconSlot(attack, 1)
 	ns.Tooltip(attack, ns:Trans("LID_ACT_ATTACK"), ns:Trans("LID_ATTACK_DESC"))
 	self.attackButton = attack
 	self.abilityButtons = {}
 	for i = 1, 3 do
-		local b = ns.MakeButton(battle, 339, 28, "", nil, function(self2) UI:CastAbility(self2.ability) end)
-		BattleSlot(b, i + 1)
+		local b = ns.MakeSquareButton(battle, BATTLE_ICON, nil, function(self2) UI:CastAbility(self2.ability) end)
+		BattleIconSlot(b, i + 1)
 		self.abilityButtons[i] = b
 	end
 
 	self.supplyButtons = {}
 	for i, supply in ipairs(ns.CONSUMABLES) do
-		local b = ns.MakeButton(battle, 339, 28, "", supply.icon, function() UI:SimpleAction(function() C:UseSupply(supply.id) end) end)
-		BattleSlot(b, i + 4)
+		local b = ns.MakeSquareButton(battle, BATTLE_ICON, supply.icon, function() UI:SimpleAction(function() C:UseSupply(supply.id) end) end)
+		BattleSupplySlot(b, i)
 		b.supply = supply
 		self.supplyButtons[i] = b
 	end
 
-	local flee = ns.MakeButton(battle, 339, 28, ns:Trans("LID_ACT_FLEE"), "vanish", function() UI:SimpleAction(function() C:Flee() end) end)
-	BattleSlot(flee, #ns.CONSUMABLES + 5)
+	local flee = ns.MakeSquareButton(battle, BATTLE_ICON, "vanish", function() UI:SimpleAction(function() C:Flee() end) end)
+	flee:SetPoint("TOPRIGHT", -4, -2)
 	ns.Tooltip(flee, ns:Trans("LID_ACT_FLEE"), ns:Trans("LID_FLEE_DESC"))
 	self.fleeButton = flee
 	local victory = CreateFrame("Frame", nil, area)
@@ -654,7 +748,7 @@ function UI:CreateActions(parent)
 	ns.Tooltip(back, ns:Trans("LID_RETURN_CAMP"), ns:Trans("LID_TIP_RETURN"))
 	self.returnButton = back
 	local nextEnemy = ns.MakeButton(victory, 686, 28, ns:Trans("LID_NEXT_ENEMY"), "stealth", function() UI:NextEnemy() end)
-	nextEnemy:SetPoint("TOPLEFT", 4, -2)
+	nextEnemy:SetPoint("TOPLEFT", 4, -70)
 	ns.Tooltip(nextEnemy, ns:Trans("LID_NEXT_ENEMY"), ns:Trans("LID_TIP_NEXT"), ns:Trans("LID_STREAK_TIP"))
 	self.nextEnemyButton = nextEnemy
 	local dead = CreateFrame("Frame", nil, area)
@@ -844,6 +938,20 @@ function UI:NextEnemy()
 	C:Start()
 end
 
+function UI:Logout()
+	if self.busy or self.transition then return end
+	self:HidePanels()
+	self:HideWindows()
+	G.battle = nil
+	G.turnLocked = false
+	G.victory = false
+	G.dungeon = false
+	G:ResetStreak()
+	self.mode = nil
+	ns.Sound("IG_CHARACTER_INFO_CLOSE")
+	self:ShowPage("menu")
+end
+
 function UI:ReturnToCamp()
 	if self.busy then return end
 	self.busy = true
@@ -994,7 +1102,6 @@ function UI:RefreshAbilityButtons(canAct)
 			b:Hide()
 		else
 			b:Show()
-			b:SetText(ns:Trans(a.name))
 			ns.SetIcon(b.icon, a.icon)
 			local cost = G:AbilityCost(a)
 			local known = G.db.level >= a.level
@@ -1027,7 +1134,8 @@ function UI:Refresh()
 	if mode ~= self.mode and not self.transition then self:EnterMode(mode) end
 	local class = G:Class()
 	local hardcoreTag = G:Hardcore() and format("  |cffff4040%s|r", ns:Trans("LID_HARDCORE")) or ""
-	self.nameText:SetText((class and format("Murk  |cff9ad8ff%s|r", ns:Trans(class.name)) or "Murk") .. hardcoreTag)
+	local charName = G:Name()
+	self.nameText:SetText((class and format("%s  |cff9ad8ff%s|r", charName, ns:Trans(class.name)) or charName) .. hardcoreTag)
 	self.levelText:SetText(format(ns:Trans("LID_LEVEL"), db.level))
 	ns.SetBar(self.hpBar, db.hp, s.maxHP, format(ns:Trans("LID_BARTEXT"), db.hp, s.maxHP))
 	ns.SetBar(self.mpBar, db.mp, s.maxMP, format(ns:Trans("LID_BARTEXT"), db.mp, s.maxMP))
@@ -1107,7 +1215,7 @@ function UI:Refresh()
 	for _, b in ipairs(self.supplyButtons) do
 		local count = G:SupplyCount(b.supply.id)
 		ns.Enable(b, canAct and count > 0)
-		b:SetText(format(ns:Trans("LID_ACT_ITEM"), ns:Trans(b.supply.name), count))
+		b.count:SetText(count > 0 and count or "")
 		ns.Tooltip(b, ns:Trans(b.supply.name), format(ns:Trans("LID_ITEM_DESC"), ns:Trans(b.supply.desc), count))
 		ns.RefreshTooltip(b)
 	end

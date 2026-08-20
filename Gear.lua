@@ -314,7 +314,7 @@ function Character:Refresh()
 	local class = G:Class()
 	local s = G:Stats()
 	local db = G.db
-	self.subtitle:SetText(format("Murk  -  %s  -  %s", class and ns:Trans(class.name) or "?", format(ns:Trans("LID_LEVEL"), db.level)))
+	self.subtitle:SetText(format("%s  -  %s  -  %s", G:Name(), class and ns:Trans(class.name) or "?", format(ns:Trans("LID_LEVEL"), db.level)))
 	for slotKey, b in pairs(self.slots) do
 		local item = ns.ITEM_BY_ID[G:Equipped()[slotKey]]
 		if item then

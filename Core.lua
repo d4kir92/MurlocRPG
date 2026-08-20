@@ -2,27 +2,87 @@ local _, ns = ...
 MurlocRPGDB = MurlocRPGDB or {}
 local G = {}
 ns.Game = G
-local SAVE_VERSION = 7
+local SAVE_VERSION = 8
+ns.SAVE_SLOTS = 4
+ns.DEFAULT_NAME = "Murk"
 function ns.Sound(key)
 	if SOUNDKIT and PlaySound and SOUNDKIT[key] then pcall(PlaySound, SOUNDKIT[key]) end
 end
 
+local function UpgradeDB()
+	if MurlocRPGDB.version == 7 and MurlocRPGDB.class then
+		local old = {}
+		for k, v in pairs(MurlocRPGDB) do
+			old[k] = v
+		end
+
+		old.version = nil
+		old.name = ns.DEFAULT_NAME
+		wipe(MurlocRPGDB)
+		MurlocRPGDB.slots = {old}
+	elseif MurlocRPGDB.version ~= SAVE_VERSION then
+		wipe(MurlocRPGDB)
+	end
+end
+
 function G:Init()
 	if type(MurlocRPGDB) ~= "table" then MurlocRPGDB = {} end
-	if MurlocRPGDB.version ~= SAVE_VERSION then wipe(MurlocRPGDB) end
-	self.db = MurlocRPGDB
+	UpgradeDB()
+	MurlocRPGDB.version = SAVE_VERSION
+	if type(MurlocRPGDB.slots) ~= "table" then MurlocRPGDB.slots = {} end
+	for i = 1, ns.SAVE_SLOTS do
+		if type(MurlocRPGDB.slots[i]) ~= "table" then MurlocRPGDB.slots[i] = {} end
+	end
+
+	self:SelectSlot(MurlocRPGDB.slot or 1)
+end
+
+function G:SelectSlot(index)
+	index = math.max(1, math.min(ns.SAVE_SLOTS, index or 1))
+	MurlocRPGDB.slot = index
+	self.slot = index
+	self.db = MurlocRPGDB.slots[index]
 	self.battle = nil
 	self.turnLocked = false
 	self.victory = false
 end
 
-function G:HasSave()
-	return self.db.version == SAVE_VERSION and self.db.class ~= nil
+function G:SlotData(index)
+	return MurlocRPGDB.slots and MurlocRPGDB.slots[index]
 end
 
-function G:NewGame(classId, hardcore)
+function G:SlotUsed(index)
+	local slot = self:SlotData(index)
+	return slot ~= nil and slot.class ~= nil
+end
+
+function G:SlotName(index)
+	local slot = self:SlotData(index)
+	return slot and slot.name or ns.DEFAULT_NAME
+end
+
+function G:DeleteSlot(index)
+	local slot = self:SlotData(index)
+	if not slot then return end
+	wipe(slot)
+	if index == self.slot then
+		self.battle = nil
+		self.turnLocked = false
+		self.victory = false
+	end
+end
+
+function G:Name()
+	return self.db and self.db.name or ns.DEFAULT_NAME
+end
+
+function G:HasSave()
+	return self.db ~= nil and self.db.class ~= nil
+end
+
+function G:NewGame(classId, hardcore, name)
 	wipe(self.db)
-	self.db.version = SAVE_VERSION
+	self.db.name = name and name ~= "" and name or ns.DEFAULT_NAME
 	self.db.class = classId
 	self.db.hardcore = hardcore and true or false
 	self.db.kills = 0

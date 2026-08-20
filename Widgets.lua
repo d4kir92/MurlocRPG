@@ -86,6 +86,12 @@ function ns.RefreshTooltip(button)
 	if onEnter then onEnter(button) end
 end
 
+function ns.AddonVersion()
+	local getter = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
+	local version = getter and getter("MurlocRPG", "Version")
+	return version and format("v%s", version) or ""
+end
+
 function ns.SetAtlasIcon(texture, atlas)
 	if not texture then return false end
 	local info = C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(atlas)

@@ -85,7 +85,7 @@ function UI:Create()
 	self.pages = {}
 	self.titleText = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	self.titleText:SetPoint("TOP", 0, -8)
-	self.titleText:SetText(ns:Trans("LID_TITLE"))
+	self.titleText:SetText(format("%s  |cff9ad8ff%s|r", ns:Trans("LID_TITLE"), ns.AddonVersion()))
 	local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
 	close:SetPoint("TOPRIGHT", -3, -3)
 	local area = CreateFrame("Frame", nil, f)

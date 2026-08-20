@@ -86,6 +86,22 @@ function ns.RefreshTooltip(button)
 	if onEnter then onEnter(button) end
 end
 
+function ns.SetAtlasIcon(texture, atlas)
+	if not texture then return false end
+	local info = C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(atlas)
+	if info and (info.file or info.filename) then
+		texture:SetTexture(info.file or info.filename)
+		texture:SetTexCoord(info.leftTexCoord, info.rightTexCoord, info.topTexCoord, info.bottomTexCoord)
+		texture:SetDesaturated(false)
+		return true
+	end
+
+	if not texture.SetAtlas then return false end
+	texture:SetTexCoord(0, 1, 0, 1)
+	texture:SetAtlas(atlas)
+	return true
+end
+
 function ns.MakeButton(parent, w, h, text, iconName, onClick)
 	local b = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
 	b:SetSize(w, h)

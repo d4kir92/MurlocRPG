@@ -671,24 +671,26 @@ function UI:CreateActions(parent)
 	local camp = CreateFrame("Frame", nil, area)
 	camp:SetAllPoints(area)
 	self.campActions = camp
-	local talents = ns.MakeButton(camp, 339, 28, ns:Trans("LID_TALENTS"), "Ability_Marksmanship", function() ns.Talents:Toggle() end)
-	talents:SetPoint("TOPLEFT", 4, -2)
-	ns.Tooltip(talents, ns:Trans("LID_TALENTS"), ns:Trans("LID_TIP_TALENTS"))
-	self.talentsButton = talents
 	local character = ns.MakeButton(camp, 339, 28, ns:Trans("LID_CHARACTER"), "Murloc_icon", function() ns.Character:Toggle() end)
-	character:SetPoint("LEFT", talents, "RIGHT", 8, 0)
+	character:SetPoint("TOPLEFT", 4, -2)
 	ns.Tooltip(character, ns:Trans("LID_CHARACTER"), ns:Trans("LID_TIP_CHARACTER"))
 	self.characterButton = character
+	local talents = ns.MakeButton(camp, 339, 28, ns:Trans("LID_TALENTS"), "Ability_Marksmanship", function() ns.Talents:Toggle() end)
+	talents:SetPoint("LEFT", character, "RIGHT", 8, 0)
+	ns.Tooltip(talents, ns:Trans("LID_TALENTS"), ns:Trans("LID_TIP_TALENTS"))
+	self.talentsButton = talents
 	local inventory = ns.MakeButton(camp, 339, 28, ns:Trans("LID_INVENTORY"), "Inv_misc_bag_08", function() ns.Inventory:Toggle() end)
-	inventory:SetPoint("TOPLEFT", talents, "BOTTOMLEFT", 0, -6)
+	inventory:SetPoint("TOPLEFT", character, "BOTTOMLEFT", 0, -6)
 	ns.Tooltip(inventory, ns:Trans("LID_INVENTORY"), ns:Trans("LID_TIP_INVENTORY"))
 	self.inventoryButton = inventory
 	local shop = ns.MakeButton(camp, 339, 28, ns:Trans("LID_SHOP"), "gold_coin_icon", function() ns.Shop:Toggle() end)
 	shop:SetPoint("LEFT", inventory, "RIGHT", 8, 0)
 	ns.Tooltip(shop, ns:Trans("LID_SHOP"), ns:Trans("LID_TIP_SHOP"))
 	self.shopButton = shop
-	local rest = ns.MakeButton(camp, 339, 28, ns:Trans("LID_REST"), "Spell_nature_regeneration", function() UI:Rest() end)
+	local rest = ns.MakeButton(camp, 339, 28, ns:Trans("LID_REST"), nil, function() UI:Rest() end)
 	rest:SetPoint("TOPLEFT", inventory, "BOTTOMLEFT", 0, -6)
+	rest.icon:SetTexture("Interface\\Icons\\INV_Misc_Rune_01")
+	rest.icon:SetTexCoord(0, 1, 0, 1)
 	ns.Tooltip(rest, ns:Trans("LID_REST"), ns:Trans("LID_TIP_REST"))
 	self.restButton = rest
 	local hunt = ns.MakeButton(camp, 339, 28, ns:Trans("LID_HUNT"), "stealth", function() UI:StartHunt() end)
@@ -697,6 +699,7 @@ function UI:CreateActions(parent)
 	self.huntButton = hunt
 	local dungeon = ns.MakeButton(camp, 339, 28, ns:Trans("LID_DUNGEON"), "Ability_Creature_Cursed_02", function() UI:StartDungeon() end)
 	dungeon:SetPoint("TOPLEFT", rest, "BOTTOMLEFT", 0, -6)
+	ns.SetAtlasIcon(dungeon.icon, "Dungeon")
 	self.dungeonButton = dungeon
 	local logout = ns.MakeButton(camp, 339, 28, ns:Trans("LID_LOGOUT"), "rune_of_teleportation_icon", function() UI:Logout() end)
 	logout:SetPoint("LEFT", dungeon, "RIGHT", 8, 0)

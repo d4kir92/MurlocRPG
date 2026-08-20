@@ -1072,31 +1072,31 @@ ns.BAG_DROPS = {
 	{
 		id = "runecloth_bag",
 		min = 16,
-		chance = 1
+		chance = 0.5
 	},
 	{
 		id = "mageweave_bag",
 		min = 12,
 		max = 18,
-		chance = 2
+		chance = 1
 	},
 	{
 		id = "small_silk_pack",
 		min = 8,
 		max = 14,
-		chance = 4
+		chance = 2
 	},
 	{
 		id = "woolen_bag",
 		min = 4,
 		max = 10,
-		chance = 8
+		chance = 4
 	},
 	{
 		id = "linen_bag",
 		min = 1,
 		max = 6,
-		chance = 16
+		chance = 8
 	},
 }
 
@@ -1137,7 +1137,7 @@ function ns.RollBagDrop(playerLevel, dungeon)
 	for _, entry in ipairs(ns.BAG_DROPS) do
 		if playerLevel >= entry.min and (not entry.max or playerLevel <= entry.max) then
 			local chance = entry.chance * (dungeon and 2 or 1)
-			if math.random(100) <= chance then return ns.ITEM_BY_ID[entry.id] end
+			if math.random() * 100 <= chance then return ns.ITEM_BY_ID[entry.id] end
 		end
 	end
 	return nil

@@ -159,9 +159,11 @@ function UI:RefreshMenu()
 			local slot = G:SlotData(i)
 			local class = ns.CLASS_BY_ID[slot.class]
 			b:SetText(G:SlotName(i))
+			ns.SetIcon(b.icon, class and class.icon or nil)
 			ns.Tooltip(b, G:SlotName(i), format("%s  -  %s", class and ns:Trans(class.name) or "?", format(ns:Trans("LID_LEVEL"), slot.level or 1)), slot.hardcore and ns:Trans("LID_HARDCORE") or nil)
 		else
 			b:SetText(ns:Trans("LID_NEW_GAME"))
+			ns.SetIcon(b.icon, nil)
 			ns.Tooltip(b, ns:Trans("LID_NEW_GAME"), nil)
 		end
 
@@ -689,20 +691,24 @@ function UI:CreateActions(parent)
 	self.shopButton = shop
 	local rest = ns.MakeButton(camp, 339, 28, ns:Trans("LID_REST"), nil, function() UI:Rest() end)
 	rest:SetPoint("TOPLEFT", inventory, "BOTTOMLEFT", 0, -6)
-	rest.icon:SetTexture("Interface\\Icons\\INV_Misc_Rune_01")
+	rest.icon:SetTexture("Interface\\Icons\\Spell_Nature_Sleep")
 	rest.icon:SetTexCoord(0, 1, 0, 1)
 	ns.Tooltip(rest, ns:Trans("LID_REST"), ns:Trans("LID_TIP_REST"))
 	self.restButton = rest
-	local hunt = ns.MakeButton(camp, 339, 28, ns:Trans("LID_HUNT"), "stealth", function() UI:StartHunt() end)
+	local hunt = ns.MakeButton(camp, 339, 28, ns:Trans("LID_HUNT"), nil, function() UI:StartHunt() end)
 	hunt:SetPoint("LEFT", rest, "RIGHT", 8, 0)
+	hunt.icon:SetTexture("Interface\\Icons\\INV_Misc_Map_01")
+	hunt.icon:SetTexCoord(0, 1, 0, 1)
 	ns.Tooltip(hunt, ns:Trans("LID_HUNT"), ns:Trans("LID_TIP_HUNT"))
 	self.huntButton = hunt
 	local dungeon = ns.MakeButton(camp, 339, 28, ns:Trans("LID_DUNGEON"), "Ability_Creature_Cursed_02", function() UI:StartDungeon() end)
 	dungeon:SetPoint("TOPLEFT", rest, "BOTTOMLEFT", 0, -6)
 	ns.SetAtlasIcon(dungeon.icon, "Dungeon")
 	self.dungeonButton = dungeon
-	local logout = ns.MakeButton(camp, 339, 28, ns:Trans("LID_LOGOUT"), "rune_of_teleportation_icon", function() UI:Logout() end)
+	local logout = ns.MakeButton(camp, 339, 28, ns:Trans("LID_LOGOUT"), nil, function() UI:Logout() end)
 	logout:SetPoint("LEFT", dungeon, "RIGHT", 8, 0)
+	logout.icon:SetTexture("Interface\\Icons\\INV_Misc_Rune_01")
+	logout.icon:SetTexCoord(0, 1, 0, 1)
 	ns.Tooltip(logout, ns:Trans("LID_LOGOUT"), ns:Trans("LID_TIP_LOGOUT"))
 	self.logoutButton = logout
 	local battle = CreateFrame("Frame", nil, area)
@@ -749,12 +755,16 @@ function UI:CreateActions(parent)
 	victory:SetAllPoints(area)
 	victory:Hide()
 	self.victoryActions = victory
-	local back = ns.MakeButton(victory, 686, 28, ns:Trans("LID_RETURN_CAMP"), "Spell_nature_regeneration", function() UI:ReturnToCamp() end)
+	local back = ns.MakeButton(victory, 686, 28, ns:Trans("LID_RETURN_CAMP"), nil, function() UI:ReturnToCamp() end)
 	back:SetPoint("TOPLEFT", 4, -104)
+	back.icon:SetTexture("Interface\\Icons\\Spell_Fire_Fire")
+	back.icon:SetTexCoord(0, 1, 0, 1)
 	ns.Tooltip(back, ns:Trans("LID_RETURN_CAMP"), ns:Trans("LID_TIP_RETURN"))
 	self.returnButton = back
-	local nextEnemy = ns.MakeButton(victory, 686, 28, ns:Trans("LID_NEXT_ENEMY"), "stealth", function() UI:NextEnemy() end)
+	local nextEnemy = ns.MakeButton(victory, 686, 28, ns:Trans("LID_NEXT_ENEMY"), nil, function() UI:NextEnemy() end)
 	nextEnemy:SetPoint("TOPLEFT", 4, -70)
+	nextEnemy.icon:SetTexture("Interface\\Icons\\Ability_Hunter_SniperShot")
+	nextEnemy.icon:SetTexCoord(0, 1, 0, 1)
 	ns.Tooltip(nextEnemy, ns:Trans("LID_NEXT_ENEMY"), ns:Trans("LID_TIP_NEXT"), ns:Trans("LID_STREAK_TIP"))
 	self.nextEnemyButton = nextEnemy
 	local dead = CreateFrame("Frame", nil, area)

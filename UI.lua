@@ -1187,6 +1187,7 @@ function UI:Refresh()
 	ns.Enable(self.characterButton, idle)
 	ns.Enable(self.inventoryButton, idle)
 	ns.Enable(self.shopButton, idle)
+	ns.Enable(self.logoutButton, idle and not self.transition)
 	local dungeonReady = (G.db.level or 1) >= ns.DUNGEON_LEVEL
 	ns.Enable(self.dungeonButton, idle and dungeonReady)
 	if dungeonReady then

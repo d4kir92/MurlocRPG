@@ -2,11 +2,34 @@ local _, ns = ...
 local G = ns.Game
 local SLOT = 44
 local STEP = 52
-local COLS = 5
+local COLS = 6
 local BUY_ROWS = 5
 local BLOCK_GAP = 26
+local BUY_TOP = 78
+local CATEGORIES = {"LID_SHOP_ARMOR", "LID_SHOP_WEAPONS", "LID_SHOP_BAGS", "LID_SHOP_SUPPLIES",}
 local Shop = {}
 ns.Shop = Shop
+local function CategoryOf(item)
+	if item.slotType == "BAG" then return 3 end
+	if item.slotType == "MAINHAND" or item.slotType == "OFFHAND" then return 2 end
+	return 1
+end
+
+local PER_BLOCK = COLS * BUY_ROWS
+local BLOCK_WIDTH = COLS * STEP - (STEP - SLOT)
+local function BlockLayout(count)
+	local blocks = math.max(1, math.ceil(count / PER_BLOCK))
+	local lastCols = math.max(1, math.min(COLS, count - (blocks - 1) * PER_BLOCK))
+	local width = (blocks - 1) * (BLOCK_WIDTH + BLOCK_GAP) + lastCols * STEP - (STEP - SLOT)
+	local rows = blocks > 1 and BUY_ROWS or math.max(1, math.ceil(count / COLS))
+	return width, rows
+end
+
+local function SlotOffset(index)
+	local inBlock = (index - 1) % PER_BLOCK
+	local block = math.floor((index - 1) / PER_BLOCK)
+	return block * (BLOCK_WIDTH + BLOCK_GAP) + (inBlock % COLS) * STEP, math.floor(inBlock / COLS) * STEP
+end
 function Shop:Create()
 	if self.frame then return end
 	local f = CreateFrame("Frame", "MurlocRPGShopFrame", UIParent)
@@ -30,9 +53,14 @@ function Shop:Create()
 	self.title:SetText(ns:Trans("LID_SHOP_TITLE"))
 	self.money = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	self.money:SetPoint("TOP", 0, -32)
-	local buyHeader = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	buyHeader:SetPoint("TOPLEFT", 14, -56)
-	buyHeader:SetText(ns:Trans("LID_SHOP_BUY"))
+	self.catHeaders = {}
+	for i, key in ipairs(CATEGORIES) do
+		local header = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		header:SetPoint("TOPLEFT", 14, -56)
+		header:SetText(ns:Trans(key))
+		self.catHeaders[i] = header
+	end
+
 	self.buySlots = {}
 	for i = 1, #ns.VENDOR_STOCK + #ns.VENDOR_BAGS do
 		local b = ns.ItemSlot(f, SLOT, function(self2) Shop:OnBuy(self2.itemId, self2) end)
@@ -50,13 +78,9 @@ function Shop:Create()
 	self.empty:SetWidth(268)
 	self.empty:SetJustifyH("LEFT")
 	self.empty:SetText(ns:Trans("LID_SHOP_EMPTY"))
-	local supplyHeader = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	supplyHeader:SetPoint("TOPLEFT", 14, -344)
-	supplyHeader:SetText(ns:Trans("LID_SHOP_SUPPLIES"))
 	self.supplySlots = {}
 	for i, supply in ipairs(ns.CONSUMABLES) do
 		local b = ns.ItemSlot(f, SLOT, function(self2) Shop:OnBuySupply(supply.id, self2) end)
-		b:SetPoint("TOPLEFT", 14 + (i - 1) * STEP, -366)
 		ns.SetIcon(b.icon, supply.icon)
 		b:SetScript("OnEnter", function(self2)
 			GameTooltip:SetOwner(self2, "ANCHOR_RIGHT")
@@ -73,9 +97,9 @@ function Shop:Create()
 		self.supplySlots[i] = b
 	end
 
-	local sellHeader = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	sellHeader:SetPoint("TOPLEFT", 14, -424)
-	sellHeader:SetText(ns:Trans("LID_SHOP_SELL"))
+	self.sellHeader = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	self.sellHeader:SetPoint("TOPLEFT", 14, -424)
+	self.sellHeader:SetText(ns:Trans("LID_SHOP_SELL"))
 	self.sellSlots = {}
 	for i = 1, ns.BAG_MAX_SIZE do
 		local b = ns.ItemSlot(f, SLOT, function(self2) Shop:OnSell(self2.bagIndex, self2) end)
@@ -129,35 +153,73 @@ function Shop:Refresh()
 	self.money:SetText(format(ns:Trans("LID_SHOP_MONEY"), ns.MoneyText(G:Money())))
 	local stock = G:ShopStock()
 	self.empty:SetShown(#stock == 0)
-	local perBlock = COLS * BUY_ROWS
-	local blockWidth = COLS * SLOT + (COLS - 1) * (STEP - SLOT)
-	local blocks = math.max(1, math.ceil(#stock / perBlock))
-	local buyWidth = blocks * blockWidth + (blocks - 1) * BLOCK_GAP
-	for i, b in ipairs(self.buySlots) do
-		local item = stock[i]
-		b.itemId = item and item.id or nil
-		if item then
-			local inBlock = (i - 1) % perBlock
-			b:ClearAllPoints()
-			b:SetPoint("TOPLEFT", 14 + math.floor((i - 1) / perBlock) * (blockWidth + BLOCK_GAP) + (inBlock % COLS) * STEP, -78 - math.floor(inBlock / COLS) * STEP)
-			b:Show()
-			ns.SetIcon(b.icon, item.icon)
-			b.icon:SetVertexColor(G:CanAfford(item.value) and 1 or 0.9, G:CanAfford(item.value) and 1 or 0.4, G:CanAfford(item.value) and 1 or 0.4)
-			ns.SetBorderColor(b, ns.ItemColor(item))
+	local groups = {{}, {}, {},}
+	for _, item in ipairs(stock) do
+		local group = groups[CategoryOf(item)]
+		group[#group + 1] = item
+	end
+
+	local x = 14
+	local rows = 1
+	local index = 0
+	for category = 1, 3 do
+		local items = groups[category]
+		local header = self.catHeaders[category]
+		if #items == 0 then
+			header:Hide()
 		else
-			b:Hide()
+			local width, blockRows = BlockLayout(#items)
+			header:ClearAllPoints()
+			header:SetPoint("TOPLEFT", x, -56)
+			header:Show()
+			for i, item in ipairs(items) do
+				index = index + 1
+				local b = self.buySlots[index]
+				if b then
+					local dx, dy = SlotOffset(i)
+					b.itemId = item.id
+					b:ClearAllPoints()
+					b:SetPoint("TOPLEFT", x + dx, -BUY_TOP - dy)
+					b:Show()
+					ns.SetIcon(b.icon, item.icon)
+					b.icon:SetVertexColor(G:CanAfford(item.value) and 1 or 0.9, G:CanAfford(item.value) and 1 or 0.4, G:CanAfford(item.value) and 1 or 0.4)
+					ns.SetBorderColor(b, ns.ItemColor(item))
+				end
+			end
+
+			rows = math.max(rows, blockRows)
+			x = x + width + BLOCK_GAP
 		end
 	end
 
+	for i = index + 1, #self.buySlots do
+		self.buySlots[i].itemId = nil
+		self.buySlots[i]:Hide()
+	end
+
+	local supplyWidth, supplyRows = BlockLayout(#self.supplySlots)
+	local supplyHeader = self.catHeaders[4]
+	supplyHeader:ClearAllPoints()
+	supplyHeader:SetPoint("TOPLEFT", x, -56)
+	supplyHeader:Show()
 	for i, b in ipairs(self.supplySlots) do
 		local supply = ns.CONSUMABLES[i]
+		local dx, dy = SlotOffset(i)
+		b:ClearAllPoints()
+		b:SetPoint("TOPLEFT", x + dx, -BUY_TOP - dy)
 		b.count:SetText(G:SupplyCount(supply.id))
 		b.icon:SetVertexColor(1, G:CanAfford(supply.value) and 1 or 0.4, G:CanAfford(supply.value) and 1 or 0.4)
 	end
 
+	rows = math.max(rows, supplyRows)
+	x = x + supplyWidth + BLOCK_GAP
+	local buyWidth = x - 14 - BLOCK_GAP
+	local buyBottom = BUY_TOP + (rows - 1) * STEP + SLOT + 20
+	self.sellHeader:ClearAllPoints()
+	self.sellHeader:SetPoint("TOPLEFT", 14, -buyBottom)
 	local bag = G:Bag()
-	local width, height = ns.LayoutBags(self.sellSlots, self.sellHeaders, 14, -466)
-	self.frame:SetSize(math.max(300, width + 28, buyWidth + 28), 466 + height + 40)
+	local width, height = ns.LayoutBags(self.sellSlots, self.sellHeaders, 14, -(buyBottom + 22))
+	self.frame:SetSize(math.max(300, width + 28, buyWidth + 28), buyBottom + 22 + height + 40)
 	self.hint:SetWidth(math.max(276, width))
 	for i, b in ipairs(self.sellSlots) do
 		local item = ns.ITEM_BY_ID[bag[i]]

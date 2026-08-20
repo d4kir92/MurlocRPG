@@ -12,7 +12,7 @@ local BRAKIL_X = 389
 local MERCHANT_X = 556
 local MURK_FIGHT_X = 160
 local ENEMY_X = 500
-local LOAD_TIME = 1.6
+local LOAD_TIME = 0.96
 local BATTLE_ICON = 62
 local BG_LEFT = 0.2404
 local BG_RIGHT = 0.7596
@@ -158,7 +158,7 @@ function UI:RefreshMenu()
 		if used then
 			local slot = G:SlotData(i)
 			local class = ns.CLASS_BY_ID[slot.class]
-			b:SetText(format(ns:Trans("LID_LOAD_SLOT"), G:SlotName(i)))
+			b:SetText(G:SlotName(i))
 			ns.Tooltip(b, G:SlotName(i), format("%s  -  %s", class and ns:Trans(class.name) or "?", format(ns:Trans("LID_LEVEL"), slot.level or 1)), slot.hardcore and ns:Trans("LID_HARDCORE") or nil)
 		else
 			b:SetText(ns:Trans("LID_NEW_GAME"))
@@ -175,7 +175,7 @@ function UI:PickSlot(index)
 		self:StartLoading("world")
 	else
 		self:ResetCharName()
-		self:StartLoading("class")
+		self:ShowPage("class")
 	end
 end
 
@@ -208,9 +208,11 @@ function UI:CreateLoadingPage(parent)
 		ns.SetBar(UI.loadBar, pct, 1, format("%d%%", math.floor(pct * 100)))
 		if pct >= 1 then
 			local target = UI.loadTarget
+			local fresh = UI.loadFresh
 			UI.loadTarget = nil
+			UI.loadFresh = false
 			if target == "world" then
-				UI:EnterWorld(false)
+				UI:EnterWorld(fresh)
 			elseif target then
 				UI:ShowPage(target)
 			end
@@ -218,8 +220,9 @@ function UI:CreateLoadingPage(parent)
 	end)
 end
 
-function UI:StartLoading(target)
+function UI:StartLoading(target, fresh)
 	self.loadTarget = target
+	self.loadFresh = fresh and true or false
 	self.loadTime = 0
 	ns.SetBar(self.loadBar, 0, 1, "0%")
 	self:ShowPage("loading")
@@ -318,7 +321,7 @@ function UI:CreateClassPage(parent)
 	self.hardcoreCheck = hardcore
 	self.enterButton = ns.MakeButton(p, 240, 34, ns:Trans("LID_ENTER_WORLD"), nil, function()
 		G:NewGame(ns.CLASSES[UI.selectedClass or 1].id, UI.hardcore, UI:CharName())
-		UI:EnterWorld(true)
+		UI:StartLoading("world", true)
 	end)
 
 	self.enterButton:SetPoint("BOTTOM", 0, 16)
@@ -374,7 +377,7 @@ function UI:CreateGameOverPage(parent)
 	self.overNewButton = ns.MakeButton(p, 240, 34, ns:Trans("LID_GAMEOVER_NEW_CHAR"), nil, function()
 		G:DeleteSave()
 		UI:ResetCharName()
-		UI:StartLoading("class")
+		UI:ShowPage("class")
 	end)
 
 	self.overNewButton:SetPoint("BOTTOM", -125, 40)

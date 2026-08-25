@@ -34,7 +34,17 @@ function G:Init()
 		if type(MurlocRPGDB.slots[i]) ~= "table" then MurlocRPGDB.slots[i] = {} end
 	end
 
+	ns.SetUserScale(self:UIScale())
 	self:SelectSlot(MurlocRPGDB.slot or 1)
+end
+
+function G:UIScale()
+	return MurlocRPGDB.uiScale or 1
+end
+
+function G:SetUIScale(value)
+	MurlocRPGDB.uiScale = value
+	ns.SetUserScale(value)
 end
 
 function G:SelectSlot(index)

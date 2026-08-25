@@ -98,6 +98,11 @@ function UI:Create()
 	self:CreateClassPage(area)
 	self:CreateWorldPage(area)
 	self:CreateGameOverPage(area)
+	local scaleSlider = ns.MakeSlider(f, "MurlocRPGScaleSlider", 130, 0.5, 1.5, 0.05, ns:Trans("LID_SCALE"), function(value) G:SetUIScale(value) end)
+	scaleSlider:SetPoint("BOTTOMLEFT", 14, 12)
+	scaleSlider:SetFrameLevel(f:GetFrameLevel() + 20)
+	scaleSlider:SetValue(G:UIScale())
+	self.scaleSlider = scaleSlider
 	self:ShowPage("menu")
 end
 

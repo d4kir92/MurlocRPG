@@ -154,13 +154,60 @@ function ns.IconButton(parent, size, iconName, onClick)
 	return b
 end
 
+local SLIDER_TEMPLATES = {"MinimalSliderTemplate", "UISliderTemplate", "OptionsSliderTemplate"}
+local function SliderTemplate()
+	if not DoesTemplateExist then return "OptionsSliderTemplate" end
+	for _, name in ipairs(SLIDER_TEMPLATES) do
+		if DoesTemplateExist(name) then return name end
+	end
+
+	return "OptionsSliderTemplate"
+end
+
+function ns.MakeSlider(parent, name, width, minValue, maxValue, step, labelFormat, onChange)
+	local slider = CreateFrame("Slider", name, parent, SliderTemplate())
+	slider:SetSize(width, 16)
+	slider:SetOrientation("HORIZONTAL")
+	slider:SetMinMaxValues(minValue, maxValue)
+	slider:SetValueStep(step)
+	if slider.SetObeyStepOnDrag then slider:SetObeyStepOnDrag(true) end
+	for _, suffix in ipairs({"Low", "High", "Text"}) do
+		local fs = _G[name .. suffix]
+		if fs then fs:SetText("") end
+	end
+
+	slider.label = slider:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	slider.label:SetPoint("LEFT", slider, "RIGHT", 8, 0)
+	slider:HookScript("OnValueChanged", function(self, value)
+		value = math.max(minValue, math.min(maxValue, tonumber(format("%.2f", value)) or minValue))
+		self.pending = value
+		self.label:SetText(format(labelFormat, value))
+	end)
+
+	slider:HookScript("OnMouseUp", function(self)
+		if onChange and self.pending then onChange(self.pending) end
+	end)
+
+	slider:SetValue(minValue)
+	slider.label:SetText(format(labelFormat, minValue))
+	return slider
+end
+
 local REFERENCE_UI_SCALE = 0.65
+local userScale = 1
 local scaledFrames = {}
 local function ApplyLockedScale(frame)
 	local parent = frame:GetParent() or UIParent
 	local scale = parent:GetEffectiveScale()
 	if not scale or scale <= 0 then return end
-	frame:SetScale(REFERENCE_UI_SCALE / scale)
+	frame:SetScale(REFERENCE_UI_SCALE * userScale / scale)
+end
+
+function ns.SetUserScale(value)
+	userScale = math.max(0.5, math.min(1.5, tonumber(value) or 1))
+	for _, frame in ipairs(scaledFrames) do
+		ApplyLockedScale(frame)
+	end
 end
 
 function ns.LockScale(frame)

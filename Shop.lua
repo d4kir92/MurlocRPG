@@ -34,6 +34,7 @@ function Shop:Create()
 	if self.frame then return end
 	local f = CreateFrame("Frame", "MurlocRPGShopFrame", UIParent)
 	f:SetSize(300, 716)
+	ns.LockScale(f)
 	f:SetFrameStrata("DIALOG")
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)

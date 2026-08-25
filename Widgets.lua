@@ -153,3 +153,27 @@ function ns.IconButton(parent, size, iconName, onClick)
 	if onClick then b:SetScript("OnClick", onClick) end
 	return b
 end
+
+local REFERENCE_UI_SCALE = 0.65
+local scaledFrames = {}
+local function ApplyLockedScale(frame)
+	local parent = frame:GetParent() or UIParent
+	local scale = parent:GetEffectiveScale()
+	if not scale or scale <= 0 then return end
+	frame:SetScale(REFERENCE_UI_SCALE / scale)
+end
+
+function ns.LockScale(frame)
+	if not frame then return end
+	scaledFrames[#scaledFrames + 1] = frame
+	ApplyLockedScale(frame)
+end
+
+local scaleWatcher = CreateFrame("Frame")
+pcall(scaleWatcher.RegisterEvent, scaleWatcher, "UI_SCALE_CHANGED")
+pcall(scaleWatcher.RegisterEvent, scaleWatcher, "DISPLAY_SIZE_CHANGED")
+scaleWatcher:SetScript("OnEvent", function()
+	for _, frame in ipairs(scaledFrames) do
+		ApplyLockedScale(frame)
+	end
+end)

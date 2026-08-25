@@ -10,6 +10,7 @@ function T:Create()
 	if self.frame then return end
 	local f = CreateFrame("Frame", "MurlocRPGTalentFrame", UIParent)
 	f:SetSize(296, 470)
+	ns.LockScale(f)
 	f:SetFrameStrata("DIALOG")
 	f:SetClampedToScreen(true)
 	f:SetMovable(true)

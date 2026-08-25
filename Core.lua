@@ -1,5 +1,6 @@
 local _, ns = ...
 MurlocRPGDB = MurlocRPGDB or {}
+MurlocRPGGlobalDB = MurlocRPGGlobalDB or {}
 local G = {}
 ns.Game = G
 local SAVE_VERSION = 8
@@ -27,6 +28,9 @@ end
 
 function G:Init()
 	if type(MurlocRPGDB) ~= "table" then MurlocRPGDB = {} end
+	if type(MurlocRPGGlobalDB) ~= "table" then MurlocRPGGlobalDB = {} end
+	if MurlocRPGGlobalDB.uiScale == nil and MurlocRPGDB.uiScale ~= nil then MurlocRPGGlobalDB.uiScale = MurlocRPGDB.uiScale end
+	MurlocRPGDB.uiScale = nil
 	UpgradeDB()
 	MurlocRPGDB.version = SAVE_VERSION
 	if type(MurlocRPGDB.slots) ~= "table" then MurlocRPGDB.slots = {} end
@@ -39,11 +43,11 @@ function G:Init()
 end
 
 function G:UIScale()
-	return MurlocRPGDB.uiScale or 1
+	return MurlocRPGGlobalDB.uiScale or 1
 end
 
 function G:SetUIScale(value)
-	MurlocRPGDB.uiScale = value
+	MurlocRPGGlobalDB.uiScale = value
 	ns.SetUserScale(value)
 end
 

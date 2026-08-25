@@ -204,7 +204,7 @@ local function ApplyLockedScale(frame)
 end
 
 function ns.SetUserScale(value)
-	userScale = math.max(0.5, math.min(1.5, tonumber(value) or 1))
+	userScale = math.max(0.75, math.min(1.5, tonumber(value) or 1))
 	for _, frame in ipairs(scaledFrames) do
 		ApplyLockedScale(frame)
 	end

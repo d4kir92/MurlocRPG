@@ -31,6 +31,7 @@
 ## Category-zhCN: 迷你游戏
 ## Category-zhTW: 迷你遊戲
 ## DefaultState: enabled
+## SavedVariables: MurlocRPGGlobalDB
 ## SavedVariablesPerCharacter: MurlocRPGDB
 ## X-Curse-Project-ID: 1656392
 ## X-Wago-ID: aNDMz96o

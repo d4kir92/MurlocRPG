@@ -98,7 +98,7 @@ function UI:Create()
 	self:CreateClassPage(area)
 	self:CreateWorldPage(area)
 	self:CreateGameOverPage(area)
-	local scaleSlider = ns.MakeSlider(f, "MurlocRPGScaleSlider", 130, 0.5, 1.5, 0.05, ns:Trans("LID_SCALE"), function(value) G:SetUIScale(value) end)
+	local scaleSlider = ns.MakeSlider(f, "MurlocRPGScaleSlider", 130, 0.75, 1.5, 0.05, ns:Trans("LID_SCALE"), function(value) G:SetUIScale(value) end)
 	scaleSlider:SetPoint("BOTTOMLEFT", 14, 12)
 	scaleSlider:SetFrameLevel(f:GetFrameLevel() + 20)
 	scaleSlider:SetValue(G:UIScale())
@@ -1224,7 +1224,6 @@ function UI:Refresh()
 	local bagLabel = format("%s (%d/%d)", ns:Trans("LID_INVENTORY"), #G:Bag(), G:BagSize())
 	if newItems > 0 then bagLabel = format("%s |cff20ff20(%s)|r", bagLabel, format(ns:Trans("LID_NEW_ITEMS"), newItems)) end
 	self.inventoryButton:SetText(bagLabel)
-
 	local enemy = G.battle
 	if enemy then
 		local eliteTag = enemy.elite and format("  |cffff8000%s|r", ns:Trans("LID_ELITE")) or ""

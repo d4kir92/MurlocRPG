@@ -9,6 +9,7 @@ ns.BG_DUNGEON = ns.MEDIA .. "bg_dungeon"
 ns.TITLE_ART = ns.MEDIA .. "title"
 ns.CAMP_HUT = ns.MEDIA .. "camp_hut"
 ns.CAMP_TENT = ns.MEDIA .. "camp_tent"
+ns.QUEST_ICONS = ns.MEDIA .. "questicons"
 local iconSlots
 function ns.IconSlot(name)
 	if not iconSlots then

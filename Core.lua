@@ -31,6 +31,7 @@ function G:Init()
 	if type(MurlocRPGGlobalDB) ~= "table" then MurlocRPGGlobalDB = {} end
 	if MurlocRPGGlobalDB.uiScale == nil and MurlocRPGDB.uiScale ~= nil then MurlocRPGGlobalDB.uiScale = MurlocRPGDB.uiScale end
 	MurlocRPGDB.uiScale = nil
+	if MurlocRPGGlobalDB.minimapButton == nil then MurlocRPGGlobalDB.minimapButton = true end
 	UpgradeDB()
 	MurlocRPGDB.version = SAVE_VERSION
 	if type(MurlocRPGDB.slots) ~= "table" then MurlocRPGDB.slots = {} end
@@ -758,8 +759,9 @@ loader:RegisterEvent("PLAYER_LOGIN")
 loader:SetScript("OnEvent", function(self)
 	self:UnregisterEvent("PLAYER_LOGIN")
 	ns:SetAddonOutput("MurlocRPG", 134169)
-	ns:SetVersion(134169, "0.6.3")
+	ns:SetVersion(134169, "0.6.4")
 	G:Init()
 	ns.UI:Create()
+	ns.UI:CreateMinimapIcon()
 	print(ns:Trans("LID_LOADED"))
 end)

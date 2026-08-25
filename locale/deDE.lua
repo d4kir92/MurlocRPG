@@ -1,5 +1,4 @@
 local _, ns = ...
-
 ns:AddTrans("deDE", "LID_ABILITY_AMBUSH", "Hinterhalt")
 ns:AddTrans("deDE", "LID_ABILITY_CHARGE", "Sturmangriff")
 ns:AddTrans("deDE", "LID_ABILITY_COLD_BLOOD", "Kaltes Blut")
@@ -106,6 +105,7 @@ ns:AddTrans("deDE", "LID_LOG_LATEST", "Zum Neuesten")
 ns:AddTrans("deDE", "LID_LOG_LATEST_TIP", "Scrollt das Log zurück zur neuesten Meldung.")
 ns:AddTrans("deDE", "LID_LOOT", "Du erbeutest %d x %s.")
 ns:AddTrans("deDE", "LID_LOOT_MONEY", "Du erbeutest %s.")
+ns:AddTrans("deDE", "LID_MINIMAP_TIP", "öffnen / schließen")
 ns:AddTrans("deDE", "LID_MURK_HINT", "Klicken für das Charakterfenster, Rechtsklick für das Inventar.")
 ns:AddTrans("deDE", "LID_NEW_GAME", "Neues Spiel")
 ns:AddTrans("deDE", "LID_NEW_ITEMS", "%d Neu")
@@ -226,7 +226,7 @@ ns:AddTrans("deDE", "LID_STATTIP_MANA", "Aktuelles und maximales Mana. Fähigkei
 ns:AddTrans("deDE", "LID_STATTIP_REGEN", "Mana, das am Ende jeder Runde wiederhergestellt wird.")
 ns:AddTrans("deDE", "LID_STATTIP_STM", "Erhöht die maximale Gesundheit um 10 pro Punkt.")
 ns:AddTrans("deDE", "LID_STATTIP_STR", "Erhöht den Waffenschaden. Je 4 Stärke geben einen Multiplikator.")
-ns:AddTrans("deDE", "LID_STAT_AGI","Beweglichkeit")
+ns:AddTrans("deDE", "LID_STAT_AGI", "Beweglichkeit")
 ns:AddTrans("deDE", "LID_STAT_ARMOR", "Rüstung")
 ns:AddTrans("deDE", "LID_STAT_CRIT", "Krit")
 ns:AddTrans("deDE", "LID_STAT_DAMAGE", "Schaden")

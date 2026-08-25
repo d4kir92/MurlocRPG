@@ -1,5 +1,4 @@
 local _, ns = ...
-
 ns:AddTrans("enUS", "LID_ABILITY_AMBUSH", "Ambush")
 ns:AddTrans("enUS", "LID_ABILITY_CHARGE", "Charge")
 ns:AddTrans("enUS", "LID_ABILITY_COLD_BLOOD", "Cold Blood")
@@ -106,6 +105,7 @@ ns:AddTrans("enUS", "LID_LOG_LATEST", "Jump to Latest")
 ns:AddTrans("enUS", "LID_LOG_LATEST_TIP", "Scroll the log back to the newest message.")
 ns:AddTrans("enUS", "LID_LOOT", "You loot %d x %s.")
 ns:AddTrans("enUS", "LID_LOOT_MONEY", "You loot %s.")
+ns:AddTrans("enUS", "LID_MINIMAP_TIP", "open / close")
 ns:AddTrans("enUS", "LID_MURK_HINT", "Click for the character window, right-click for the inventory.")
 ns:AddTrans("enUS", "LID_NEW_GAME", "New Game")
 ns:AddTrans("enUS", "LID_NEW_ITEMS", "%d New")

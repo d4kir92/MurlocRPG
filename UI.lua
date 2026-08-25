@@ -14,6 +14,7 @@ local MURK_FIGHT_X = 160
 local ENEMY_X = 500
 local LOAD_TIME = 0.96
 local BATTLE_ICON = 62
+local QUEST_ICON_H = 44
 local BG_LEFT = 0.2404
 local BG_RIGHT = 0.7596
 local function SetShown(frame, shown)
@@ -98,7 +99,7 @@ function UI:Create()
 	self:CreateClassPage(area)
 	self:CreateWorldPage(area)
 	self:CreateGameOverPage(area)
-	local scaleSlider = ns.MakeSlider(f, "MurlocRPGScaleSlider", 130, 0.75, 1.5, 0.05, ns:Trans("LID_SCALE"), function(value) G:SetUIScale(value) end)
+	local scaleSlider = ns.MakeSlider(f, "MurlocRPGScaleSlider", 220, 0.75, 1.5, 0.05, ns:Trans("LID_SCALE"), function(value) G:SetUIScale(value) end)
 	scaleSlider:SetPoint("BOTTOMLEFT", 14, 12)
 	scaleSlider:SetFrameLevel(f:GetFrameLevel() + 20)
 	scaleSlider:SetValue(G:UIScale())
@@ -544,6 +545,11 @@ function UI:CreateScene(parent)
 	self.brakilName = scene:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	self.brakilName:SetPoint("BOTTOM", scene, "BOTTOMLEFT", BRAKIL_X, GROUND - 12)
 	self.brakilName:SetText(ns:Trans("LID_BRAKIL"))
+	self.brakilQuest = scene:CreateTexture(nil, "OVERLAY")
+	self.brakilQuest:SetSize(QUEST_ICON_H / 2, QUEST_ICON_H)
+	self.brakilQuest:SetPoint("BOTTOM", scene, "BOTTOMLEFT", BRAKIL_X, GROUND + SPRITE_SIZE + 4)
+	self.brakilQuest:SetTexture(ns.QUEST_ICONS)
+	self.brakilQuest:Hide()
 	local brakilHit = CreateFrame("Button", nil, scene)
 	brakilHit:SetSize(110, 150)
 	brakilHit:SetPoint("BOTTOM", scene, "BOTTOMLEFT", BRAKIL_X, GROUND)
@@ -1140,6 +1146,26 @@ function UI:RefreshAbilityButtons(canAct)
 	end
 end
 
+function UI:SetBrakilQuestIcon(state)
+	local icon = self.brakilQuest
+	if not icon then return end
+	if not state or not self.brakil:IsShown() then
+		icon:Hide()
+		return
+	end
+
+	if state == "new" then
+		icon:SetTexCoord(0, 0.5, 0, 1)
+	else
+		icon:SetTexCoord(0.5, 1, 0, 1)
+	end
+
+	local shade = state == "active" and 0.65 or 1
+	icon:SetDesaturated(state == "active")
+	icon:SetVertexColor(shade, shade, shade)
+	icon:Show()
+end
+
 function UI:Refresh()
 	if not self.frame or not G:HasSave() then return end
 	local db = G.db
@@ -1174,15 +1200,19 @@ function UI:Refresh()
 		self.questText:SetText(format(ns:Trans("LID_Q_LINE"), ns.QuestText(quest, "NAME"), G:QuestProgress(), quest.need))
 		if G:QuestReady() then
 			self.questText:SetTextColor(0.4, 1, 0.4)
+			self:SetBrakilQuestIcon("done")
 		else
 			self.questText:SetTextColor(1, 0.82, 0)
+			self:SetBrakilQuestIcon("active")
 		end
 	elseif quest then
 		self.questText:SetText(format(ns:Trans("LID_Q_LINE_NEW"), ns.QuestText(quest, "NAME")))
 		self.questText:SetTextColor(1, 0.82, 0)
+		self:SetBrakilQuestIcon("new")
 	else
 		self.questText:SetText(ns:Trans("LID_Q_ALL_DONE"))
 		self.questText:SetTextColor(0.6, 0.6, 0.6)
+		self:SetBrakilQuestIcon(nil)
 	end
 
 	local idle = not self.busy
@@ -1247,6 +1277,17 @@ function UI:Refresh()
 	ns.Character:Refresh()
 	ns.Inventory:Refresh()
 	ns.Shop:Refresh()
+end
+
+function UI:CreateMinimapIcon()
+	ns:CreateMinimapButton({
+		name = "MurlocRPG",
+		icon = 134169,
+		dbtab = MurlocRPGGlobalDB,
+		dbkey = "minimapButton",
+		vTT = {{"|T134169:16:16:0:0|t " .. ns:Trans("LID_TITLE"), ns.AddonVersion()}, {ns:Trans("LID_LEFTCLICK"), ns:Trans("LID_MINIMAP_TIP")},},
+		funcL = function() UI:Toggle() end,
+	})
 end
 
 function UI:Toggle()

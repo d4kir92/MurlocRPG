@@ -27,19 +27,25 @@ local function EnemyById(id)
 	end
 end
 
+local function CurrentTrack()
+	return G.dungeon and "dungeon" or "main"
+end
+
 local function QuestTarget()
-	local q = G:CurrentQuest()
-	if not q or G.db.quest ~= "active" or q.kind ~= "kill" then return end
-	if G:QuestProgress() >= q.need then return end
+	local track = CurrentTrack()
+	local q = G:CurrentQuest(track)
+	if not q or not G:QuestActive(track) or q.kind ~= "kill" then return end
+	if G:QuestProgress(track) >= q.need then return end
 	return EnemyById(q.enemy)
 end
 
 local function PickEnemy()
-	local target = not G.dungeon and QuestTarget()
+	local target = QuestTarget()
 	if target and (target.unique or math.random(100) <= QUEST_TARGET_CHANCE) then return target end
+	local level = G.db.level or 1
 	local pool = {}
 	for _, enemy in ipairs(ns.ENEMIES) do
-		if not enemy.unique then pool[#pool + 1] = enemy end
+		if not enemy.unique and (enemy.minLevel or 1) <= level then pool[#pool + 1] = enemy end
 	end
 	return pool[math.random(#pool)]
 end
@@ -223,7 +229,7 @@ function C:Victory()
 
 	G:AddKill()
 	G.streak = G:Streak() + 1
-	if not enemy.elite then G:QuestKill(enemy.id) end
+	G:QuestKill(enemy.elite and "dungeon" or "main", enemy.id)
 	local money = math.floor(ns.MoneyFromEnemy(enemy.level) * (enemy.elite and ns.ELITE_MONEY or 1) * G:StreakMult())
 	if money > 0 then
 		G:AddMoney(money)

@@ -129,6 +129,7 @@ function UI:HideWindows()
 	ns.Character:Hide()
 	ns.Inventory:Hide()
 	ns.Shop:Hide()
+	ns.Quests:Hide()
 end
 
 function UI:CreateMenuPage(parent)
@@ -476,6 +477,10 @@ function UI:CreateWorldPage(parent)
 	self.questText = p:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	self.questText:SetPoint("TOPRIGHT", self.bagText, "BOTTOMRIGHT", 0, -4)
 	self.questText:SetJustifyH("RIGHT")
+	self.dquestText = p:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	self.dquestText:SetPoint("TOPRIGHT", self.questText, "BOTTOMRIGHT", 0, -2)
+	self.dquestText:SetJustifyH("RIGHT")
+	self.dquestText:Hide()
 	self:CreateScene(p)
 	self:CreateActions(p)
 	local log = CreateFrame("ScrollingMessageFrame", nil, p)
@@ -560,17 +565,8 @@ function UI:CreateScene(parent)
 		GameTooltip:SetOwner(self2, "ANCHOR_RIGHT")
 		GameTooltip:AddLine(ns:Trans("LID_BRAKIL"), 1, 0.82, 0)
 		GameTooltip:AddLine(ns:Trans("LID_TALK"), 1, 1, 1)
-		local quest = G:CurrentQuest()
-		if not quest then
-			GameTooltip:AddLine(ns:Trans("LID_Q_ALL_DONE"), 0.6, 0.6, 0.6)
-		elseif G.db.quest ~= "active" then
-			GameTooltip:AddLine(format(ns:Trans("LID_Q_LINE_NEW"), ns.QuestText(quest, "NAME")), 1, 0.82, 0)
-		elseif G:QuestReady() then
-			GameTooltip:AddLine(format(ns:Trans("LID_Q_LINE_DONE"), ns.QuestText(quest, "NAME")), 0.4, 1, 0.4)
-		else
-			GameTooltip:AddLine(format(ns:Trans("LID_Q_LINE"), ns.QuestText(quest, "NAME"), G:QuestProgress(), quest.need), 1, 0.82, 0)
-		end
-
+		UI:AddQuestTooltipLine("main")
+		if (G.db.level or 1) >= ns.DUNGEON_LEVEL then UI:AddQuestTooltipLine("dungeon") end
 		GameTooltip:Show()
 	end)
 
@@ -881,6 +877,8 @@ function UI:EnterBattle(chained)
 	local enemy = G.battle
 	self.enemy:StopMove()
 	self.enemy:SetDisplaySize(SPRITE_SIZE * (enemy.scale or 1))
+	local tint = enemy.tint
+	self.enemy:SetTint(tint and tint[1] or 1, tint and tint[2] or 1, tint and tint[3] or 1)
 	self.enemy:SetPos(ENEMY_X, GROUND)
 	self.enemy:Show()
 	self.enemy:Play(ns.SPRITES[enemy.sprite], 10, true)
@@ -1039,7 +1037,7 @@ end
 
 function UI:Talk()
 	if self.busy or G.battle then return end
-	G:TalkToBrakil()
+	ns.Quests:Toggle()
 end
 
 function UI:Rest()
@@ -1146,6 +1144,35 @@ function UI:RefreshAbilityButtons(canAct)
 	end
 end
 
+local ICON_PRIORITY = {
+	done = 3,
+	new = 2,
+	active = 1
+}
+
+local function QuestIconState(a, b)
+	local pa = a and ICON_PRIORITY[a] or 0
+	local pb = b and ICON_PRIORITY[b] or 0
+	if pa == 0 and pb == 0 then return nil end
+	if pa >= pb then return a end
+	return b
+end
+
+function UI:QuestLineText(track)
+	local quest = G:CurrentQuest(track)
+	if not quest then return ns:Trans("LID_Q_ALL_DONE"), 0.6, 0.6, 0.6, nil end
+	local name = ns.QuestText(quest, "NAME")
+	if not G:QuestUnlocked(track) then return format(ns:Trans("LID_Q_LINE_LOCKED"), name, quest.level or 1), 0.6, 0.6, 0.6, nil end
+	if not G:QuestActive(track) then return format(ns:Trans("LID_Q_LINE_NEW"), name), 1, 0.82, 0, "new" end
+	if G:QuestReady(track) then return format(ns:Trans("LID_Q_LINE_DONE"), name), 0.4, 1, 0.4, "done" end
+	return format(ns:Trans("LID_Q_LINE"), name, G:QuestProgress(track), quest.need), 1, 0.82, 0, "active"
+end
+
+function UI:AddQuestTooltipLine(track)
+	local text, r, g, b = self:QuestLineText(track)
+	GameTooltip:AddLine(text, r, g, b)
+end
+
 function UI:SetBrakilQuestIcon(state)
 	local icon = self.brakilQuest
 	if not icon then return end
@@ -1195,25 +1222,22 @@ function UI:Refresh()
 
 	self.moneyText:SetText(ns.MoneyText(G:Money()))
 	self.bagText:SetText(format(ns:Trans("LID_BAG"), db.meat))
-	local quest = G:CurrentQuest()
-	if quest and db.quest == "active" then
-		self.questText:SetText(format(ns:Trans("LID_Q_LINE"), ns.QuestText(quest, "NAME"), G:QuestProgress(), quest.need))
-		if G:QuestReady() then
-			self.questText:SetTextColor(0.4, 1, 0.4)
-			self:SetBrakilQuestIcon("done")
-		else
-			self.questText:SetTextColor(1, 0.82, 0)
-			self:SetBrakilQuestIcon("active")
-		end
-	elseif quest then
-		self.questText:SetText(format(ns:Trans("LID_Q_LINE_NEW"), ns.QuestText(quest, "NAME")))
-		self.questText:SetTextColor(1, 0.82, 0)
-		self:SetBrakilQuestIcon("new")
+	local questLine, qr, qg, qb, mainState = self:QuestLineText("main")
+	self.questText:SetText(questLine)
+	self.questText:SetTextColor(qr, qg, qb)
+	local dungeonState
+	if (db.level or 1) >= ns.DUNGEON_LEVEL then
+		local dungeonLine, dr, dg, dbl, state = self:QuestLineText("dungeon")
+		self.dquestText:SetText(dungeonLine)
+		self.dquestText:SetTextColor(dr, dg, dbl)
+		self.dquestText:Show()
+		dungeonState = state
 	else
-		self.questText:SetText(ns:Trans("LID_Q_ALL_DONE"))
-		self.questText:SetTextColor(0.6, 0.6, 0.6)
-		self:SetBrakilQuestIcon(nil)
+		self.dquestText:Hide()
 	end
+
+	self:SetBrakilQuestIcon(QuestIconState(mainState, dungeonState))
+	if ns.Quests.frame and ns.Quests.frame:IsShown() then ns.Quests:Refresh() end
 
 	local idle = not self.busy
 	local points = G:TalentPoints()

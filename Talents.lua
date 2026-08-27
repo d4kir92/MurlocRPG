@@ -152,6 +152,7 @@ function T:Toggle()
 
 	ns.Inventory:Hide()
 	ns.Shop:Hide()
+	ns.Quests:Hide()
 	self.frame:ClearAllPoints()
 	if ns.UI.frame and ns.UI.frame:IsShown() then
 		self.frame:SetPoint("TOPLEFT", ns.UI.frame, "TOPRIGHT", 8, 0)

@@ -62,4 +62,5 @@ Anim.lua
 Talents.lua
 Gear.lua
 Shop.lua
+Quests.lua
 UI.lua

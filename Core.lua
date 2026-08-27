@@ -112,6 +112,9 @@ function G:NewGame(classId, hardcore, name)
 	self.db.quest = "none"
 	self.db.questIndex = 1
 	self.db.questProgress = 0
+	self.db.dquest = "none"
+	self.db.dquestIndex = 1
+	self.db.dquestProgress = 0
 	self.db.talents = {}
 	self.db.bag = {"worn_dagger"}
 	self.db.equipped = {
@@ -148,17 +151,20 @@ function G:AddKill()
 	self.db.kills = (self.db.kills or 0) + 1
 end
 
+function G:QuestsDone()
+	return math.max(0, (self.db.questIndex or 1) - 1) + math.max(0, (self.db.dquestIndex or 1) - 1)
+end
+
 function G:RunScore()
-	local questsDone = math.max(0, (self.db.questIndex or 1) - 1)
-	return (self.db.level or 1) * 100 + questsDone * 250 + (self.db.kills or 0) * 10 + math.floor((self.db.earned or 0) / 100)
+	return (self.db.level or 1) * 100 + self:QuestsDone() * 250 + (self.db.kills or 0) * 10 + math.floor((self.db.earned or 0) / 100)
 end
 
 function G:EndRun(killedBy, keep)
 	local summary = {
 		level = self.db.level or 1,
 		xp = self.db.xp or 0,
-		questsDone = math.max(0, (self.db.questIndex or 1) - 1),
-		questTotal = #ns.QUESTS,
+		questsDone = self:QuestsDone(),
+		questTotal = #ns.QUESTS + #ns.DUNGEON_QUESTS,
 		kills = self.db.kills or 0,
 		earned = self.db.earned or 0,
 		killedBy = killedBy,
@@ -636,36 +642,64 @@ function G:AddXP(amount)
 	end
 end
 
-function G:QuestIndex()
-	local i = self.db.questIndex
+function G:QuestTrack(track)
+	return ns.QUEST_TRACKS[track] or ns.QUEST_TRACKS.main
+end
+
+function G:QuestIndex(track)
+	local t = self:QuestTrack(track)
+	local i = self.db[t.index]
 	if type(i) ~= "number" or i < 1 then
 		i = 1
-		self.db.questIndex = i
+		self.db[t.index] = i
 	end
 	return i
 end
 
-function G:CurrentQuest()
-	if self.db.quest == "all_done" then return nil end
-	return ns.QUESTS[self:QuestIndex()]
+function G:CurrentQuest(track)
+	local t = self:QuestTrack(track)
+	return t.list[self:QuestIndex(track)]
 end
 
-function G:QuestProgress()
-	local q = self:CurrentQuest()
+function G:QuestActive(track)
+	return self.db[self:QuestTrack(track).state] == "active"
+end
+
+function G:QuestProgress(track)
+	local q = self:CurrentQuest(track)
 	if not q then return 0 end
 	if q.kind == "meat" then return math.min(self.db.meat or 0, q.need) end
-	return math.min(self.db.questProgress or 0, q.need)
+	return math.min(self.db[self:QuestTrack(track).progress] or 0, q.need)
 end
 
-function G:QuestReady()
-	local q = self:CurrentQuest()
-	return q ~= nil and self:QuestProgress() >= q.need
+function G:QuestReady(track)
+	local q = self:CurrentQuest(track)
+	return q ~= nil and self:QuestActive(track) and self:QuestProgress(track) >= q.need
 end
 
-function G:QuestKill(enemyId)
-	local q = self:CurrentQuest()
-	if not q or self.db.quest ~= "active" or q.kind ~= "kill" or q.enemy ~= enemyId then return end
-	self.db.questProgress = math.min((self.db.questProgress or 0) + 1, q.need)
+function G:QuestUnlocked(track)
+	local t = self:QuestTrack(track)
+	local level = self.db.level or 1
+	if t.elite and level < ns.DUNGEON_LEVEL then return false end
+	local q = self:CurrentQuest(track)
+	return q ~= nil and level >= (q.level or 1)
+end
+
+function G:QuestAvailable(track)
+	return not self:QuestActive(track) and self:QuestUnlocked(track)
+end
+
+function G:QuestKill(track, enemyId)
+	local q = self:CurrentQuest(track)
+	if not q or not self:QuestActive(track) then return end
+	if q.kind == "kill" then
+		if q.enemy ~= enemyId then return end
+	elseif q.kind ~= "hunt" then
+		return
+	end
+
+	local t = self:QuestTrack(track)
+	self.db[t.progress] = math.min((self.db[t.progress] or 0) + 1, q.need)
 end
 
 function G:GiveQuestReward(q)
@@ -694,51 +728,38 @@ function G:GiveQuestReward(q)
 	self:AddXP(q.xp)
 end
 
-function G:TalkToBrakil()
-	local db = self.db
-	local q = self:CurrentQuest()
-	if not q then
-		ns.UI:Log(ns:Trans("LID_Q_FINISHED"), 1, 0.85, 0.2)
-		ns.UI:Refresh()
-		return
-	end
+function G:AcceptQuest(track)
+	if not self:QuestAvailable(track) then return false end
+	local t = self:QuestTrack(track)
+	local q = self:CurrentQuest(track)
+	self.db[t.state] = "active"
+	self.db[t.progress] = 0
+	ns.UI:Log(ns.QuestText(q, "OFFER"), 1, 0.85, 0.2)
+	ns.UI:Log(format(ns:Trans("LID_Q_ACCEPTED"), ns.QuestText(q, "NAME")), 0.4, 1, 0.4)
+	ns.Sound("IG_QUEST_LIST_OPEN")
+	ns.UI:Refresh()
+	return true
+end
 
-	if db.quest ~= "active" then
-		db.quest = "active"
-		db.questProgress = 0
-		ns.UI:Log(ns.QuestText(q, "OFFER"), 1, 0.85, 0.2)
-		ns.UI:Log(format(ns:Trans("LID_Q_ACCEPTED"), ns.QuestText(q, "NAME")), 0.4, 1, 0.4)
-		ns.UI:Refresh()
-		return
-	end
-
-	if not self:QuestReady() then
-		if q.kind == "meat" then
-			ns.UI:Log(format(ns.QuestText(q, "HINT"), self:QuestProgress(), q.need), 1, 0.85, 0.2)
-		elseif q.need > 1 then
-			ns.UI:Log(format(ns.QuestText(q, "HINT"), self:QuestProgress(), q.need), 1, 0.85, 0.2)
-		else
-			ns.UI:Log(ns.QuestText(q, "HINT"), 1, 0.85, 0.2)
-		end
-
-		ns.UI:Refresh()
-		return
-	end
-
-	if q.kind == "meat" then db.meat = db.meat - q.need end
+function G:TurnInQuest(track)
+	if not self:QuestReady(track) then return false end
+	local t = self:QuestTrack(track)
+	local q = self:CurrentQuest(track)
+	if q.kind == "meat" then self.db.meat = self.db.meat - q.need end
 	ns.UI:Log(ns.QuestText(q, "TURNIN"), 1, 0.85, 0.2)
 	ns.Sound("IG_QUEST_LIST_COMPLETE")
 	self:GiveQuestReward(q)
-	db.questProgress = 0
-	db.questIndex = self:QuestIndex() + 1
-	if ns.QUESTS[db.questIndex] then
-		db.quest = "ready"
+	self.db[t.progress] = 0
+	self.db[t.index] = self:QuestIndex(track) + 1
+	if t.list[self.db[t.index]] then
+		self.db[t.state] = "ready"
 	else
-		db.quest = "all_done"
+		self.db[t.state] = "all_done"
 		ns.UI:Log(ns:Trans("LID_Q_ALL_DONE"), 0.6, 0.6, 0.6)
 	end
 
 	ns.UI:Refresh()
+	return true
 end
 
 function G:Rest()

@@ -789,6 +789,21 @@ function UI:SetSceneBG(file)
 	if self.sceneBG then self.sceneBG:SetTexture(file) end
 end
 
+function ns.InWestfall()
+	return (G.db and G.db.level or 1) >= ns.WESTFALL_LEVEL
+end
+
+function UI:HuntBG()
+	if G.dungeon then return ns.BG_DUNGEON end
+	if ns.InWestfall() then return ns.BG_WESTFALL end
+	return ns.SCENE_SHORE
+end
+
+function UI:CampBG()
+	if ns.InWestfall() then return ns.BG_CAMP_WESTFALL end
+	return ns.BG_CAMP
+end
+
 function UI:SetCampProps(shown)
 	for _, prop in ipairs(self.campProps) do
 		SetShown(prop, shown)
@@ -840,7 +855,7 @@ end
 function UI:ShowCamp()
 	self:HidePanels()
 	self:HideHealer()
-	self:SetSceneBG(ns.BG_CAMP)
+	self:SetSceneBG(self:CampBG())
 	self.campActions:Show()
 	self.campLabel:Show()
 	self.brakil:Show()
@@ -865,7 +880,7 @@ function UI:EnterBattle(chained)
 	self:HidePanels()
 	self:HideHealer()
 	self.battleActions:Show()
-	self:SetSceneBG(G.dungeon and ns.BG_DUNGEON or ns.SCENE_SHORE)
+	self:SetSceneBG(self:HuntBG())
 	self.campLabel:Hide()
 	self.brakil:Hide()
 	self.brakilName:Hide()
@@ -1242,6 +1257,10 @@ function UI:Refresh()
 	local idle = not self.busy
 	local points = G:TalentPoints()
 	ns.Enable(self.huntButton, idle)
+	local westfall = ns.InWestfall()
+	local huntText = westfall and ns:Trans("LID_HUNT_WESTFALL") or ns:Trans("LID_HUNT")
+	self.huntButton:SetText(huntText)
+	ns.Tooltip(self.huntButton, huntText, westfall and ns:Trans("LID_TIP_HUNT_WESTFALL") or ns:Trans("LID_TIP_HUNT"))
 	ns.Enable(self.restButton, idle)
 	ns.Enable(self.talentsButton, idle)
 	ns.Enable(self.characterButton, idle)

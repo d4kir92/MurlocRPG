@@ -777,12 +777,24 @@ SLASH_MURLOCRPG6 = "/мурлок"
 SlashCmdList["MURLOCRPG"] = function() ns.UI:Toggle() end
 local loader = CreateFrame("Frame")
 loader:RegisterEvent("PLAYER_LOGIN")
-loader:SetScript("OnEvent", function(self)
+loader:SetScript("OnEvent", function(self, event)
+	if event == "PLAYER_REGEN_DISABLED" then
+		ns.UI:CombatHide()
+		return
+	end
+
+	if event == "PLAYER_REGEN_ENABLED" then
+		ns.UI:CombatShow()
+		return
+	end
+
 	self:UnregisterEvent("PLAYER_LOGIN")
 	ns:SetAddonOutput("MurlocRPG", 134169)
-	ns:SetVersion(134169, "0.6.4")
+	ns:SetVersion(134169, "0.7.0")
 	G:Init()
 	ns.UI:Create()
 	ns.UI:CreateMinimapIcon()
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	print(ns:Trans("LID_LOADED"))
 end)

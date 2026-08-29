@@ -17,6 +17,7 @@ local BATTLE_ICON = 62
 local QUEST_ICON_H = 44
 local BG_LEFT = 0.2404
 local BG_RIGHT = 0.7596
+local WINDOWS = {"Character", "Talents", "Inventory", "Shop", "Quests"}
 local function SetShown(frame, shown)
 	if shown then
 		frame:Show()
@@ -130,6 +131,49 @@ function UI:HideWindows()
 	ns.Inventory:Hide()
 	ns.Shop:Hide()
 	ns.Quests:Hide()
+end
+
+function UI:StashWindows()
+	local open
+	for _, key in ipairs(WINDOWS) do
+		local w = ns[key]
+		if w and w.frame and w.frame:IsShown() then
+			open = open or {}
+			open[#open + 1] = key
+		end
+	end
+
+	if open then self.stashedWindows = open end
+	self:HideWindows()
+end
+
+function UI:RestoreWindows()
+	local open = self.stashedWindows
+	self.stashedWindows = nil
+	if not open then return end
+	for _, key in ipairs(open) do
+		local w = ns[key]
+		if w and w.frame then
+			w.frame:Show()
+			w:Refresh()
+		end
+	end
+end
+
+function UI:CombatHide()
+	if self.combatHidden then return end
+	self.combatHidden = true
+	self.combatFrameShown = self.frame and self.frame:IsShown() or false
+	self:StashWindows()
+	if self.combatFrameShown then self.frame:Hide() end
+end
+
+function UI:CombatShow()
+	if not self.combatHidden then return end
+	self.combatHidden = false
+	if self.combatFrameShown and self.frame then self.frame:Show() end
+	self.combatFrameShown = false
+	self:RestoreWindows()
 end
 
 function UI:CreateMenuPage(parent)
@@ -826,6 +870,7 @@ end
 function UI:EnterWorld(fresh)
 	self.busy = false
 	self.transition = false
+	self.stashedWindows = nil
 	G.battle = nil
 	G.turnLocked = false
 	G.victory = false
@@ -982,6 +1027,7 @@ end
 function UI:Logout()
 	if self.busy or self.transition then return end
 	self:HidePanels()
+	self.stashedWindows = nil
 	self:HideWindows()
 	G.battle = nil
 	G.turnLocked = false

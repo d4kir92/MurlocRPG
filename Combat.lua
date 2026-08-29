@@ -265,7 +265,6 @@ function C:Defeat()
 	G.battle = nil
 	G.turnLocked = false
 	G.victory = false
-	G.dungeon = false
 	G:ResetStreak()
 	G.db.hp = 0
 	if G:Hardcore() then

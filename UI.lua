@@ -933,7 +933,7 @@ end
 function UI:ShowDead()
 	self:HidePanels()
 	self.deadActions:Show()
-	self:SetSceneBG(ns.SCENE_SHORE)
+	self:SetSceneBG(self:HuntBG())
 	self:FadeOutEnemy()
 	self.campLabel:Hide()
 	self.brakil:Hide()
@@ -1025,6 +1025,7 @@ function UI:DoResurrect()
 	self.murk:SetFlip(true)
 	self.murk:Play(ns.SPRITES.MURK_WALK, 16, true)
 	self.murk:MoveTo(-100, 1.3, function()
+		G.dungeon = false
 		UI.transition = false
 		UI.busy = false
 		UI:EnterMode("camp")

@@ -1,11 +1,12 @@
 ## Interface-Classic: 11509
 ## Interface-BCC: 20506
 ## Interface-Wrath: 30403
+## Interface-Titan: 38002
 ## Interface-Cata: 40402
 ## Interface-Mists: 50504
 ## Interface: 120100
 
-## Version: 0.7.1
+## Version: 0.7.2
 ## Title: Murloc RPG |T135994:16:16:0:0|t by |cff55d2ffD4KiR |T132115:16:16:0:0|t
 ## Notes: A small turn-based Murloc RPG inside World of Warcraft. Type /murloc
 ## Notes-deDE: Ein kleines rundenbasiertes Murloc-RPG in World of Warcraft. Tippe /murloc

@@ -87,8 +87,7 @@ function ns.RefreshTooltip(button)
 end
 
 function ns.AddonVersion()
-	local getter = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
-	local version = getter and getter("MurlocRPG", "Version")
+	local version = ns:GetAddonVersion()
 	return version and format("v%s", version) or ""
 end
 

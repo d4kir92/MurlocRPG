@@ -789,8 +789,8 @@ loader:SetScript("OnEvent", function(self, event)
 	end
 
 	self:UnregisterEvent("PLAYER_LOGIN")
-	ns:SetAddonOutput("MurlocRPG", 134169)
-	ns:SetVersion(134169, "0.7.6")
+	ns:SetAddonOutput()
+	ns:SetVersion()
 	G:Init()
 	ns.UI:Create()
 	ns.UI:CreateMinimapIcon()

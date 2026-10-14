@@ -1372,10 +1372,10 @@ end
 function UI:CreateMinimapIcon()
 	ns:CreateMinimapButton({
 		name = "MurlocRPG",
-		icon = 134169,
+		icon = ns:GetAddonIcon(),
 		dbtab = MurlocRPGGlobalDB,
 		dbkey = "minimapButton",
-		vTT = {{"|T134169:16:16:0:0|t " .. ns:Trans("LID_TITLE"), ns.AddonVersion()}, {ns:Trans("LID_LEFTCLICK"), ns:Trans("LID_MINIMAP_TIP")},},
+		vTT = {{format("|T%s:16:16:0:0|t ", ns:GetAddonIcon()) .. ns:Trans("LID_TITLE"),ns.AddonVersion()}, {ns:Trans("LID_LEFTCLICK"), ns:Trans("LID_MINIMAP_TIP")},},
 		funcL = function() UI:Toggle() end,
 	})
 end
